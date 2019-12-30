@@ -4,11 +4,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "users")
 public class User {
 
     private long id;
