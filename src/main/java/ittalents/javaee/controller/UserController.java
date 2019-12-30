@@ -1,38 +1,32 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.User;
+import ittalents.javaee.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
 public class UserController {
 
-    private static ArrayList<User> users = new ArrayList<>();
-//    static{
-//        list.add(new User("Pesho", 13, "petyr@abv.bg", "CSKArulz"));
-//        list.add(new User("Tosho", 23, "toshetyyy@abv.bg", "levskiilismyrt"));
-//    }
+    @Autowired
+    private UserService userService;
 
-    @GetMapping(value = "/hi")
-    public String sayHi() {
-        return "Hi from Spring";
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userService.getUsers();
     }
 
-    @GetMapping(value = "/users/all")
-    public ArrayList<User> getUsers() {
-        return users;
-    }
-
-    @PostMapping(value = "/users/add")
+    @PostMapping("/users")
     public void saveUser(@RequestBody User user) {
         if (validateUser(user)) {
-            System.out.println("A user has been added!");
-            // add to db
+            userService.addUser(user);
         } else {
+            // throw exception?
             System.out.println("Invalid email or password, try again!");
         }
     }
@@ -82,24 +76,14 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable("id") long id) {
-        for (User u : users) {
-            if (u.getId() == id) {
-                return u;
-            }
-        }
-        return null;
+    public User getUserById(@PathVariable() long id) {
+        return userService.getUserById(id);
     }
 
     @PutMapping("/users/{id}")
     public void editUser(@PathVariable long id, @RequestBody User user, HttpServletRequest req) {
         if (SessionManager.validateLogged(req)) {
-            for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).getId() == id) {
-                    users.set(i, user);
-                    break;
-                }
-            }
+            userService.editUser(id, user);
         } else {
             System.out.println(SessionManager.EXPIRED_SESSION);
         }
@@ -107,11 +91,6 @@ public class UserController {
 
     @DeleteMapping("/users/{id}")
     public void deleteUser(@PathVariable long id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                users.remove(user);
-                break;
-            }
-        }
+        userService.deleteUser(id);
     }
 }
