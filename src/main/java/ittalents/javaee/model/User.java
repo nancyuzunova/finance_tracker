@@ -20,9 +20,9 @@ public class User {
     private LocalDateTime lastLogin;
 
     public User(String firstName, String lastName, String password, String email) {
-        setFirstName(firstName);
-        setLastName(lastName);
-        setPassword(password);
-        setEmail(email);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
     }
 }
