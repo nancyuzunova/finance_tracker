@@ -10,18 +10,22 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@RestController
+@RestController("/users")
 public class UserController {
 
-    @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
     public List<User> getUsers() {
         return userService.getUsers();
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public void saveUser(@RequestBody User user) {
         if (validateUser(user)) {
             userService.addUser(user);
@@ -69,18 +73,18 @@ public class UserController {
         String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
-        if (matcher.find()) {
+            if (matcher.find()) {
             return true;
         }
         return false;
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable() long id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public void editUser(@PathVariable long id, @RequestBody User user, HttpServletRequest req) {
         if (SessionManager.validateLogged(req)) {
             userService.editUser(id, user);

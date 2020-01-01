@@ -6,16 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public List<User> getUsers() {
-        return userRepository.findAll();
+        List<User> users = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            users.add(user);
+        }
+        return users;
     }
 
     public User getUserById(long id) {
