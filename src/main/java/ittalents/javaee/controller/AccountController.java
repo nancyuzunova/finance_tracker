@@ -1,6 +1,6 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.Account;
+import ittalents.javaee.model.AccountDto;
 import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,33 +19,20 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public List<Account> getAllAccounts(@PathVariable @PositiveOrZero long userId) {
+    public List<AccountDto> getAllAccounts() {
         return accountService.getAllAccounts();
     }
 
-//    @GetMapping("/accounts/{id}")
-//    public Account getAccountById(@PathVariable long id) {
-//        for (Account account : accounts) {
-//            if (account.getId() == id) {
-//                return account;
-//            }
-//        }
-//        return null;
-//    }
+    @GetMapping("/accounts/{id}")
+    public AccountDto getAccountById(@PathVariable @PositiveOrZero long id) {
+        return accountService.getAccountById(id);
+    }
 
     @PutMapping("/accounts/{id}")
-    public void editAccount(@PathVariable int id, @RequestBody Account account) {
+    public void editAccount(@PathVariable int id, @RequestBody AccountDto accountDto) {
         // TODO
         // AccountService.editAccount(id, account); -> AccountRepository.save(account)
     }
 
-//    @DeleteMapping("/accounts/{id}")
-//    public void deleteAccount(@PathVariable int id) {
-//        for (Account account : accounts) {
-//            if (account.getId() == id) {
-//                accounts.remove(account);
-//                break;
-//            }
-//        }
-//    }
+    // delete account
 }

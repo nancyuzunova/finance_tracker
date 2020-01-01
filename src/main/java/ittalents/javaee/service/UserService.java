@@ -1,6 +1,8 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.model.AccountDto;
 import ittalents.javaee.model.User;
+import ittalents.javaee.model.UserDto;
 import ittalents.javaee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,39 +10,50 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     private UserRepository userRepository;
+    private AccountService accountService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AccountService accountService) {
         this.userRepository = userRepository;
+        this.accountService = accountService;
     }
 
-    public List<User> getUsers() {
-        List<User> users = new ArrayList<>();
+    public List<UserDto> getUsers() {
+        List<UserDto> users = new ArrayList<>();
         for (User user : userRepository.findAll()) {
-            users.add(user);
+            users.add(user.toDto());
         }
         return users;
     }
 
     public User getUserById(long id) {
-        return userRepository.findById(id).get();
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        throw new NoSuchElementException();
     }
 
-    public void addUser(User user) {
+    public void createUser(UserDto userDto) {
         LocalDateTime now = LocalDateTime.now();
+        User user = new User();
+        user.fromDto(userDto);
         user.setDateCreated(now);
+        // TODO - see how to update last login time
         user.setLastLogin(now);
         userRepository.save(user);
     }
 
-    public void editUser(long id, User user) {
-        // the repository takes a look if there is a User as row in db,
-        // sees its id and if there is row with that user, it overrides it?
+    public void updateUser(long id, UserDto userDto) {
+        User user = getUserById(id);
+        user.fromDto(userDto);
         userRepository.save(user);
     }
 
@@ -48,13 +61,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public boolean checkUser(long id, String email, String password) {
-        if (userRepository.existsById(id)) {
-            User user = getUserById(id);
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                return true;
-            }
-        }
-        return false;
+    public void addAccount(long id, AccountDto accountDto) {
+        accountService.createAccount(getUserById(id), accountDto);
     }
 }
