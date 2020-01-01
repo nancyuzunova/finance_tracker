@@ -27,7 +27,7 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     public User getUserById(@PathVariable @PositiveOrZero long id) {
         return userService.getUserById(id);
     }
@@ -37,12 +37,12 @@ public class UserController {
         userService.createUser(user);
     }
 
-    @PostMapping("/{id}/accounts")
+    @PostMapping("/users/{id}/accounts")
     public void addAccount(@PathVariable @PositiveOrZero long id, @RequestBody @Valid AccountDto accountDto) {
         this.userService.addAccount(id, accountDto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/users/{id}")
     public void updateUser(@PathVariable @PositiveOrZero long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
         // TODO see when to log user
         if (SessionManager.validateLogged(req)) {
