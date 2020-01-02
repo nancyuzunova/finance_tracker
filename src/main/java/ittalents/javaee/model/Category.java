@@ -4,9 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
+
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "categories")
 public class Category {
 
     public enum CategoryName {
@@ -15,16 +19,29 @@ public class Category {
         COMMUNICATION_PC, FINANCIAL_EXPENSES, INVESTMENTS, INCOME, OTHERS
     }
 
-    //    private static int uniqueId;
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Enumerated(EnumType.STRING)
     private CategoryName name;
     private String iconURL;
+
+    @Enumerated(EnumType.STRING)
     private Type type;
 
+    public void fromDto(CategoryDto categoryDto) {
+        this.name = categoryDto.getCategoryName();
+        this.iconURL = categoryDto.getIconURL();
+        this.type = categoryDto.getType();
+    }
 
-    public Category(CategoryName name, String iconURL, Type type) {
-        this.name = name;
-        this.iconURL = iconURL;
-        this.type = type;
+    public CategoryDto toDto() {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(id);
+        categoryDto.setCategoryName(name);
+        categoryDto.setIconURL(iconURL);
+        categoryDto.setType(type);
+        return categoryDto;
     }
 }
