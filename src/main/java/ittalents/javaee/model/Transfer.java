@@ -15,9 +15,16 @@ public class Transfer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
     private long id;
+
+    @Column(name = "from_account_id", nullable = false, updatable = false)
     private long fromAccountId;
+
+    @Column(name = "to_account_id", nullable = false, updatable = false)
     private long toAccountId;
+
+    @Column(name = "amount", nullable = false, updatable = false)
     private double amount;
 
     public void fromDto(TransferDto transferDto) {
