@@ -4,10 +4,8 @@ import ittalents.javaee.exceptions.AccountNotFoundException;
 import ittalents.javaee.exceptions.InvalidTransferOperationException;
 import ittalents.javaee.model.*;
 import ittalents.javaee.repository.AccountRepository;
-import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

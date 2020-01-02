@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -41,10 +42,13 @@ public class AccountController {
         this.accountService.deleteAccount(id);
     }
 
-    @PostMapping("/makeTransfer")
+    @PostMapping("/accounts/makeTransfer")
     public void makeTransfer(@RequestBody @Valid TransferDto transferDto) {
         this.accountService.makeTransfer(transferDto);
     }
 
-    // getTransfersByAccountId() ?
+    @GetMapping("/accounts/{id}/transfers")
+    public List<TransferDto> getTransfersByAccountId(@PathVariable @Positive long id) {
+        return accountService.getTransfersByAccountId(id);
+    }
 }

@@ -1,8 +1,7 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.AccountDto;
-import ittalents.javaee.model.User;
-import ittalents.javaee.model.UserDto;
+import ittalents.javaee.model.*;
+import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +15,12 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
+    private AccountService accountService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AccountService accountService) {
         this.userService = userService;
+        this.accountService = accountService;
     }
 
     @GetMapping("/users")
@@ -31,6 +32,16 @@ public class UserController {
     public User getUserById(@PathVariable @PositiveOrZero long id) {
         return userService.getUserById(id);
     }
+
+    @GetMapping("/users/{id}/accounts")
+    public List<AccountDto> getAccountsByUserId(@PathVariable long id) {
+        return this.accountService.getAllAccountsByUserId(id);
+    }
+
+//    @GetMapping("/users/{id}/transfers")
+//    public List<TransferDto> getAllTransfersByUserId(@PathVariable long id){
+//
+//    }
 
     @PostMapping("/users")
     public void createUser(@RequestBody @Valid UserDto user) {
