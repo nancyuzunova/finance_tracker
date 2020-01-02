@@ -1,28 +1,31 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.exceptions.AccountNotFoundException;
 import ittalents.javaee.exceptions.InvalidTransferOperationException;
 import ittalents.javaee.model.*;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
 
     private AccountRepository accountRepository;
-    private TransferRepository transferRepository;
+    private TransferService transferService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, TransferRepository transferRepository) {
+    public AccountService(AccountRepository accountRepository, TransferService transferService) {
         this.accountRepository = accountRepository;
-        this.transferRepository = transferRepository;
+        this.transferService = transferService;
     }
 
     public List<AccountDto> getAllAccounts() {
@@ -31,6 +34,10 @@ public class AccountService {
             accounts.add(account.toDto());
         }
         return accounts;
+    }
+
+    public List<AccountDto> getAllAccountsByUserId(long id) {
+        return accountRepository.findAllByUserId(id).stream().map(Account::toDto).collect(Collectors.toList());
     }
 
     public Account getAccountById(long id) {
@@ -54,8 +61,8 @@ public class AccountService {
     }
 
     public void makeTransfer(TransferDto transferDto) {
-        Account accountFrom = new Account();
-        Account accountTo = new Account();
+        Account accountFrom;
+        Account accountTo;
 
         try {
             accountFrom = getAccountById(transferDto.getFromAccountId());
@@ -71,19 +78,28 @@ public class AccountService {
                     "Account with id " + transferDto.getToAccountId() + " does not exists!");
         }
 
+        if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
+            throw new InvalidTransferOperationException("You can not make transfer to other users!");
+        }
+
         double amount = transferDto.getAmount();
         if (accountFrom.getBalance() >= amount) {
             // make transfer
             accountFrom.setBalance(accountFrom.getBalance() - amount);
             accountTo.setBalance(accountTo.getBalance() + amount);
 
-            Transfer transfer = new Transfer();
-            transfer.fromDto(transferDto);
-            this.transferRepository.save(transfer);
+            this.transferService.createTransfer(transferDto);
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
         } else {
             throw new InvalidTransferOperationException("Not enough balance!");
         }
+    }
+
+    public List<TransferDto> getTransfersByAccountId(long id) {
+        if (!accountRepository.existsById(id)) {
+            throw new AccountNotFoundException("Account with " + id + " does not exist!");
+        }
+        return transferService.getTransfersByAccountId(id);
     }
 }
