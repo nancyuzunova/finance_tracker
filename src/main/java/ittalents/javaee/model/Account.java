@@ -3,6 +3,7 @@ package ittalents.javaee.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @Entity
+@DynamicUpdate
 @Table(name = "accounts")
 public class Account {
 
@@ -24,6 +26,8 @@ public class Account {
     private User user;
     private LocalDateTime createdOn;
     private double balance;
+
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     public void fromDto(AccountDto accountDto) {

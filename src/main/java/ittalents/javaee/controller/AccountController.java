@@ -33,8 +33,7 @@ public class AccountController {
 
     @PutMapping("/accounts/{id}")
     public void updateAccount(@PathVariable int id, @RequestBody AccountDto accountDto) {
-        // TODO
-        // AccountService.editAccount(id, account); -> AccountRepository.save(account)
+         accountService.updateAccount(id, accountDto);
     }
 
     @DeleteMapping("/accounts/{id}")

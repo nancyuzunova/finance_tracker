@@ -54,6 +54,13 @@ public class AccountService {
         this.accountRepository.save(a);
     }
 
+    public void updateAccount(long id, AccountDto accountDto) {
+        // TODO how to update only some columns' values ???
+        Account account = accountRepository.getOne(id);
+        account.fromDto(accountDto);
+        this.accountRepository.save(account);
+    }
+
     public void deleteAccount(long id) {
         this.accountRepository.deleteById(id);
     }
