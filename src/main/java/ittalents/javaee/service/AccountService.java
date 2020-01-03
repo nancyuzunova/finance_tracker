@@ -119,11 +119,16 @@ public class AccountService {
         Account account = accountRepository.getOne(id);
         double amount = transactionDto.getAmount();
 
-        if (account.getBalance() < amount) {
+        if (account.getBalance() < amount && transactionDto.getType().name().equals(Type.EXPENSE.name())) {
             throw new InvalidTransactionOperationException("Not enough account balance!");
         }
 
-        account.setBalance(account.getBalance() - amount);
+        if (transactionDto.getType().name().equals(Type.EXPENSE.name())) {
+            account.setBalance(account.getBalance() - amount);
+        } else {
+            account.setBalance(account.getBalance() + amount);
+        }
+
         accountRepository.save(account);
         this.transactionService.createTransaction(account.getId(), transactionDto);
     }
