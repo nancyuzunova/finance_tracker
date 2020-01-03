@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.AccountDto;
+import ittalents.javaee.model.TransactionDto;
 import ittalents.javaee.model.TransferDto;
 import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,14 @@ public class AccountController {
         return accountService.getAccountById(id).toDto();
     }
 
+    @GetMapping("/accounts/{id}/transfers")
+    public List<TransferDto> getTransfersByAccountId(@PathVariable @Positive long id) {
+        return accountService.getTransfersByAccountId(id);
+    }
+
     @PutMapping("/accounts/{id}")
-    public void updateAccount(@PathVariable int id, @RequestBody AccountDto accountDto) {
-         accountService.updateAccount(id, accountDto);
+    public void updateAccount(@PathVariable long id, @RequestBody AccountDto accountDto) {
+        accountService.updateAccount(id, accountDto);
     }
 
     @DeleteMapping("/accounts/{id}")
@@ -46,8 +52,8 @@ public class AccountController {
         this.accountService.makeTransfer(transferDto);
     }
 
-    @GetMapping("/accounts/{id}/transfers")
-    public List<TransferDto> getTransfersByAccountId(@PathVariable @Positive long id) {
-        return accountService.getTransfersByAccountId(id);
+    @PostMapping("/accounts/{id}/makeTransaction")
+    public void makeTransaction(@PathVariable long id, @RequestBody @Valid TransactionDto transactionDto) {
+        accountService.makeTransaction(id, transactionDto);
     }
 }

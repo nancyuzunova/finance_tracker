@@ -1,6 +1,7 @@
 package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.AccountNotFoundException;
+import ittalents.javaee.exceptions.InvalidTransactionOperationException;
 import ittalents.javaee.exceptions.InvalidTransferOperationException;
 import ittalents.javaee.model.*;
 import ittalents.javaee.repository.AccountRepository;
@@ -19,11 +20,13 @@ public class AccountService {
 
     private AccountRepository accountRepository;
     private TransferService transferService;
+    private TransactionService transactionService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, TransferService transferService) {
+    public AccountService(AccountRepository accountRepository, TransferService transferService, TransactionService transactionService) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
+        this.transactionService = transactionService;
     }
 
     public List<AccountDto> getAllAccounts() {
@@ -103,8 +106,25 @@ public class AccountService {
 
     public List<TransferDto> getTransfersByAccountId(long id) {
         if (!accountRepository.existsById(id)) {
-            throw new AccountNotFoundException("Account with " + id + " does not exist!");
+            throw new AccountNotFoundException("Account with id = " + id + " does not exist!");
         }
         return transferService.getTransfersByAccountId(id);
+    }
+
+    public void makeTransaction(long id, TransactionDto transactionDto) {
+        if (!accountRepository.existsById(id)) {
+            throw new AccountNotFoundException("Account with id = " + id + " does not exist!");
+        }
+
+        Account account = accountRepository.getOne(id);
+        double amount = transactionDto.getAmount();
+
+        if (account.getBalance() < amount) {
+            throw new InvalidTransactionOperationException("Not enough account balance!");
+        }
+
+        account.setBalance(account.getBalance() - amount);
+        accountRepository.save(account);
+        this.transactionService.createTransaction(account.getId(), transactionDto);
     }
 }
