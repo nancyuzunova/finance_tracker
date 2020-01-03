@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -27,6 +28,9 @@ public class Transfer {
     @Column(name = "amount", nullable = false, updatable = false)
     private double amount;
 
+    @Column(name = "date", nullable = false, updatable = false)
+    private LocalDateTime date;
+
     public void fromDto(TransferDto transferDto) {
         this.fromAccountId = transferDto.getFromAccountId();
         this.toAccountId = transferDto.getToAccountId();
@@ -39,6 +43,7 @@ public class Transfer {
         transferDto.setFromAccountId(fromAccountId);
         transferDto.setToAccountId(toAccountId);
         transferDto.setAmount(amount);
+        transferDto.setDate(date);
         return transferDto;
     }
 }
