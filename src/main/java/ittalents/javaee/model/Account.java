@@ -32,7 +32,10 @@ public class Account {
 
     public void fromDto(AccountDto accountDto) {
         this.balance = accountDto.getBalance();
-        this.currency = accountDto.getCurrency();
+
+        if (accountDto.getCurrency() != null) {
+            this.currency = accountDto.getCurrency();
+        }
     }
 
     public AccountDto toDto() {

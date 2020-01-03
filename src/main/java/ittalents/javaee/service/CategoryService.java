@@ -33,6 +33,10 @@ public class CategoryService {
         this.categoryRepository.save(category);
     }
 
+    public Category getCategoryById(long id) {
+        return categoryRepository.getOne(id);
+    }
+
     public List<String> getCategoryIcons(long id) {
         List<String> categoryIcons = new ArrayList<>();
         // iconRepository.findIconsByCategoryId(id) ?

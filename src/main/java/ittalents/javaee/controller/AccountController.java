@@ -4,6 +4,7 @@ import ittalents.javaee.model.AccountDto;
 import ittalents.javaee.model.TransactionDto;
 import ittalents.javaee.model.TransferDto;
 import ittalents.javaee.service.AccountService;
+import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +17,12 @@ import java.util.List;
 public class AccountController {
 
     private AccountService accountService;
+    private TransactionService transactionService;
 
     @Autowired
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, TransactionService transactionService) {
         this.accountService = accountService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/accounts")
@@ -35,6 +38,11 @@ public class AccountController {
     @GetMapping("/accounts/{id}/transfers")
     public List<TransferDto> getTransfersByAccountId(@PathVariable @Positive long id) {
         return accountService.getTransfersByAccountId(id);
+    }
+
+    @GetMapping("/accounts/{id}/transactions")
+    public List<TransactionDto> getTransactionsByAccountId(@PathVariable long id) {
+        return transactionService.getTransactionsByAccountId(id);
     }
 
     @PutMapping("/accounts/{id}")
