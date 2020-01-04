@@ -4,14 +4,19 @@ import ittalents.javaee.model.*;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.List;
 
 @RestController
+@Validated
 public class UserController {
 
     private UserService userService;
@@ -24,18 +29,21 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<UserDto> getUsers() {
-        return userService.getUsers();
+    public ResponseEntity getUsers() {
+        List<UserDto> users = userService.getUsers();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable @PositiveOrZero long id) {
-        return userService.getUserById(id);
+    public ResponseEntity getUserById(@PathVariable @Positive long id) {
+        UserDto user = userService.getUserById(id).toDto();
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/users/{id}/accounts")
-    public List<AccountDto> getAccountsByUserId(@PathVariable long id) {
-        return this.accountService.getAllAccountsByUserId(id);
+    public ResponseEntity getAccountsByUserId(@PathVariable @Positive long id) {
+        List<AccountDto> accounts = this.accountService.getAllAccountsByUserId(id);
+        return ResponseEntity.ok(accounts);
     }
 
 //    @GetMapping("/users/{id}/transfers")
@@ -44,27 +52,32 @@ public class UserController {
 //    }
 
     @PostMapping("/users")
-    public void createUser(@RequestBody @Valid UserDto user) {
-        userService.createUser(user);
+    public ResponseEntity createUser(@RequestBody @Valid UserDto user) {
+        URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
+        return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/users/{id}/accounts")
-    public void addAccount(@PathVariable @PositiveOrZero long id, @RequestBody @Valid AccountDto accountDto) {
-        this.userService.addAccount(id, accountDto);
+    public ResponseEntity addAccount(@PathVariable @Positive long id, @RequestBody @Valid AccountDto accountDto) {
+        URI location = URI.create(String.format("/accounts/%d", this.userService.addAccount(id, accountDto)));
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/users/{id}")
-    public void updateUser(@PathVariable @PositiveOrZero long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
+    public ResponseEntity updateUser(@PathVariable @Positive long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
         // TODO see when to log user
         if (SessionManager.validateLogged(req)) {
-            userService.updateUser(id, userDto);
+            UserDto user = userService.updateUser(id, userDto).toDto();
+            return ResponseEntity.ok(user);
         } else {
             System.out.println(SessionManager.EXPIRED_SESSION);
+            return ResponseEntity.status(HttpStatus.valueOf(440)).build(); // 440 Login Time-out
         }
     }
 
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable long id) {
+    public ResponseEntity deleteUser(@PathVariable @Positive long id) {
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

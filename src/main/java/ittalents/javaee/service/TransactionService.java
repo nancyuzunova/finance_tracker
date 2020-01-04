@@ -2,7 +2,7 @@ package ittalents.javaee.service;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
-import ittalents.javaee.exceptions.TransactionNotFoundException;
+import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.Category;
 import ittalents.javaee.model.Transaction;
 import ittalents.javaee.model.TransactionDto;
@@ -29,12 +29,12 @@ public class TransactionService {
         this.categoryService = categoryService;
     }
 
-    public void createTransaction(long accountId, TransactionDto transactionDto) {
+    public long createTransaction(long accountId, TransactionDto transactionDto) {
         Transaction transaction = new Transaction();
         transaction.fromDto(transactionDto);
         transaction.setDate(LocalDateTime.now());
         transaction.setAccountId(accountId);
-        this.transactionRepository.save(transaction);
+        return this.transactionRepository.save(transaction).getId();
     }
 
     public List<TransactionDto> getTransactionsByAccountId(long id) {
@@ -45,7 +45,7 @@ public class TransactionService {
         Optional<Transaction> transactionById = transactionRepository.findById(id);
 
         if (!transactionById.isPresent()) {
-            throw new TransactionNotFoundException("Transaction with id = " + id + " does not exist!");
+            throw new ElementNotFoundException("Transaction with id = " + id + " does not exist!");
         }
 
         return transactionById.get();

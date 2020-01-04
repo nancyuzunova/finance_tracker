@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.AccountDto;
 import ittalents.javaee.model.User;
 import ittalents.javaee.model.UserDto;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -35,33 +35,35 @@ public class UserService {
 
     public User getUserById(long id) {
         Optional<User> user = userRepository.findById(id);
+
         if (user.isPresent()) {
             return user.get();
         }
-        throw new NoSuchElementException();
+
+        throw new ElementNotFoundException("User with id = " + id + " does not exist!");
     }
 
-    public void createUser(UserDto userDto) {
+    public long createUser(UserDto userDto) {
         LocalDateTime now = LocalDateTime.now();
         User user = new User();
         user.fromDto(userDto);
         user.setDateCreated(now);
         // TODO - see how to update last login time
         user.setLastLogin(now);
-        userRepository.save(user);
+        return userRepository.save(user).getId();
     }
 
-    public void updateUser(long id, UserDto userDto) {
+    public User updateUser(long id, UserDto userDto) {
         User user = getUserById(id);
         user.fromDto(userDto);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public void deleteUser(long id) {
         userRepository.deleteById(id);
     }
 
-    public void addAccount(long id, AccountDto accountDto) {
-        accountService.createAccount(getUserById(id), accountDto);
+    public long addAccount(long id, AccountDto accountDto) {
+        return accountService.createAccount(getUserById(id), accountDto);
     }
 }

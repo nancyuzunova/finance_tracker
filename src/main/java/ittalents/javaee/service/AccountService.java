@@ -1,8 +1,7 @@
 package ittalents.javaee.service;
 
-import ittalents.javaee.exceptions.AccountNotFoundException;
-import ittalents.javaee.exceptions.InvalidTransactionOperationException;
-import ittalents.javaee.exceptions.InvalidTransferOperationException;
+import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.*;
 import ittalents.javaee.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,51 +42,58 @@ public class AccountService {
 
     public Account getAccountById(long id) {
         Optional<Account> account = accountRepository.findById(id);
+
         if (account.isPresent()) {
             return account.get();
         }
-        throw new NoSuchElementException();
+
+        throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
     }
 
-    public void createAccount(User user, AccountDto accountDto) {
+    public long createAccount(User user, AccountDto accountDto) {
         Account a = new Account();
         a.fromDto(accountDto);
         a.setCreatedOn(LocalDateTime.now());
         a.setUser(user);
-        this.accountRepository.save(a);
+        return this.accountRepository.save(a).getId();
     }
 
-    public void updateAccount(long id, AccountDto accountDto) {
-        // TODO how to update only some columns' values ???
-        Account account = accountRepository.getOne(id);
-        account.fromDto(accountDto);
-        this.accountRepository.save(account);
+    public Account changeAccountCurrency(long id, Currency currency) {
+        Optional<Account> accountById = accountRepository.findById(id);
+
+        if (!accountById.isPresent()) {
+            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
+        }
+
+        Account account = accountById.get();
+        account.setCurrency(currency);
+        return this.accountRepository.save(account);
     }
 
     public void deleteAccount(long id) {
         this.accountRepository.deleteById(id);
     }
 
-    public void makeTransfer(TransferDto transferDto) {
+    public long makeTransfer(TransferDto transferDto) {
         Account accountFrom;
         Account accountTo;
 
         try {
             accountFrom = getAccountById(transferDto.getFromAccountId());
         } catch (NoSuchElementException e) {
-            throw new InvalidTransferOperationException(
+            throw new InvalidOperationException(
                     "Account with id " + transferDto.getFromAccountId() + " does not exists!");
         }
 
         try {
             accountTo = getAccountById(transferDto.getToAccountId());
         } catch (NoSuchElementException e) {
-            throw new InvalidTransferOperationException(
+            throw new InvalidOperationException(
                     "Account with id " + transferDto.getToAccountId() + " does not exists!");
         }
 
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
-            throw new InvalidTransferOperationException("You can not make transfer to other users!");
+            throw new InvalidOperationException("You can not make transfer to other users!");
         }
 
         double amount = transferDto.getAmount();
@@ -96,40 +102,42 @@ public class AccountService {
             accountFrom.setBalance(accountFrom.getBalance() - amount);
             accountTo.setBalance(accountTo.getBalance() + amount);
 
-            this.transferService.createTransfer(transferDto);
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
+            return this.transferService.createTransfer(transferDto);
         } else {
-            throw new InvalidTransferOperationException("Not enough balance!");
+            throw new InvalidOperationException("Not enough balance!");
         }
     }
 
     public List<TransferDto> getTransfersByAccountId(long id) {
         if (!accountRepository.existsById(id)) {
-            throw new AccountNotFoundException("Account with id = " + id + " does not exist!");
+            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
         }
         return transferService.getTransfersByAccountId(id);
     }
 
-    public void makeTransaction(long id, TransactionDto transactionDto) {
-        if (!accountRepository.existsById(id)) {
-            throw new AccountNotFoundException("Account with id = " + id + " does not exist!");
+    public long makeTransaction(long id, TransactionDto transactionDto) {
+        Optional<Account> accountById = accountRepository.findById(id);
+
+        if (!accountById.isPresent()) {
+            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
         }
 
-        Account account = accountRepository.getOne(id);
+        Account account = accountById.get();
         double amount = transactionDto.getAmount();
 
-        if (account.getBalance() < amount && transactionDto.getType().name().equals(Type.EXPENSE.name())) {
-            throw new InvalidTransactionOperationException("Not enough account balance!");
+        if (Type.EXPENSE.equals(transactionDto.getType()) && account.getBalance() < amount) {
+            throw new InvalidOperationException("Not enough account balance!");
         }
 
-        if (transactionDto.getType().name().equals(Type.EXPENSE.name())) {
+        if (Type.EXPENSE.equals(transactionDto.getType())) {
             account.setBalance(account.getBalance() - amount);
         } else {
             account.setBalance(account.getBalance() + amount);
         }
 
         accountRepository.save(account);
-        this.transactionService.createTransaction(account.getId(), transactionDto);
+        return this.transactionService.createTransaction(account.getId(), transactionDto);
     }
 }

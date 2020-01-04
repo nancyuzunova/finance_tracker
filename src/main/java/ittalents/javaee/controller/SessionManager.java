@@ -22,7 +22,7 @@ public class SessionManager {
     }
 
     public static void logUser(HttpServletRequest req) {
-        // session.setAttribute(req, user ? -> serializable User ?)
+        // TODO session.setAttribute(req, user ? -> serializable User ?)
         HttpSession session = req.getSession();
         session.setMaxInactiveInterval(60 * 10); // 10 minutes
         session.setAttribute(LOGGED, true);

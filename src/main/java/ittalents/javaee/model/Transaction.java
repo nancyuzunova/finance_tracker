@@ -38,7 +38,6 @@ public class Transaction {
         transactionDto.setType(type);
         transactionDto.setCategoryId(categoryId);
         transactionDto.setAmount(amount);
-        transactionDto.setAccountId(accountId);
         return transactionDto;
     }
 }

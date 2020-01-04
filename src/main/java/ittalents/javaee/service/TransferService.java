@@ -21,11 +21,11 @@ public class TransferService {
         this.transferRepository = transferRepository;
     }
 
-    public void createTransfer(TransferDto transferDto) {
+    public long createTransfer(TransferDto transferDto) {
         Transfer transfer = new Transfer();
         transfer.fromDto(transferDto);
         transfer.setDate(LocalDateTime.now());
-        transferRepository.save(transfer);
+        return transferRepository.save(transfer).getId();
     }
 
     public List<TransferDto> getTransfersByAccountId(long id) {

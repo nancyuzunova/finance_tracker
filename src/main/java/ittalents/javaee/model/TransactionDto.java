@@ -25,5 +25,4 @@ public class TransactionDto {
     @NotNull
     @Positive
     private double amount;
-    private long accountId;
 }
