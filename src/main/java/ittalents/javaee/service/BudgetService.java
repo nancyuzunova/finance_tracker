@@ -3,6 +3,7 @@ package ittalents.javaee.service;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.Budget;
 import ittalents.javaee.model.BudgetDto;
+import ittalents.javaee.model.User;
 import ittalents.javaee.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,5 +76,11 @@ public class BudgetService {
             budgetDtos.add(budget.toDto());
         }
         return budgetDtos;
+    }
+
+    public long createBudget(User userById, BudgetDto budgetDto) {
+        Budget budget = new Budget();
+        budget.fromDto(budgetDto);
+        return this.budgetRepository.save(budget).getId();
     }
 }
