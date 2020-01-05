@@ -1,50 +1,76 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.Account;
+import ittalents.javaee.model.*;
+import ittalents.javaee.service.AccountService;
+import ittalents.javaee.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.List;
 
 @RestController
+@Validated
 public class AccountController {
 
-    private static List<Account> accounts = new ArrayList<>();
+    private AccountService accountService;
+    private TransactionService transactionService;
 
-    @GetMapping("/accounts/{userId}")
-    public List<Account> getAllAccounts(@PathVariable long userId) {
-        List<Account> userAccounts = new ArrayList<>();
-        for (Account account : accounts) {
-            if (account.getUser().getId() == userId) {
-                userAccounts.add(account);
-            }
-        }
-        return userAccounts;
+    @Autowired
+    public AccountController(AccountService accountService, TransactionService transactionService) {
+        this.accountService = accountService;
+        this.transactionService = transactionService;
+    }
+
+    @GetMapping("/accounts")
+    public ResponseEntity getAllAccounts() {
+        List<AccountDto> accounts = accountService.getAllAccounts();
+        return ResponseEntity.ok(accounts);
     }
 
     @GetMapping("/accounts/{id}")
-    public Account getAccountById(@PathVariable long id) {
-        for (Account account : accounts) {
-            if (account.getId() == id) {
-                return account;
-            }
-        }
-        return null;
+    public ResponseEntity getAccountById(@PathVariable @Positive long id) {
+        AccountDto accountDto = accountService.getAccountById(id).toDto();
+        return ResponseEntity.ok(accountDto);
+    }
+
+    @GetMapping("/accounts/{id}/transfers")
+    public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long id) {
+        List<TransferDto> accounts = accountService.getTransfersByAccountId(id);
+        return ResponseEntity.ok(accounts);
+    }
+
+    @GetMapping("/accounts/{id}/transactions")
+    public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long id) {
+        List<TransactionDto> transactions = transactionService.getTransactionsByAccountId(id);
+        return ResponseEntity.ok(transactions);
     }
 
     @PutMapping("/accounts/{id}")
-    public void editAccount(@PathVariable int id, @RequestBody Account account) {
-        // TODO
-        // AccountService.editAccount(id, account); -> AccountRepository.save(account)
+    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long id, @RequestParam Currency currency) {
+        AccountDto account = accountService.changeAccountCurrency(id, currency).toDto();
+        return ResponseEntity.ok(account);
     }
 
     @DeleteMapping("/accounts/{id}")
-    public void deleteAccount(@PathVariable int id) {
-        for (Account account : accounts) {
-            if (account.getId() == id) {
-                accounts.remove(account);
-                break;
-            }
-        }
+    public ResponseEntity deleteAccount(@PathVariable @Positive long id) {
+        this.accountService.deleteAccount(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/accounts/makeTransfer")
+    public ResponseEntity makeTransfer(@RequestBody @Valid TransferDto transferDto) {
+        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(transferDto)));
+        return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping("/accounts/{id}/makeTransaction")
+    public ResponseEntity makeTransaction(@PathVariable @Positive long id, @RequestBody @Valid TransactionDto transactionDto) {
+        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(id, transactionDto)));
+        return ResponseEntity.created(location).build();
     }
 }

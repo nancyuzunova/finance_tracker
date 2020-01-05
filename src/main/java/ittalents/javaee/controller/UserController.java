@@ -1,96 +1,83 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.User;
+import ittalents.javaee.model.*;
+import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
+@Validated
 public class UserController {
 
-    @Autowired
     private UserService userService;
+    private AccountService accountService;
+
+    @Autowired
+    public UserController(UserService userService, AccountService accountService) {
+        this.userService = userService;
+        this.accountService = accountService;
+    }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return userService.getUsers();
-    }
-
-    @PostMapping("/users")
-    public void saveUser(@RequestBody User user) {
-        if (validateUser(user)) {
-            userService.addUser(user);
-        } else {
-            // throw exception?
-            System.out.println("Invalid email or password, try again!");
-        }
-    }
-
-    private boolean validateUser(User user) {
-        if (user.getFirstName() == null || user.getFirstName().isEmpty()
-                || user.getLastName() == null || user.getLastName().isEmpty()) {
-            return false;
-        }
-
-        boolean validEmail = validateEmail(user.getEmail());
-        boolean validPassword = validatePassword(user.getPassword());
-
-        if (validEmail && validPassword) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validateEmail(String email) {
-        // https://emailregex.com/
-        String regex = "(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b" +
-                "\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9]" +
-                "(?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" +
-                "\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f" +
-                "\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(email);
-        if (matcher.find()) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validatePassword(String password) {
-        /** https://stackoverflow.com/questions/3802192/regexp-java-for-password-validation
-         * password must satisfy the following requirements:
-         * at least one digit, lower case, upper case, no whitespaces, minimum 8 symbols long
-         */
-        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(password);
-        if (matcher.find()) {
-            return true;
-        }
-        return false;
+    public ResponseEntity getUsers() {
+        List<UserDto> users = userService.getUsers();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable() long id) {
-        return userService.getUserById(id);
+    public ResponseEntity getUserById(@PathVariable @Positive long id) {
+        UserDto user = userService.getUserById(id).toDto();
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/users/{id}/accounts")
+    public ResponseEntity getAccountsByUserId(@PathVariable @Positive long id) {
+        List<AccountDto> accounts = this.accountService.getAllAccountsByUserId(id);
+        return ResponseEntity.ok(accounts);
+    }
+
+//    @GetMapping("/users/{id}/transfers")
+//    public List<TransferDto> getAllTransfersByUserId(@PathVariable long id){
+//
+//    }
+
+    @PostMapping("/users")
+    public ResponseEntity createUser(@RequestBody @Valid UserDto user) {
+        URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
+        return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping("/users/{id}/accounts")
+    public ResponseEntity addAccount(@PathVariable @Positive long id, @RequestBody @Valid AccountDto accountDto) {
+        URI location = URI.create(String.format("/accounts/%d", this.userService.addAccount(id, accountDto)));
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/users/{id}")
-    public void editUser(@PathVariable long id, @RequestBody User user, HttpServletRequest req) {
+    public ResponseEntity updateUser(@PathVariable @Positive long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
+        // TODO see when to log user
         if (SessionManager.validateLogged(req)) {
-            userService.editUser(id, user);
+            UserDto user = userService.updateUser(id, userDto).toDto();
+            return ResponseEntity.ok(user);
         } else {
             System.out.println(SessionManager.EXPIRED_SESSION);
+            return ResponseEntity.status(HttpStatus.valueOf(440)).build(); // 440 Login Time-out
         }
     }
 
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable long id) {
+    public ResponseEntity deleteUser(@PathVariable @Positive long id) {
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -4,19 +4,46 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "transfers")
 public class Transfer {
 
-    private int id;
-    private int fromAccountId;
-    private int toAccountId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private long id;
+
+    @Column(name = "from_account_id", nullable = false, updatable = false)
+    private long fromAccountId;
+
+    @Column(name = "to_account_id", nullable = false, updatable = false)
+    private long toAccountId;
+
+    @Column(name = "amount", nullable = false, updatable = false)
     private double amount;
 
-    public Transfer(int fromAccountId, int toAccountId, double amount) {
-        this.fromAccountId = fromAccountId;
-        this.toAccountId = toAccountId;
-        this.amount = amount;
+    @Column(name = "date", nullable = false, updatable = false)
+    private LocalDateTime date;
+
+    public void fromDto(TransferDto transferDto) {
+        this.fromAccountId = transferDto.getFromAccountId();
+        this.toAccountId = transferDto.getToAccountId();
+        this.amount = transferDto.getAmount();
+    }
+
+    public TransferDto toDto() {
+        TransferDto transferDto = new TransferDto();
+        transferDto.setId(id);
+        transferDto.setFromAccountId(fromAccountId);
+        transferDto.setToAccountId(toAccountId);
+        transferDto.setAmount(amount);
+        transferDto.setDate(date);
+        return transferDto;
     }
 }
