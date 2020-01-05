@@ -68,4 +68,12 @@ public class BudgetService {
         }
         return budgetDtos;
     }
+
+    public List<BudgetDto> getBudgetsAfter(LocalDate date) {
+        List<BudgetDto> budgetDtos = new ArrayList<>();
+        for(Budget budget : this.budgetRepository.findAllByFromDateAfter(date)){
+            budgetDtos.add(budget.toDto());
+        }
+        return budgetDtos;
+    }
 }

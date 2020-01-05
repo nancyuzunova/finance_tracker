@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -56,6 +55,12 @@ public class BudgetController {
     @GetMapping(value = "/budgets/before/{date}")
     public ResponseEntity getBudgetsByDateBefore(@PathVariable LocalDate date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsBefore(date);
+        return ResponseEntity.ok(budgetDtos);
+    }
+
+    @GetMapping(value = "/budgets/after/{date}")
+    public ResponseEntity getBudgetsByDateAfter(@PathVariable LocalDate date){
+        List<BudgetDto> budgetDtos = budgetService.getBudgetsAfter(date);
         return ResponseEntity.ok(budgetDtos);
     }
 }
