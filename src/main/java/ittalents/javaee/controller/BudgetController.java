@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.BudgetDto;
+import ittalents.javaee.model.Category;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +63,23 @@ public class BudgetController {
     public ResponseEntity getBudgetsByDateAfter(@PathVariable LocalDate date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsAfter(date);
         return ResponseEntity.ok(budgetDtos);
+    }
+
+    @PutMapping(value = "/budgets/{id}/category/change")
+    public ResponseEntity changeCategory(@PathVariable @Positive long id, @RequestParam Category category){
+        BudgetDto dto = budgetService.changeBudgetCategory(id, category).toDto();
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping(value = "/budgets/{id}/title")
+    public ResponseEntity editTitle(@PathVariable @Positive long id, @RequestParam String newTitle){
+        BudgetDto dto = budgetService.changeTitle(id, newTitle).toDto();
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping(value = "/budgets/{id}/edit/from/{from}/to/{to}")
+    public ResponseEntity updatePeriod(@PathVariable @Positive long id, @PathVariable LocalDate from, @PathVariable LocalDate to){
+        BudgetDto dto = budgetService.changePeriod(id, from, to).toDto();
+        return ResponseEntity.ok(dto);
     }
 }

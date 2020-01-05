@@ -3,6 +3,7 @@ package ittalents.javaee.service;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.Budget;
 import ittalents.javaee.model.BudgetDto;
+import ittalents.javaee.model.Category;
 import ittalents.javaee.model.User;
 import ittalents.javaee.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,5 +90,36 @@ public class BudgetService {
             budgets.add(budget.toDto());
         }
         return budgets;
+    }
+
+    public Budget changeBudgetCategory(long id, Category category) {
+        Optional<Budget> budget = this.budgetRepository.findById(id);
+        if(!budget.isPresent()){
+            throw new ElementNotFoundException("Budget with id "+ id + " does NOT exists");
+        }
+        Budget b = budget.get();
+        b.setCategory(category);
+        return this.budgetRepository.save(b);
+    }
+
+    public Budget changeTitle(long id, String newTitle) {
+        Optional<Budget> budget = this.budgetRepository.findById(id);
+        if(!budget.isPresent()){
+            throw new ElementNotFoundException("Budget with id "+ id + " does NOT exists");
+        }
+        Budget b = budget.get();
+        b.setTitle(newTitle);
+        return this.budgetRepository.save(b);
+    }
+
+    public Budget changePeriod(long id, LocalDate from, LocalDate to) {
+        Optional<Budget> budget = this.budgetRepository.findById(id);
+        if(!budget.isPresent()){
+            throw new ElementNotFoundException("Budget with id "+ id + " does NOT exists");
+        }
+        Budget b = budget.get();
+        b.setFromDate(from);
+        b.setToDate(to);
+        return this.budgetRepository.save(b);
     }
 }
