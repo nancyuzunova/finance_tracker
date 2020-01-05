@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,5 +81,13 @@ public class BudgetService {
         Budget budget = new Budget();
         budget.fromDto(budgetDto);
         return this.budgetRepository.save(budget).getId();
+    }
+
+    public List<BudgetDto> getBudgetsByAccountId(long id) {
+        List<BudgetDto> budgets = new ArrayList<>();
+        for(Budget budget : this.budgetRepository.findAllByAccountId(id)){
+            budgets.add(budget.toDto());
+        }
+        return budgets;
     }
 }

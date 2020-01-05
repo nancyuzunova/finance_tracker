@@ -9,6 +9,10 @@ import java.util.List;
 public interface BudgetRepository extends CrudRepository<Budget, Long> {
 
     List<Budget> findAllByFromDateBetween(LocalDate from, LocalDate to);
+
     List<Budget> findAllByFromDateAfter(LocalDate after);
+
     List<Budget> findAllByFromDateBefore(LocalDate before);
+
+    List<Budget> findAllByAccountId(long id);
 }

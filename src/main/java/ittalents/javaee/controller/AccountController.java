@@ -2,6 +2,7 @@ package ittalents.javaee.controller;
 
 import ittalents.javaee.model.*;
 import ittalents.javaee.service.AccountService;
+import ittalents.javaee.service.BudgetService;
 import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,13 @@ public class AccountController {
 
     private AccountService accountService;
     private TransactionService transactionService;
+    private BudgetService budgetService;
 
     @Autowired
-    public AccountController(AccountService accountService, TransactionService transactionService) {
+    public AccountController(AccountService accountService, TransactionService transactionService, BudgetService budgetService) {
         this.accountService = accountService;
         this.transactionService = transactionService;
+        this.budgetService = budgetService;
     }
 
     @GetMapping("/accounts")
@@ -48,6 +51,12 @@ public class AccountController {
     public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long id) {
         List<TransactionDto> transactions = transactionService.getTransactionsByAccountId(id);
         return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping(value = "/accounts/{id}/budgets")
+    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long id){
+        List<BudgetDto> budgets = budgetService.getBudgetsByAccountId(id);
+        return ResponseEntity.ok(budgets);
     }
 
     @PutMapping("/accounts/{id}")
