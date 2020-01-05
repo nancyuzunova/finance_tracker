@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDate;
 
 @Getter
@@ -11,7 +15,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Budget {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private long id;
+
     private LocalDate fromDate;
     private LocalDate toDate;
     private Category category;
@@ -27,4 +35,28 @@ public class Budget {
         this.amount = amount;
         this.accountId = accountId;
     }
+
+    public void fromDto(BudgetDto dto){
+        this.accountId = dto.getAccountId();
+        this.amount = dto.getAmount();
+        if(dto.getCategory() != null) {
+            this.category = dto.getCategory();
+        }
+        this.fromDate = dto.getFromDate();
+        this.toDate = dto.getToDate();
+        this.title = dto.getTitle();
+    }
+
+    public BudgetDto toDto() {
+        BudgetDto dto = new BudgetDto();
+        dto.setId(id);
+        dto.setAccountId(accountId);
+        dto.setAmount(amount);
+        dto.setCategory(category);
+        dto.setFromDate(fromDate);
+        dto.setToDate(toDate);
+        dto.setTitle(title);
+        return dto;
+    }
 }
+
