@@ -55,15 +55,15 @@ public class BudgetService {
         return this.budgetRepository.save(budget1);
     }
 
-    public List<BudgetDto> getBudgetsByDate(LocalDate from_date, LocalDate to_date) {
+    public List<BudgetDto> getBudgetsByDate(Date fromDate, Date toDate) {
         List<BudgetDto> budgetDtos = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByFromDateBetween(from_date, to_date)) {
+        for (Budget budget : this.budgetRepository.findAllByFromDateBetween(fromDate, toDate)) {
             budgetDtos.add(budget.toDto());
         }
         return budgetDtos;
     }
 
-    public List<BudgetDto> getBudgetsBefore(LocalDate date) {
+    public List<BudgetDto> getBudgetsBefore(Date date) {
         List<BudgetDto> budgetDtos = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByFromDateBefore(date)) {
             budgetDtos.add(budget.toDto());
@@ -71,7 +71,7 @@ public class BudgetService {
         return budgetDtos;
     }
 
-    public List<BudgetDto> getBudgetsAfter(LocalDate date) {
+    public List<BudgetDto> getBudgetsAfter(Date date) {
         List<BudgetDto> budgetDtos = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByFromDateAfter(date)) {
             budgetDtos.add(budget.toDto());

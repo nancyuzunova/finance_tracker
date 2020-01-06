@@ -48,20 +48,20 @@ public class BudgetController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping(value = "/budgets/{from_date}-{to_date}")
-    public ResponseEntity getBudgetsByDateBetween(@PathVariable LocalDate from_date, @PathVariable LocalDate to_date){
-        List<BudgetDto> budgetDtos = budgetService.getBudgetsByDate(from_date, to_date);
+    @GetMapping(value = "/budgets/{fromDate}-{toDate}")
+    public ResponseEntity getBudgetsByDateBetween(@PathVariable Date fromDate, @PathVariable Date toDate){
+        List<BudgetDto> budgetDtos = budgetService.getBudgetsByDate(fromDate, toDate);
         return ResponseEntity.ok(budgetDtos);
     }
 
     @GetMapping(value = "/budgets/before/{date}")
-    public ResponseEntity getBudgetsByDateBefore(@PathVariable LocalDate date){
+    public ResponseEntity getBudgetsByDateBefore(@PathVariable Date date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsBefore(date);
         return ResponseEntity.ok(budgetDtos);
     }
 
     @GetMapping(value = "/budgets/after/{date}")
-    public ResponseEntity getBudgetsByDateAfter(@PathVariable LocalDate date){
+    public ResponseEntity getBudgetsByDateAfter(@PathVariable Date date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsAfter(date);
         return ResponseEntity.ok(budgetDtos);
     }
