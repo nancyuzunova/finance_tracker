@@ -19,10 +19,19 @@ public class Budget {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
+    @Column(name = "from_date", nullable = false)
     private LocalDate fromDate;
+
+    @Column(name = "to_date", nullable = false)
     private LocalDate toDate;
+
+    @Column(name = "category", nullable = false)
     private Category category;
+
+    @Column(name = "amount", nullable = false)
     private double amount;
+
+    @Column(name = "account_id", nullable = false)
     private int accountId;
     private String title;
 
@@ -35,10 +44,10 @@ public class Budget {
         this.accountId = accountId;
     }
 
-    public void fromDto(BudgetDto dto){
+    public void fromDto(BudgetDto dto) {
         this.accountId = dto.getAccountId();
         this.amount = dto.getAmount();
-        if(dto.getCategory() != null) {
+        if (dto.getCategory() != null) {
             this.category = dto.getCategory();
         }
         this.fromDate = dto.getFromDate();
