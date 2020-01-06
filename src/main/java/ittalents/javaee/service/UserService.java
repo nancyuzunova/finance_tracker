@@ -49,8 +49,7 @@ public class UserService {
         User user = new User();
         user.fromDto(userDto);
         user.setDateCreated(now);
-        // TODO - see how to update last login time
-        user.setLastLogin(now);
+        user.setLastLogin(LocalDateTime.now());
         return userRepository.save(user).getId();
     }
 
@@ -75,6 +74,7 @@ public class UserService {
     public UserDto logUser(String email, String password) {
         User user = userRepository.findByEmailAndPassword(email, password);
         if(user != null){
+            user.setLastLogin(LocalDateTime.now());
             return user.toDto();
         }
         throw new ElementNotFoundException("User could NOT be found. Please check your credentials");
