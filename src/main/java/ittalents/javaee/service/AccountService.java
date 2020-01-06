@@ -69,6 +69,10 @@ public class AccountService {
         }
 
         Account account = accountById.get();
+
+        double balance = account.getBalance();
+        double convertedBalance = CurrencyConverter.convert(account.getCurrency(), currency, balance);
+        account.setBalance(convertedBalance);
         account.setCurrency(currency);
         return this.accountRepository.save(account);
     }
