@@ -2,7 +2,6 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.AccountDto;
-import ittalents.javaee.model.BudgetDto;
 import ittalents.javaee.model.User;
 import ittalents.javaee.model.UserDto;
 import ittalents.javaee.repository.UserRepository;
@@ -19,13 +18,11 @@ public class UserService {
 
     private UserRepository userRepository;
     private AccountService accountService;
-    private BudgetService budgetService;
 
     @Autowired
-    public UserService(UserRepository userRepository, AccountService accountService, BudgetService budgetService) {
+    public UserService(UserRepository userRepository, AccountService accountService) {
         this.userRepository = userRepository;
         this.accountService = accountService;
-        this.budgetService = budgetService;
     }
 
     public List<UserDto> getUsers() {
@@ -68,5 +65,9 @@ public class UserService {
 
     public long addAccount(long id, AccountDto accountDto) {
         return accountService.createAccount(getUserById(id), accountDto);
+    }
+
+    public boolean existByEmailAndPassword(String email, String password) {
+        return userRepository.existsByEmailAndPassword(email, password);
     }
 }
