@@ -17,7 +17,8 @@ public class BudgetDto {
     private LocalDate toDate;
 
     @NotNull
-    private Category category;
+    @Positive
+    private long categoryId;
 
     @NotNull
     @PositiveOrZero

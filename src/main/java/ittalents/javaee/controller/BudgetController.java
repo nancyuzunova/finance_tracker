@@ -66,8 +66,8 @@ public class BudgetController {
     }
 
     @PutMapping(value = "/budgets/{id}/category/change")
-    public ResponseEntity changeCategory(@PathVariable @Positive long id, @RequestParam Category category){
-        BudgetDto dto = budgetService.changeBudgetCategory(id, category).toDto();
+    public ResponseEntity changeCategory(@PathVariable @Positive long id, @RequestParam @Positive long categoryId){
+        BudgetDto dto = budgetService.changeBudgetCategory(id, categoryId).toDto();
         return ResponseEntity.ok(dto);
     }
 

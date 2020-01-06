@@ -92,13 +92,13 @@ public class BudgetService {
         return budgets;
     }
 
-    public Budget changeBudgetCategory(long id, Category category) {
+    public Budget changeBudgetCategory(long id, long categoryId) {
         Optional<Budget> budget = this.budgetRepository.findById(id);
         if(!budget.isPresent()){
             throw new ElementNotFoundException("Budget with id "+ id + " does NOT exists");
         }
         Budget b = budget.get();
-        b.setCategory(category);
+        b.setCategoryId(categoryId);
         return this.budgetRepository.save(b);
     }
 

@@ -25,8 +25,8 @@ public class Budget {
     @Column(name = "to_date", nullable = false)
     private LocalDate toDate;
 
-    @Column(name = "category", nullable = false)
-    private Category category;
+    @Column(name = "category_id", nullable = false)
+    private long categoryId;
 
     @Column(name = "amount", nullable = false)
     private double amount;
@@ -35,21 +35,10 @@ public class Budget {
     private int accountId;
     private String title;
 
-    public Budget(String title, LocalDate fromDate, LocalDate toDate, Category category, double amount, int accountId) {
-        this.title = title;
-        this.fromDate = fromDate;
-        this.toDate = toDate;
-        this.category = category;
-        this.amount = amount;
-        this.accountId = accountId;
-    }
-
     public void fromDto(BudgetDto dto) {
         this.accountId = dto.getAccountId();
         this.amount = dto.getAmount();
-        if (dto.getCategory() != null) {
-            this.category = dto.getCategory();
-        }
+        this.categoryId = dto.getCategoryId();
         this.fromDate = dto.getFromDate();
         this.toDate = dto.getToDate();
         this.title = dto.getTitle();
@@ -60,7 +49,7 @@ public class Budget {
         dto.setId(id);
         dto.setAccountId(accountId);
         dto.setAmount(amount);
-        dto.setCategory(category);
+        dto.setCategoryId(categoryId);
         dto.setFromDate(fromDate);
         dto.setToDate(toDate);
         dto.setTitle(title);
