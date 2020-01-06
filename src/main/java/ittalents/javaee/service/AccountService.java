@@ -157,4 +157,8 @@ public class AccountService {
 
         return budgetService.createBudget(account.getId(), budgetDto);
     }
+
+    public List<TransactionDto> getTransactionsByType(long id, Type type) {
+        return transactionService.getTransactionsByAccountId(id).stream().filter(x-> x.getType().equals(type)).collect(Collectors.toList());
+    }
 }
