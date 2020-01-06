@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,5 +78,9 @@ public class UserService {
             return user.toDto();
         }
         throw new ElementNotFoundException("User could NOT be found. Please check your credentials");
+    }
+
+    public List<User> getInactiveUsers(Date date){
+        return this.userRepository.findAllByLastLoginBefore(date);
     }
 }
