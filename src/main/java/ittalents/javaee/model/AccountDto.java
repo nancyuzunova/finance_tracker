@@ -10,7 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 @Getter
 @Setter
-public class AccountDto {
+public class AccountDto implements IDto{
 
     private long id;
 
