@@ -75,7 +75,7 @@ public class UserService {
         User user = userRepository.findByEmailAndPassword(email, password);
         if(user != null){
             user.setLastLogin(LocalDateTime.now());
-            return user.toDto();
+            return this.userRepository.save(user).toDto();
         }
         throw new ElementNotFoundException("User could NOT be found. Please check your credentials");
     }
