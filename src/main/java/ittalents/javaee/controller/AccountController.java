@@ -82,4 +82,10 @@ public class AccountController {
         URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(id, transactionDto)));
         return ResponseEntity.created(location).build();
     }
+
+    @PostMapping("/accounts/{id}/budgets")
+    public ResponseEntity addBudget(@PathVariable @Positive long id, @RequestBody @Valid BudgetDto budgetDto){
+        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(id, budgetDto)));
+        return ResponseEntity.created(location).build();
+    }
 }

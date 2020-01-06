@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -78,7 +79,7 @@ public class BudgetController {
     }
 
     @PutMapping(value = "/budgets/{id}/edit/from/{from}/to/{to}")
-    public ResponseEntity updatePeriod(@PathVariable @Positive long id, @PathVariable LocalDate from, @PathVariable LocalDate to){
+    public ResponseEntity updatePeriod(@PathVariable @Positive long id, @PathVariable Date from, @PathVariable Date to){
         BudgetDto dto = budgetService.changePeriod(id, from, to).toDto();
         return ResponseEntity.ok(dto);
     }

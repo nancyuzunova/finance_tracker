@@ -69,8 +69,4 @@ public class UserService {
     public long addAccount(long id, AccountDto accountDto) {
         return accountService.createAccount(getUserById(id), accountDto);
     }
-
-    public long addBudget(long id, BudgetDto budgetDto) {
-        return budgetService.createBudget(getUserById(id), budgetDto);
-    }
 }

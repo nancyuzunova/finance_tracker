@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -20,10 +21,10 @@ public class Budget {
     private long id;
 
     @Column(name = "from_date", nullable = false)
-    private LocalDate fromDate;
+    private Date fromDate;
 
     @Column(name = "to_date", nullable = false)
-    private LocalDate toDate;
+    private Date toDate;
 
     @Column(name = "category_id", nullable = false)
     private long categoryId;
@@ -32,7 +33,7 @@ public class Budget {
     private double amount;
 
     @Column(name = "account_id", nullable = false)
-    private int accountId;
+    private long accountId;
     private String title;
 
     public void fromDto(BudgetDto dto) {

@@ -20,12 +20,15 @@ public class AccountService {
     private AccountRepository accountRepository;
     private TransferService transferService;
     private TransactionService transactionService;
+    private BudgetService budgetService;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, TransferService transferService, TransactionService transactionService) {
+    public AccountService(AccountRepository accountRepository, TransferService transferService,
+                          TransactionService transactionService, BudgetService budgetService) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
+        this.budgetService = budgetService;
     }
 
     public List<AccountDto> getAllAccounts() {
@@ -139,5 +142,15 @@ public class AccountService {
 
         accountRepository.save(account);
         return this.transactionService.createTransaction(account.getId(), transactionDto);
+    }
+
+    public long addBudget(long id, BudgetDto budgetDto) {
+        Account account = getAccountById(id);
+
+        if (account.getBalance() < budgetDto.getAmount()) {
+            throw new InvalidOperationException("The budget can not exceed the account balance!");
+        }
+
+        return budgetService.createBudget(account.getId(), budgetDto);
     }
 }

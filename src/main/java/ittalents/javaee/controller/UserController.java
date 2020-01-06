@@ -63,12 +63,6 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/users/{id}/budgets")
-    public ResponseEntity addBudget(@PathVariable @Positive long id, @RequestBody @Valid BudgetDto budgetDto){
-        URI location = URI.create(String.format("/budgets/%d", this.userService.addBudget(id, budgetDto)));
-        return ResponseEntity.created(location).build();
-    }
-
     @PutMapping("/users/{id}")
     public ResponseEntity updateUser(@PathVariable @Positive long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
         // TODO see when to log user

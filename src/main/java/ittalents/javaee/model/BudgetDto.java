@@ -1,5 +1,6 @@
 package ittalents.javaee.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,14 +8,21 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
 public class BudgetDto {
 
     private long id;
-    private LocalDate fromDate;
-    private LocalDate toDate;
+
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private Date fromDate;
+
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private Date toDate;
 
     @NotNull
     @Positive
@@ -24,9 +32,7 @@ public class BudgetDto {
     @PositiveOrZero
     private double amount;
 
-    @NotNull
-    @Positive
-    private int accountId;
+    private long accountId;
 
     @NotNull
     private String title;
