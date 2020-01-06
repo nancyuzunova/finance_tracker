@@ -57,6 +57,12 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
+    @PostMapping("/users/login")
+    public ResponseEntity logUser(@RequestBody @Valid LoginUserDto loginUserDto){
+        UserDto dto = this.userService.logUser(loginUserDto.getEmail(), loginUserDto.getPassword());
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/users/{id}/accounts")
     public ResponseEntity addAccount(@PathVariable @Positive long id, @RequestBody @Valid AccountDto accountDto) {
         URI location = URI.create(String.format("/accounts/%d", this.userService.addAccount(id, accountDto)));

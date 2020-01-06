@@ -70,4 +70,12 @@ public class UserService {
     public boolean existByEmailAndPassword(String email, String password) {
         return userRepository.existsByEmailAndPassword(email, password);
     }
+
+    public UserDto logUser(String email, String password) {
+        User user = userRepository.findByEmailAndPassword(email, password);
+        if(user != null){
+            return user.toDto();
+        }
+        throw new ElementNotFoundException("User could NOT be found. Please check your credentials");
+    }
 }
