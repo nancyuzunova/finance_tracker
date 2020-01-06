@@ -4,6 +4,7 @@ import ittalents.javaee.model.BudgetDto;
 import ittalents.javaee.model.Category;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,20 +49,21 @@ public class BudgetController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping(value = "/budgets/{fromDate}-{toDate}")
-    public ResponseEntity getBudgetsByDateBetween(@PathVariable Date fromDate, @PathVariable Date toDate){
+    @GetMapping(value = "/budgets/from/to")
+    public ResponseEntity getBudgetsByDateBetween(@RequestParam("from")  @DateTimeFormat(pattern = "dd.MM.yyyy") Date fromDate,
+                                                  @RequestParam("to")  @DateTimeFormat(pattern = "dd.MM.yyyy") Date toDate){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsByDate(fromDate, toDate);
         return ResponseEntity.ok(budgetDtos);
     }
 
-    @GetMapping(value = "/budgets/before/{date}")
-    public ResponseEntity getBudgetsByDateBefore(@PathVariable Date date){
+    @GetMapping(value = "/budgets/before")
+    public ResponseEntity getBudgetsByDateBefore(@RequestParam("before")  @DateTimeFormat(pattern = "dd.MM.yyyy") Date date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsBefore(date);
         return ResponseEntity.ok(budgetDtos);
     }
 
-    @GetMapping(value = "/budgets/after/{date}")
-    public ResponseEntity getBudgetsByDateAfter(@PathVariable Date date){
+    @GetMapping(value = "/budgets/after")
+    public ResponseEntity getBudgetsByDateAfter(@RequestParam("after")  @DateTimeFormat(pattern = "dd.MM.yyyy") Date date){
         List<BudgetDto> budgetDtos = budgetService.getBudgetsAfter(date);
         return ResponseEntity.ok(budgetDtos);
     }
