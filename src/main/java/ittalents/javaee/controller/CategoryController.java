@@ -28,11 +28,12 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @PostMapping("/categories")
-    public void createCategory(@RequestBody @Valid CategoryDto categoryDto) {
-        // should anyone be able to create category? -> read only table categories?
-        this.categoryService.createCategory(categoryDto);
-    }
+    //TODO delete it if filling categories with fillCategories() is ok
+//    @PostMapping("/categories")
+//    public void createCategory(@RequestBody @Valid CategoryDto categoryDto) {
+//        // should anyone be able to create category? -> read only table categories?
+//        this.categoryService.createCategory(categoryDto);
+//    }
 
     @PutMapping("/categories/{id}")
     public void updateCategory(@PathVariable @Positive long id, @RequestBody @Valid CategoryDto categoryDto) {

@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class CategoryService {
 
-    private CategoryRepository categoryRepository;
+    private static CategoryRepository categoryRepository;
 
     @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
@@ -29,10 +29,16 @@ public class CategoryService {
         return categories;
     }
 
-    public void createCategory(CategoryDto categoryDto) {
-        Category category = new Category();
-        category.fromDto(categoryDto);
-        this.categoryRepository.save(category);
+    public static void fillCategoriesTable() {
+        Category category = new Category(Category.CategoryName.LIFE_AND_ENTERTAINMENT,
+                "resources/static/icons/entertainment/camera.png");
+        categoryRepository.save(category);
+        category = new Category(Category.CategoryName.FINANCIAL_EXPENSES, "resources/static/icons/general/money1.png");
+        categoryRepository.save(category);
+        category = new Category(Category.CategoryName.SHOPPING, "resources/static/icons/shopping/cart.png");
+        categoryRepository.save(category);
+        category = new Category(Category.CategoryName.TRANSPORTATION, "resources/static/icons/transport/bus.png");
+        categoryRepository.save(category);
     }
 
     public Category getCategoryById(long id) {

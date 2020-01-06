@@ -51,7 +51,7 @@ public class UserController {
 //
 //    }
 
-    @PostMapping("/users")
+    @PostMapping("/users/register")
     public ResponseEntity createUser(@RequestBody @Valid UserDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
         return ResponseEntity.created(location).build();
