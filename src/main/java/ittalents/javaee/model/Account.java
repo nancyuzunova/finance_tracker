@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @DynamicUpdate
 @Table(name = "accounts")
-public class Account {
+public class Account implements IPojo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,14 +30,17 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    public void fromDto(AccountDto accountDto) {
-        this.balance = accountDto.getBalance();
+    @Override
+    public void fromDto(IDto accountDto) {
+        AccountDto dto = (AccountDto)accountDto;
+        this.balance = dto.getBalance();
 
-        if (accountDto.getCurrency() != null) {
-            this.currency = accountDto.getCurrency();
+        if (dto.getCurrency() != null) {
+            this.currency = dto.getCurrency();
         }
     }
 
+    @Override
     public AccountDto toDto() {
         AccountDto accountDto = new AccountDto();
         accountDto.setId(id);
