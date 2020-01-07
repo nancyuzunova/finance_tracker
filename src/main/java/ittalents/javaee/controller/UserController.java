@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
@@ -65,6 +66,12 @@ public class UserController extends AbstractController{
     public ResponseEntity login(@RequestBody @Valid LoginUserDto loginUserDto){
         UserDto dto = this.userService.logUser(loginUserDto.getEmail(), loginUserDto.getPassword());
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/users/logout")
+    public ResponseEntity logout(HttpSession session){
+        session.invalidate();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/{id}/accounts")
