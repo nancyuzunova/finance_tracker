@@ -82,7 +82,7 @@ public class UserService {
             user.setLastLogin(LocalDateTime.now());
             return this.userRepository.save(user).toDto();
         }
-        throw new ElementNotFoundException("User could NOT be found. Please check your credentials");
+        throw new AuthorizationException("User could NOT be found. Please check your credentials");
     }
 
     public List<User> getInactiveUsers(LocalDate date){

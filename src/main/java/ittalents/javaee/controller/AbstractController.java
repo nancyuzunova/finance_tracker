@@ -46,4 +46,11 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
         ApiError apiError = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    protected ApiError handleGlobalException(Exception e){
+        return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
+    }
 }
