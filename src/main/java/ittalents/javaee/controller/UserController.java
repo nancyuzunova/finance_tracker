@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class UserController {
+public class UserController extends AbstractController{
 
     private UserService userService;
     private AccountService accountService;
@@ -54,13 +54,13 @@ public class UserController {
 //    }
 
     @PostMapping("/users/register")
-    public ResponseEntity createUser(@RequestBody @Valid UserDto user) {
+    public ResponseEntity register(@RequestBody @Valid UserDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity logUser(@RequestBody @Valid LoginUserDto loginUserDto){
+    public ResponseEntity login(@RequestBody @Valid LoginUserDto loginUserDto){
         UserDto dto = this.userService.logUser(loginUserDto.getEmail(), loginUserDto.getPassword());
         return ResponseEntity.ok(dto);
     }

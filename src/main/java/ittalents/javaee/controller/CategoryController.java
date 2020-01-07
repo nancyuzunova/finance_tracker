@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class CategoryController {
+public class CategoryController extends AbstractController{
 
     private CategoryService categoryService;
 

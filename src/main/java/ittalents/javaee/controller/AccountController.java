@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class AccountController {
+public class AccountController extends AbstractController{
 
     private AccountService accountService;
     private TransactionService transactionService;
