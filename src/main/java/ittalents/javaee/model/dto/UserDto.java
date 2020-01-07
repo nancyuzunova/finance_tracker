@@ -2,6 +2,7 @@ package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDto extends AbstractDto{
 
     private long id;
@@ -34,4 +36,11 @@ public class UserDto extends AbstractDto{
     protected LocalDateTime dateCreated;
     protected LocalDateTime lastLogin;
     protected List<AccountDto> accounts;
+
+    public UserDto(UserRegisterDto dto){
+        this.firstName = dto.getFirstName();
+        this.lastName = dto.getLastName();
+        this.email = dto.getEmail();
+        this.password = dto.getPassword();
+    }
 }
