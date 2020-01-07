@@ -1,13 +1,12 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.CategoryDto;
+import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -28,17 +27,11 @@ public class CategoryController extends AbstractController{
         return ResponseEntity.ok(categories);
     }
 
-    //TODO delete it if filling categories with fillCategories() is ok
-//    @PostMapping("/categories")
-//    public void createCategory(@RequestBody @Valid CategoryDto categoryDto) {
-//        // should anyone be able to create category? -> read only table categories?
-//        this.categoryService.createCategory(categoryDto);
-//    }
-
-    @PutMapping("/categories/{id}")
-    public void updateCategory(@PathVariable @Positive long id, @RequestBody @Valid CategoryDto categoryDto) {
+    @PutMapping("/categories/{categoryId}/{iconId}")
+    public void changeCategoryIcon(@PathVariable("categoryId") @Positive long categoryId,
+                                   @PathVariable("iconId") @Positive long iconId) {
         // TODO
-        // edit iconURL and type?
+        // edit iconURL
     }
 
     @GetMapping("/categories/{id}/icons")

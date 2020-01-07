@@ -1,9 +1,9 @@
 package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
-import ittalents.javaee.model.AccountDto;
-import ittalents.javaee.model.User;
-import ittalents.javaee.model.UserDto;
+import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.pojo.User;
+import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

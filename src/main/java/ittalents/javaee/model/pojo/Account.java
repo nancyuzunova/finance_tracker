@@ -1,5 +1,6 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.model.dto.AccountDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @DynamicUpdate
 @Table(name = "accounts")
-public class Account implements IPojo {
+public class Account extends AbstractPojo<AccountDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +32,7 @@ public class Account implements IPojo {
     private Currency currency;
 
     @Override
-    public void fromDto(IDto accountDto) {
-        AccountDto dto = (AccountDto)accountDto;
+    public void fromDto(AccountDto dto) {
         this.balance = dto.getBalance();
 
         if (dto.getCurrency() != null) {

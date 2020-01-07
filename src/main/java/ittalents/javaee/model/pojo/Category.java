@@ -1,9 +1,9 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.model.dto.CategoryDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 
@@ -12,13 +12,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "categories")
-public class Category {
+public class Category extends AbstractPojo<CategoryDto> {
 
     public enum CategoryName {
         // general categories
-        FOOD_AND_DRINKS(Type.EXPENSE), SHOPPING(Type.EXPENSE), HOUSING(Type.EXPENSE), TRANSPORTATION(Type.EXPENSE),
-        VEHICLE(Type.EXPENSE), LIFE_AND_ENTERTAINMENT(Type.EXPENSE), COMMUNICATION_PC(Type.EXPENSE),
-        FINANCIAL_EXPENSES(Type.EXPENSE), INVESTMENTS(Type.EXPENSE), INCOME(Type.INCOME), OTHERS(Type.EXPENSE);
+        SHOPPING(Type.EXPENSE), GROCERIES(Type.EXPENSE), UTILITIES(Type.EXPENSE), TRAVEL(Type.EXPENSE),
+        TRANSPORT(Type.EXPENSE), ENTERTAINMENT(Type.EXPENSE), HEALTH(Type.EXPENSE),
+        RESTAURANTS(Type.EXPENSE), INVESTMENTS(Type.EXPENSE), INCOME(Type.INCOME), OTHERS(Type.EXPENSE);
 
         private Type type;
 

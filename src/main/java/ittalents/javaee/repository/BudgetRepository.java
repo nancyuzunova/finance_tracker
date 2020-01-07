@@ -1,6 +1,6 @@
 package ittalents.javaee.repository;
 
-import ittalents.javaee.model.Budget;
+import ittalents.javaee.model.pojo.Budget;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

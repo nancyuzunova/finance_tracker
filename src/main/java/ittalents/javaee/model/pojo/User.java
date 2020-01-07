@@ -1,5 +1,6 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.model.dto.UserDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends AbstractPojo<UserDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

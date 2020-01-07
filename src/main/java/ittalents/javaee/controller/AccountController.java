@@ -1,6 +1,10 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.*;
+import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.dto.BudgetDto;
+import ittalents.javaee.model.dto.TransactionDto;
+import ittalents.javaee.model.dto.TransferDto;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.BudgetService;
 import ittalents.javaee.service.TransactionService;

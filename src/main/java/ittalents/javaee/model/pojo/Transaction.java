@@ -1,5 +1,6 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.model.dto.TransactionDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "transactions")
-public class Transaction {
+public class Transaction extends AbstractPojo<TransactionDto>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

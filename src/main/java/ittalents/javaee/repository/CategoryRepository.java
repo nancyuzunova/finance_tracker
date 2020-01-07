@@ -1,6 +1,6 @@
 package ittalents.javaee.repository;
 
-import ittalents.javaee.model.Category;
+import ittalents.javaee.model.pojo.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

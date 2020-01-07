@@ -1,5 +1,6 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 @Getter
 @Setter
-public class AccountDto implements IDto{
+public class AccountDto extends AbstractDto {
 
     private long id;
 

@@ -8,8 +8,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class JavaeeApplication {
     public static void main(String[] args) {
         SpringApplication.run(JavaeeApplication.class, args);
-//        CategoryService.fillCategoriesTable();
-//        System.out.println("category created");
     }
-
 }

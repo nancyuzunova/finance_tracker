@@ -1,6 +1,8 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.*;
+import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.dto.LoginUserDto;
+import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
