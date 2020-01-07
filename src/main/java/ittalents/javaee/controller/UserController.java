@@ -64,7 +64,7 @@ public class UserController extends AbstractController{
 
     @PostMapping("/users/login")
     public ResponseEntity login(@RequestBody @Valid LoginUserDto loginUserDto){
-        UserDto dto = this.userService.logUser(loginUserDto.getEmail(), loginUserDto.getPassword());
+        UserDto dto = this.userService.logUser(loginUserDto);
         return ResponseEntity.ok(dto);
     }
 

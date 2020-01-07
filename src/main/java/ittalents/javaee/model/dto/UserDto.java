@@ -1,6 +1,7 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,15 +15,19 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserDto extends LoginUserDto{
+public class UserDto extends AbstractDto{
 
-    protected long id;
+    private long id;
     @NotBlank
-    protected String firstName;
+    private String firstName;
 
     @NotBlank
-    protected String lastName;
+    private String lastName;
 
+    @NotBlank
+    private String email;
+
+    @NotBlank
     @JsonIgnore
     private String password;
 
