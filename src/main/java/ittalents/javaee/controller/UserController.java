@@ -1,5 +1,7 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.exceptions.AuthorizationException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.LoginUserDto;
 import ittalents.javaee.model.dto.UserDto;
@@ -12,15 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 
 @RestController
 @Validated
-public class UserController extends AbstractController{
+public class UserController extends AbstractController {
 
     private UserService userService;
     private AccountService accountService;
@@ -31,63 +32,78 @@ public class UserController extends AbstractController{
         this.accountService = accountService;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/all")
     public ResponseEntity getUsers() {
         List<UserDto> users = userService.getUsers();
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/users/{id}")
-    public ResponseEntity getUserById(@PathVariable @Positive long id) {
-        UserDto user = userService.getUserById(id).toDto();
+    @GetMapping("/users/profile")
+    public ResponseEntity getUserById(HttpSession session) {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+
+        if (user == null) {
+            throw new AuthorizationException("To use this service, please log in!");
+        }
+
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/users/{id}/accounts")
-    public ResponseEntity getAccountsByUserId(@PathVariable @Positive long id) {
-        List<AccountDto> accounts = this.accountService.getAllAccountsByUserId(id);
+    @GetMapping("/users/accounts")
+    public ResponseEntity getAccountsByUserId(HttpSession session) {
+        if (!SessionManager.validateLogged(session)) {
+            throw new AuthorizationException("To use this service, please log in!");
+        }
+        List<AccountDto> accounts = this.accountService.
+                getAllAccountsByUserId(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
         return ResponseEntity.ok(accounts);
     }
 
-//    @GetMapping("/users/{id}/transfers")
-//    public List<TransferDto> getAllTransfersByUserId(@PathVariable long id){
-//
-//    }
-
     @PostMapping("/users/register")
-    public ResponseEntity register(@RequestBody UserRegisterDto user) {
+    public ResponseEntity register(HttpSession session, @RequestBody UserRegisterDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
-        //TODO log user using SessionManager
+        SessionManager.logUser(session, user);
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity login(@RequestBody @Valid LoginUserDto loginUserDto){
+    public ResponseEntity login(HttpSession session, @RequestBody @Valid LoginUserDto loginUserDto) {
         UserDto dto = this.userService.logUser(loginUserDto.getEmail(), loginUserDto.getPassword());
+        SessionManager.logUser(session, dto);
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/users/{id}/accounts")
-    public ResponseEntity addAccount(@PathVariable @Positive long id, @RequestBody @Valid AccountDto accountDto) {
-        URI location = URI.create(String.format("/accounts/%d", this.userService.addAccount(id, accountDto)));
+    @PostMapping("/users/accounts")
+    public ResponseEntity addAccount(HttpSession session, @RequestBody @Valid AccountDto accountDto) {
+        if (!SessionManager.validateLogged(session)) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED.value()).build();
+        }
+
+        URI location = URI.create(String.format("/accounts/%d",
+                this.userService
+                        .addAccount(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), accountDto)));
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity updateUser(@PathVariable @Positive long id, @RequestBody @Valid UserDto userDto, HttpServletRequest req) {
-        // TODO see when to log user
-        if (SessionManager.validateLogged(req)) {
-            UserDto user = userService.updateUser(id, userDto).toDto();
+    @PutMapping("/users/edit")
+    public ResponseEntity updateUser(HttpSession session, @RequestBody @Valid UserDto userDto) {
+        if (SessionManager.validateLogged(session)) {
+            UserDto user = userService
+                    .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto).toDto();
             return ResponseEntity.ok(user);
         } else {
-            System.out.println(SessionManager.EXPIRED_SESSION);
-            return ResponseEntity.status(HttpStatus.valueOf(440)).build(); // 440 Login Time-out
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED.value()).build();
         }
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity deleteUser(@PathVariable @Positive long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/users/delete")
+    public ResponseEntity deleteUser(HttpSession session) {
+        if (!SessionManager.validateLogged(session)) {
+            throw new InvalidOperationException("To use this service, please log in!");
+        }
+
+        userService.deleteUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
+        session.invalidate();
         return ResponseEntity.noContent().build();
     }
 }
