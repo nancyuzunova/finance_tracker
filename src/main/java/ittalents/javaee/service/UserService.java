@@ -1,7 +1,9 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.dto.UserRegisterDto;
 import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.repository.UserRepository;
@@ -44,13 +46,16 @@ public class UserService {
         throw new ElementNotFoundException("User with id = " + id + " does not exist!");
     }
 
-    public long createUser(UserDto userDto) {
-        LocalDateTime now = LocalDateTime.now();
-        User user = new User();
-        user.fromDto(userDto);
-        user.setDateCreated(now);
-        user.setLastLogin(LocalDateTime.now());
-        return userRepository.save(user).getId();
+    public long createUser(UserRegisterDto userDto) {
+        if(userDto.getPassword().equals(userDto.getConfirmationPassword())) {
+            LocalDateTime now = LocalDateTime.now();
+            User user = new User();
+            user.fromDto(userDto);
+            user.setDateCreated(now);
+            user.setLastLogin(LocalDateTime.now());
+            return userRepository.save(user).getId();
+        }
+        throw new AuthorizationException("The password and its confirmation do not match. Please try again");
     }
 
     public User updateUser(long id, UserDto userDto) {

@@ -3,6 +3,7 @@ package ittalents.javaee.controller;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.LoginUserDto;
 import ittalents.javaee.model.dto.UserDto;
+import ittalents.javaee.model.dto.UserRegisterDto;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,9 @@ public class UserController extends AbstractController{
 //    }
 
     @PostMapping("/users/register")
-    public ResponseEntity register(@RequestBody @Valid UserDto user) {
+    public ResponseEntity register(@RequestBody UserRegisterDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
+        //TODO log user using SessionManager
         return ResponseEntity.created(location).build();
     }
 

@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.exceptions.ApiError;
+import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import org.springframework.http.HttpHeaders;
@@ -24,10 +25,24 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+//    @ExceptionHandler({InvalidOperationException.class , ConstraintViolationException.class})
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    protected ResponseEntity<Object> handleInvalidOperationException(RuntimeException e) {
+//        ApiError apiError = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
+//        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+//    }
+
     @ExceptionHandler({InvalidOperationException.class , ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Object> handleInvalidOperationException(RuntimeException e) {
+    protected ApiError handleInvalidOperationException(RuntimeException e) {
         ApiError apiError = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
-        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return apiError;
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ResponseEntity<Object> handleAuthorizationException(RuntimeException e){
+        ApiError error = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), e.getClass().getName());
+        return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 }
