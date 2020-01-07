@@ -2,6 +2,7 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.LoginUserDto;
 import ittalents.javaee.model.dto.UserRegisterDto;
@@ -53,6 +54,9 @@ public class UserService {
 
     public long createUser(UserRegisterDto userDto) {
         if(userDto.getPassword().equals(userDto.getConfirmationPassword())) {
+            if(userRepository.findByEmail(userDto.getEmail()) != null){
+                throw new InvalidOperationException("Username already exists!");
+            }
             LocalDateTime now = LocalDateTime.now();
             User user = new User();
             user.setFirstName(userDto.getFirstName());
