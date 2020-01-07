@@ -92,4 +92,10 @@ public class AccountController {
         URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(id, budgetDto)));
         return ResponseEntity.created(location).build();
     }
+
+    @GetMapping("/accounts/{id}/transactions/type")
+    public ResponseEntity getTransactionsByType(@PathVariable @Positive long id, @RequestParam("type") Type type){
+        List<TransactionDto> transactionDtos = accountService.getTransactionsByType(id, type);
+        return ResponseEntity.ok(transactionDtos);
+    }
 }
