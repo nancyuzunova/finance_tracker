@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class UserController {
+public class UserController extends AbstractController{
 
     private UserService userService;
     private AccountService accountService;

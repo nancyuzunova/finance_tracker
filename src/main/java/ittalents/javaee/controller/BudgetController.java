@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class BudgetController {
+public class BudgetController extends AbstractController {
 
     private BudgetService budgetService;
 
