@@ -45,7 +45,7 @@ public class CategoryService {
     }
 
     public List<String> getCategoryIcons(long id) throws SQLException {
-        return iconDao.getIconsUrlsByCategoryId(id); // add SQLException to global handler
+        return iconDao.getIconsUrlsByCategoryId(id);
     }
 
     public void deleteCategory(long id) {
