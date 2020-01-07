@@ -1,7 +1,6 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.BudgetDto;
-import ittalents.javaee.model.Category;
+import ittalents.javaee.model.dto.BudgetDto;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Positive;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

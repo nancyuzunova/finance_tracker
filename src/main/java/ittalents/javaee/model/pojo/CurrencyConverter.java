@@ -1,4 +1,4 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;

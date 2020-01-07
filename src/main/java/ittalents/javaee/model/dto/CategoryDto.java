@@ -1,5 +1,7 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Category;
+import ittalents.javaee.model.pojo.Type;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class CategoryDto {
+public class CategoryDto extends AbstractDto{
 
     private long id;
 

@@ -1,7 +1,7 @@
 package ittalents.javaee.repository;
 
-import ittalents.javaee.model.Transaction;
-import ittalents.javaee.model.Type;
+import ittalents.javaee.model.pojo.Transaction;
+import ittalents.javaee.model.pojo.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

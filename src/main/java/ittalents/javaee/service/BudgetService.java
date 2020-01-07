@@ -2,14 +2,12 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
-import ittalents.javaee.model.Budget;
-import ittalents.javaee.model.BudgetDto;
+import ittalents.javaee.model.pojo.Budget;
+import ittalents.javaee.model.dto.BudgetDto;
 import ittalents.javaee.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

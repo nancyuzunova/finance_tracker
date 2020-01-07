@@ -1,4 +1,4 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class TransferDto {
+public class TransferDto extends AbstractDto{
 
     private long id;
 

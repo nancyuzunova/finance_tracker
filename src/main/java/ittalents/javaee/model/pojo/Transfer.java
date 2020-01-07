@@ -1,5 +1,6 @@
-package ittalents.javaee.model;
+package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.model.dto.TransferDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "transfers")
-public class Transfer {
+public class Transfer extends AbstractPojo<TransferDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

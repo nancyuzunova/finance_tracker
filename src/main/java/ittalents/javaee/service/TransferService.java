@@ -1,7 +1,7 @@
 package ittalents.javaee.service;
 
-import ittalents.javaee.model.Transfer;
-import ittalents.javaee.model.TransferDto;
+import ittalents.javaee.model.pojo.Transfer;
+import ittalents.javaee.model.dto.TransferDto;
 import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

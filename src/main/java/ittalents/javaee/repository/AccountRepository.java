@@ -1,7 +1,6 @@
 package ittalents.javaee.repository;
 
-import ittalents.javaee.model.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ittalents.javaee.model.pojo.Account;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

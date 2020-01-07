@@ -1,8 +1,8 @@
 package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
-import ittalents.javaee.model.Category;
-import ittalents.javaee.model.CategoryDto;
+import ittalents.javaee.model.pojo.Category;
+import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,18 +27,6 @@ public class CategoryService {
             categories.add(category.toDto());
         }
         return categories;
-    }
-
-    public static void fillCategoriesTable() {
-        Category category = new Category(Category.CategoryName.LIFE_AND_ENTERTAINMENT,
-                "resources/static/icons/entertainment/camera.png");
-        categoryRepository.save(category);
-        category = new Category(Category.CategoryName.FINANCIAL_EXPENSES, "resources/static/icons/general/money1.png");
-        categoryRepository.save(category);
-        category = new Category(Category.CategoryName.SHOPPING, "resources/static/icons/shopping/cart.png");
-        categoryRepository.save(category);
-        category = new Category(Category.CategoryName.TRANSPORTATION, "resources/static/icons/transport/bus.png");
-        categoryRepository.save(category);
     }
 
     public Category getCategoryById(long id) {

@@ -2,7 +2,11 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
-import ittalents.javaee.model.*;
+import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.dto.BudgetDto;
+import ittalents.javaee.model.dto.TransactionDto;
+import ittalents.javaee.model.dto.TransferDto;
+import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
