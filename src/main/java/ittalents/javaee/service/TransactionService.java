@@ -34,6 +34,7 @@ public class TransactionService {
         transaction.fromDto(transactionDto);
         transaction.setDate(LocalDateTime.now());
         transaction.setAccountId(accountId);
+        transaction.setCurrency(transactionDto.getCurrency());
         return this.transactionRepository.save(transaction).getId();
     }
 

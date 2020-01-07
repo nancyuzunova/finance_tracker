@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Positive;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -29,13 +30,12 @@ public class CategoryController extends AbstractController{
 
     @PutMapping("/categories/{categoryId}/{iconId}")
     public void changeCategoryIcon(@PathVariable("categoryId") @Positive long categoryId,
-                                   @PathVariable("iconId") @Positive long iconId) {
-        // TODO
-        // edit iconURL
+                                   @PathVariable("iconId") @Positive long iconId) throws SQLException {
+        categoryService.changeCategoryIcon(categoryId, iconId);
     }
 
     @GetMapping("/categories/{id}/icons")
-    public ResponseEntity getCategoryIcons(@PathVariable @Positive long id) {
+    public ResponseEntity getCategoryIcons(@PathVariable @Positive long id) throws SQLException {
         List<String> iconUrls = this.categoryService.getCategoryIcons(id);
         return ResponseEntity.ok(iconUrls);
     }

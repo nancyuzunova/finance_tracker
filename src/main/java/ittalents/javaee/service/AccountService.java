@@ -138,6 +138,10 @@ public class AccountService {
         Account account = accountById.get();
         double amount = transactionDto.getAmount();
 
+        if (!transactionDto.getCurrency().equals(account.getCurrency())) {
+            amount = CurrencyConverter.convert(transactionDto.getCurrency(), account.getCurrency(), transactionDto.getAmount());
+        }
+
         if (Type.EXPENSE.equals(transactionDto.getType()) && account.getBalance() < amount) {
             throw new InvalidOperationException("Not enough account balance!");
         }
@@ -163,6 +167,6 @@ public class AccountService {
     }
 
     public List<TransactionDto> getTransactionsByType(long id, Type type) {
-        return transactionService.getTransactionsByAccountId(id).stream().filter(x-> x.getType().equals(type)).collect(Collectors.toList());
+        return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
     }
 }
