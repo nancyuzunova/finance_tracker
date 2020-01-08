@@ -22,6 +22,7 @@ public class MailRemainder {
     @Autowired
     private UserService userService;
 
+    //Todo make it do it every day
     @Scheduled(fixedRate = MAX_INACTIVE_DAYS)
     public void sendEmailToRemain() {
         for (User user : userService.getInactiveUsers(LocalDate.now().minusDays(DAYS_TO_SUBTRACT))) {
