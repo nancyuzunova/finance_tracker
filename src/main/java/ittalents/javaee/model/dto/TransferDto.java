@@ -1,11 +1,13 @@
 package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,11 +17,11 @@ public class TransferDto extends AbstractDto{
     private long id;
 
     @NotNull
-    @PositiveOrZero
+    @Positive
     private long fromAccountId;
 
     @NotNull
-    @PositiveOrZero
+    @Positive
     private long toAccountId;
 
     @NotNull
@@ -27,4 +29,8 @@ public class TransferDto extends AbstractDto{
     private double amount;
 
     private LocalDateTime date;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 }

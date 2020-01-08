@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Transfer;
 import ittalents.javaee.model.dto.TransferDto;
 import ittalents.javaee.repository.TransferRepository;
@@ -25,6 +26,7 @@ public class TransferService {
         Transfer transfer = new Transfer();
         transfer.fromDto(transferDto);
         transfer.setDate(LocalDateTime.now());
+        transfer.setCurrency(transferDto.getCurrency());
         return transferRepository.save(transfer).getId();
     }
 

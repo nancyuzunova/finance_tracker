@@ -104,10 +104,13 @@ public class AccountService {
         }
 
         double amount = transferDto.getAmount();
-        if (accountFrom.getBalance() >= amount) {
+        double fromAmount = CurrencyConverter.convert(transferDto.getCurrency(), accountFrom.getCurrency(), amount);
+        double toAmount = CurrencyConverter.convert(transferDto.getCurrency(), accountTo.getCurrency(), amount);
+
+        if (accountFrom.getBalance() >= fromAmount) {
             // make transfer
-            accountFrom.setBalance(accountFrom.getBalance() - amount);
-            accountTo.setBalance(accountTo.getBalance() + amount);
+            accountFrom.setBalance(accountFrom.getBalance() - fromAmount);
+            accountTo.setBalance(accountTo.getBalance() + toAmount);
 
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
@@ -135,7 +138,7 @@ public class AccountService {
         double amount = transactionDto.getAmount();
 
         if (!transactionDto.getCurrency().equals(account.getCurrency())) {
-            amount = CurrencyConverter.convert(transactionDto.getCurrency(), account.getCurrency(), transactionDto.getAmount());
+            amount = CurrencyConverter.convert(transactionDto.getCurrency(), account.getCurrency(), amount);
         }
 
         if (Type.EXPENSE.equals(transactionDto.getType()) && account.getBalance() < amount) {
