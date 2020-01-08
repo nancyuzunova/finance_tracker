@@ -28,16 +28,22 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private Type type;
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
     @Positive
     private double amount;
     private LocalDateTime date;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private Account account;
 
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @Autowired
+    @Transient
     private CategoryRepository categoryRepository;
 
     public void fromDto(RequestTransactionDto requestTransactionDto) {

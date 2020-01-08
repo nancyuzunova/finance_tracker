@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -25,13 +26,11 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
-    // TODO
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "from_account_id", referencedColumnName = "id", nullable = false)
     private Account fromAccount;
 
-    //TODO
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "to_account_id", referencedColumnName = "id", nullable = false)
     private Account toAccount;
 
@@ -45,6 +44,7 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     private LocalDateTime date;
 
     @Autowired
+    @Transient
     private AccountRepository accountRepository;
 
     public void fromDto(RequestTransferDto requestTransferDto) {
