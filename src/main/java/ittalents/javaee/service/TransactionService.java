@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class TransactionService {
     public long createTransaction(long accountId, RequestTransactionDto requestTransactionDto) {
         Transaction transaction = new Transaction();
         transaction.fromDto(requestTransactionDto);
-        transaction.setDate(LocalDateTime.now());
+        transaction.setDate(new Date());
         Optional<Account> acc = accountRepository.findById(accountId);
         if(!acc.isPresent()){
             throw new ElementNotFoundException("Account with id " + accountId + " does NOT exists");

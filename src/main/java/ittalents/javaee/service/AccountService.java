@@ -1,14 +1,20 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.controller.SessionManager;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.mail.MailSender;
 import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.repository.AccountRepository;
+import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -21,14 +27,17 @@ public class AccountService {
     private TransferService transferService;
     private TransactionService transactionService;
     private BudgetService budgetService;
+    private PlannedPaymentRepository paymentRepository;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
-                          TransactionService transactionService, BudgetService budgetService) {
+                          TransactionService transactionService, BudgetService budgetService,
+                          PlannedPaymentRepository paymentRepository) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
         this.budgetService = budgetService;
+        this.paymentRepository = paymentRepository;
     }
 //
 //    public List<AccountDto> getAllAccounts(UserDto user) {
@@ -167,5 +176,27 @@ public class AccountService {
 
     public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
         return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
+    }
+
+    //TODO
+    @Scheduled(cron = "0 0 0 * * *")
+    public void payPlannedPayments(HttpSession session){
+        Date today = new Date();
+        List<PlannedPayment> payments = paymentRepository.findAllByDateAndStatus(today, PlannedPayment.PaymentStatus.ACTIVE);
+        payments.sort((p1, p2) -> Double.compare(p1.getAmount(), p2.getAmount()));
+        for(PlannedPayment payment : payments){
+            double amount = payment.getAmount();
+            double availability = payment.getAccount().getBalance();
+            if(availability < amount){
+                UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+                MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
+                        payment.getTitle() + " has failed because of  insufficient balance of your account. " +
+                        "Please deposit to your account and make payment manually!");
+                throw new InvalidOperationException("Please feed your account!");
+            }
+            payment.getAccount().setBalance(availability - amount);
+            payment.setStatus(PlannedPayment.PaymentStatus.PAID);
+            this.paymentRepository.save(payment);
+        }
     }
 }

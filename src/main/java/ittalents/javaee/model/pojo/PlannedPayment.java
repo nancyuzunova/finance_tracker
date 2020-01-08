@@ -21,6 +21,10 @@ import java.util.Optional;
 @Table(name = "planned_payments")
 public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, RequestPlannedPaymentDto> {
 
+    public enum PaymentStatus{
+        PAID, ACTIVE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -38,6 +42,10 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
     @NotNull
     private Date date;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
     @Transient
     @Autowired
     private AccountRepository accountRepository;
@@ -54,6 +62,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
         this.account = acc.get();
         this.title = dto.getTitle();
         this.date = dto.getDate();
+        this.status = dto.getStatus();
     }
 
     @Override
@@ -64,6 +73,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
         responseDto.setAmount(amount);
         responseDto.setAccount(account);
         responseDto.setDate(date);
+        responseDto.setStatus(status);
         return responseDto;
     }
 }
