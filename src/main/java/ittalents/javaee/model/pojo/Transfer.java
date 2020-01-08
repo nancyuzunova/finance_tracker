@@ -29,6 +29,9 @@ public class Transfer extends AbstractPojo<TransferDto> {
     @Column(name = "amount", nullable = false, updatable = false)
     private double amount;
 
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
     @Column(name = "date", nullable = false, updatable = false)
     private LocalDateTime date;
 
@@ -45,6 +48,7 @@ public class Transfer extends AbstractPojo<TransferDto> {
         transferDto.setToAccountId(toAccountId);
         transferDto.setAmount(amount);
         transferDto.setDate(date);
+        transferDto.setCurrency(currency);
         return transferDto;
     }
 }
