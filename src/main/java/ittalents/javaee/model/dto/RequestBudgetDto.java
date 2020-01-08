@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 
 @Getter
@@ -28,9 +27,11 @@ public class RequestBudgetDto extends AbstractDto {
     private long categoryId;
 
     @NotNull
-    @PositiveOrZero
+    @Positive
     private double amount;
 
+    @NotNull
+    @Positive
     private long accountId;
 
     @NotNull

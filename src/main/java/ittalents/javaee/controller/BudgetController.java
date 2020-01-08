@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.RequestBudgetDto;
+import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +29,14 @@ public class BudgetController extends AbstractController {
     @GetMapping("/budgets")
     public ResponseEntity getMyBudgets(HttpSession session) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<RequestBudgetDto> myBudgets = budgetService.getMyBudgets(user.getId());
+        List<ResponseBudgetDto> myBudgets = budgetService.getMyBudgets(user.getId());
         return ResponseEntity.ok(myBudgets);
     }
 
     @GetMapping(value = "/budgets/{id}")
     public ResponseEntity getBudgetById(@PathVariable @Positive long id) {
-        RequestBudgetDto requestBudgetDto = budgetService.getBudgetById(id).toDto();
-        return ResponseEntity.ok(requestBudgetDto);
+        ResponseBudgetDto dto = budgetService.getBudgetById(id).toDto();
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping(value = "/budgets/{id}")
@@ -46,7 +47,7 @@ public class BudgetController extends AbstractController {
 
     @PutMapping(value = "/budgets/{id}")
     public ResponseEntity changeBudgetAmount(@PathVariable @Positive long id, @RequestParam double amount) {
-        RequestBudgetDto dto = this.budgetService.changeBudgetAmount(id, amount).toDto();
+        ResponseBudgetDto dto = this.budgetService.changeBudgetAmount(id, amount).toDto();
         return ResponseEntity.ok(dto);
     }
 
@@ -55,39 +56,39 @@ public class BudgetController extends AbstractController {
                                                   @DateTimeFormat(pattern = "dd.MM.yyyy") Date fromDate,
                                                   @RequestParam("to")
                                                   @DateTimeFormat(pattern = "dd.MM.yyyy") Date toDate) {
-        List<RequestBudgetDto> requestBudgetDtos = budgetService.getBudgetsByDate(fromDate, toDate);
-        return ResponseEntity.ok(requestBudgetDtos);
+        List<ResponseBudgetDto> dtos = budgetService.getBudgetsByDate(fromDate, toDate);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping(value = "/budgets/before")
     public ResponseEntity getBudgetsByDateBefore(@RequestParam("before")
                                                  @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        List<RequestBudgetDto> requestBudgetDtos = budgetService.getBudgetsBefore(date);
-        return ResponseEntity.ok(requestBudgetDtos);
+        List<ResponseBudgetDto> dtos = budgetService.getBudgetsBefore(date);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping(value = "/budgets/after")
     public ResponseEntity getBudgetsByDateAfter(@RequestParam("after")
                                                 @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        List<RequestBudgetDto> requestBudgetDtos = budgetService.getBudgetsAfter(date);
-        return ResponseEntity.ok(requestBudgetDtos);
+        List<ResponseBudgetDto> dtos = budgetService.getBudgetsAfter(date);
+        return ResponseEntity.ok(dtos);
     }
 
     @PutMapping(value = "/budgets/{id}/category/change")
     public ResponseEntity changeCategory(@PathVariable @Positive long id, @RequestParam @Positive long categoryId) {
-        RequestBudgetDto dto = budgetService.changeBudgetCategory(id, categoryId).toDto();
+        ResponseBudgetDto dto = budgetService.changeBudgetCategory(id, categoryId);
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping(value = "/budgets/{id}/title")
     public ResponseEntity editTitle(@PathVariable @Positive long id, @RequestParam String newTitle) {
-        RequestBudgetDto dto = budgetService.changeTitle(id, newTitle).toDto();
+        ResponseBudgetDto dto = budgetService.changeTitle(id, newTitle).toDto();
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping(value = "/budgets/{id}/edit/from/{from}/to/{to}")
     public ResponseEntity updatePeriod(@PathVariable @Positive long id, @PathVariable Date from, @PathVariable Date to) {
-        RequestBudgetDto dto = budgetService.changePeriod(id, from, to).toDto();
+        ResponseBudgetDto dto = budgetService.changePeriod(id, from, to).toDto();
         return ResponseEntity.ok(dto);
     }
 }
