@@ -18,7 +18,7 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
     public enum CategoryName {
         // general categories
         SHOPPING(Type.EXPENSE), GROCERIES(Type.EXPENSE), UTILITIES(Type.EXPENSE), TRAVEL(Type.EXPENSE),
-        TRANSPORT(Type.EXPENSE), ENTERTAINMENT(Type.EXPENSE), HEALTH(Type.EXPENSE),
+        TRANSPORTATION(Type.EXPENSE), ENTERTAINMENT(Type.EXPENSE), HEALTH(Type.EXPENSE),
         RESTAURANTS(Type.EXPENSE), INVESTMENTS(Type.EXPENSE), INCOME(Type.INCOME), OTHERS(Type.EXPENSE);
 
         private Type type;

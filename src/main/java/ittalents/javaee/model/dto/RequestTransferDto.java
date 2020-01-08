@@ -26,7 +26,6 @@ public class RequestTransferDto extends AbstractDto {
     @Positive
     private long toAccountId;
 
-    @NotNull
     @Positive
     private double amount;
 
