@@ -2,8 +2,10 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Budget;
 import ittalents.javaee.model.dto.BudgetDto;
+import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,21 +14,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
 
     private BudgetRepository budgetRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    public BudgetService(BudgetRepository budgetRepository) {
+    public BudgetService(BudgetRepository budgetRepository, AccountRepository accountRepository) {
         this.budgetRepository = budgetRepository;
+        this.accountRepository = accountRepository;
     }
 
-    public List<BudgetDto> getAllBudgets() {
+    public List<BudgetDto> getMyBudgets(long userId) {
+        List<Account> accounts = accountRepository.findAllByUserId(userId);
         List<BudgetDto> budgets = new ArrayList<>();
-        for (Budget budget : budgetRepository.findAll()) {
-            budgets.add(budget.toDto());
+        for (Account account : accounts) {
+            budgets.addAll(budgetRepository.findAllByAccountId(account.getId())
+                    .stream().map(Budget::toDto).collect(Collectors.toList()));
         }
         return budgets;
     }
