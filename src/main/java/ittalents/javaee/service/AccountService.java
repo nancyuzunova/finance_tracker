@@ -5,6 +5,7 @@ import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.repository.AccountRepository;
+import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +22,17 @@ public class AccountService {
     private TransferService transferService;
     private TransactionService transactionService;
     private BudgetService budgetService;
+    private PlannedPaymentRepository plannedPaymentRepository;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
-                          TransactionService transactionService, BudgetService budgetService) {
+                          TransactionService transactionService, BudgetService budgetService,
+                          PlannedPaymentRepository plannedPaymentRepository) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
         this.budgetService = budgetService;
+        this.plannedPaymentRepository = plannedPaymentRepository;
     }
 //
 //    public List<AccountDto> getAllAccounts(UserDto user) {
@@ -167,5 +171,11 @@ public class AccountService {
 
     public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
         return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
+    }
+
+    public long createPlannedPayment(RequestPlannedPaymentDto dto) {
+        PlannedPayment plannedPayment = new PlannedPayment();
+        plannedPayment.fromDto(dto);
+        return this.plannedPaymentRepository.save(plannedPayment).getId();
     }
 }

@@ -43,7 +43,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
     private AccountRepository accountRepository;
 
     @Override
-    void fromDto(RequestPlannedPaymentDto dto) {
+    public void fromDto(RequestPlannedPaymentDto dto) {
         this.amount = dto.getAmount();
         Optional<Account> acc = accountRepository.findById(dto.getAccountId());
 
@@ -57,7 +57,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
     }
 
     @Override
-    ResponsePlannedPaymentDto toDto() {
+    public ResponsePlannedPaymentDto toDto() {
         ResponsePlannedPaymentDto responseDto = new ResponsePlannedPaymentDto();
         responseDto.setId(id);
         responseDto.setTitle(title);
