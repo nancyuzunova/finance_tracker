@@ -1,5 +1,6 @@
 package ittalents.javaee.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -22,7 +23,10 @@ public class ResponseTransferDto extends AbstractDto{
 
     @Positive
     private double amount;
-    private LocalDateTime date;
+
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private Date date;
 
     @NotNull
     @Enumerated(EnumType.STRING)
