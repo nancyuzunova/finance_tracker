@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Getter
@@ -36,7 +36,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     @Positive
     private double amount;
     @NotNull
-    private LocalDateTime date;
+    private Date date;
 
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
@@ -59,15 +59,17 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         this.category = cat.get();
         this.amount = requestTransactionDto.getAmount();
         this.currency = requestTransactionDto.getCurrency();
+        this.date = requestTransactionDto.getDate();
     }
 
     public ResponseTransactionDto toDto() {
-        ResponseTransactionDto requestTransactionDto = new ResponseTransactionDto();
-        requestTransactionDto.setId(id);
-        requestTransactionDto.setType(type);
-        requestTransactionDto.setCategoryId(category);
-        requestTransactionDto.setAmount(amount);
-        requestTransactionDto.setCurrency(currency);
-        return requestTransactionDto;
+        ResponseTransactionDto responseTransactionDto = new ResponseTransactionDto();
+        responseTransactionDto.setId(id);
+        responseTransactionDto.setType(type);
+        responseTransactionDto.setCategoryId(category);
+        responseTransactionDto.setAmount(amount);
+        responseTransactionDto.setCurrency(currency);
+        responseTransactionDto.setDate(date);
+        return responseTransactionDto;
     }
 }
