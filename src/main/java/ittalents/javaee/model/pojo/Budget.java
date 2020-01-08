@@ -1,19 +1,25 @@
 package ittalents.javaee.model.pojo;
 
-import ittalents.javaee.model.dto.BudgetDto;
+import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dto.RequestBudgetDto;
+import ittalents.javaee.model.dto.ResponseBudgetDto;
+import ittalents.javaee.repository.AccountRepository;
+import ittalents.javaee.repository.CategoryRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Optional;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "budgets")
-public class Budget extends AbstractPojo<BudgetDto> {
+public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,34 +32,45 @@ public class Budget extends AbstractPojo<BudgetDto> {
     @Column(name = "to_date", nullable = false)
     private Date toDate;
 
-    //TODO
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private Category categoryId;
+    private Category category;
 
     @Column(name = "amount", nullable = false)
     private double amount;
 
-    //TODO
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private Account accountId;
+    private Account account;
     private String title;
 
-    public void fromDto(BudgetDto dto) {
-        this.accountId = dto.getAccountId();
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    public void fromDto(RequestBudgetDto dto) {
+        Optional<Account> acc = accountRepository.findById(account.getId());
+        if(!acc.isPresent()){
+            throw new InvalidOperationException("Account cannot be found!");
+        }
+        this.account = acc.get();
         this.amount = dto.getAmount();
-        this.categoryId = dto.getCategoryId();
+        Optional<Category> c = categoryRepository.findById(category.getId());
+        if(!c.isPresent()){
+            throw new InvalidOperationException("No such category!");
+        }
+        this.category = c.get();
         this.fromDate = dto.getFromDate();
         this.toDate = dto.getToDate();
         this.title = dto.getTitle();
     }
 
-    public BudgetDto toDto() {
-        BudgetDto dto = new BudgetDto();
+    public ResponseBudgetDto toDto() {
+        ResponseBudgetDto dto = new ResponseBudgetDto();
         dto.setId(id);
-        dto.setAccountId(accountId);
+        dto.setAccount(account);
         dto.setAmount(amount);
-        dto.setCategoryId(categoryId);
+        dto.setCategory(category);
         dto.setFromDate(fromDate);
         dto.setToDate(toDate);
         dto.setTitle(title);

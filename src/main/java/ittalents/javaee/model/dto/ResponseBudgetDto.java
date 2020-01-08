@@ -1,17 +1,20 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ittalents.javaee.model.pojo.Account;
+import ittalents.javaee.model.pojo.Category;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 
 @Getter
 @Setter
-public class BudgetDto extends AbstractDto {
+@NoArgsConstructor
+public class ResponseBudgetDto extends AbstractDto {
 
     private long id;
 
@@ -23,15 +26,13 @@ public class BudgetDto extends AbstractDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date toDate;
 
-    @NotNull
-    @Positive
-    private long categoryId;
+    private Category category;
 
     @NotNull
     @PositiveOrZero
     private double amount;
 
-    private long accountId;
+    private Account account;
 
     @NotNull
     private String title;

@@ -1,8 +1,7 @@
 package ittalents.javaee.service;
 
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Transfer;
-import ittalents.javaee.model.dto.TransferDto;
+import ittalents.javaee.model.dto.RequestTransferDto;
 import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,15 +21,15 @@ public class TransferService {
         this.transferRepository = transferRepository;
     }
 
-    public long createTransfer(TransferDto transferDto) {
+    public long createTransfer(RequestTransferDto requestTransferDto) {
         Transfer transfer = new Transfer();
-        transfer.fromDto(transferDto);
+        transfer.fromDto(requestTransferDto);
         transfer.setDate(LocalDateTime.now());
-        transfer.setCurrency(transferDto.getCurrency());
+        transfer.setCurrency(requestTransferDto.getCurrency());
         return transferRepository.save(transfer).getId();
     }
 
-    public List<TransferDto> getTransfersByAccountId(long id) {
+    public List<RequestTransferDto> getTransfersByAccountId(long id) {
         List<Transfer> allTransfers = new ArrayList<>();
         allTransfers.addAll(transferRepository.findByFromAccountId(id));
         allTransfers.addAll(transferRepository.findByToAccountId(id));

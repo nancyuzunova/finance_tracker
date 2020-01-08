@@ -4,7 +4,7 @@ import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Budget;
-import ittalents.javaee.model.dto.BudgetDto;
+import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +28,9 @@ public class BudgetService {
         this.accountRepository = accountRepository;
     }
 
-    public List<BudgetDto> getMyBudgets(long userId) {
+    public List<RequestBudgetDto> getMyBudgets(long userId) {
         List<Account> accounts = accountRepository.findAllByUserId(userId);
-        List<BudgetDto> budgets = new ArrayList<>();
+        List<RequestBudgetDto> budgets = new ArrayList<>();
         for (Account account : accounts) {
             budgets.addAll(budgetRepository.findAllByAccountId(account.getId())
                     .stream().map(Budget::toDto).collect(Collectors.toList()));
@@ -60,47 +60,47 @@ public class BudgetService {
         return this.budgetRepository.save(budget1);
     }
 
-    public List<BudgetDto> getBudgetsByDate(Date fromDate, Date toDate) {
-        List<BudgetDto> budgetDtos = new ArrayList<>();
+    public List<RequestBudgetDto> getBudgetsByDate(Date fromDate, Date toDate) {
+        List<RequestBudgetDto> requestBudgetDtos = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByFromDateBetween(fromDate, toDate)) {
-            budgetDtos.add(budget.toDto());
+            requestBudgetDtos.add(budget.toDto());
         }
-        return budgetDtos;
+        return requestBudgetDtos;
     }
 
-    public List<BudgetDto> getBudgetsBefore(Date date) {
-        List<BudgetDto> budgetDtos = new ArrayList<>();
+    public List<RequestBudgetDto> getBudgetsBefore(Date date) {
+        List<RequestBudgetDto> requestBudgetDtos = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByFromDateBefore(date)) {
-            budgetDtos.add(budget.toDto());
+            requestBudgetDtos.add(budget.toDto());
         }
-        return budgetDtos;
+        return requestBudgetDtos;
     }
 
-    public List<BudgetDto> getBudgetsAfter(Date date) {
-        List<BudgetDto> budgetDtos = new ArrayList<>();
+    public List<RequestBudgetDto> getBudgetsAfter(Date date) {
+        List<RequestBudgetDto> requestBudgetDtos = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByFromDateAfter(date)) {
-            budgetDtos.add(budget.toDto());
+            requestBudgetDtos.add(budget.toDto());
         }
-        return budgetDtos;
+        return requestBudgetDtos;
     }
 
-    public long createBudget(long accountId, BudgetDto budgetDto) {
+    public long createBudget(long accountId, RequestBudgetDto requestBudgetDto) {
         Budget budget = new Budget();
 
-        Date fromDate = budgetDto.getFromDate();
-        Date toDate = budgetDto.getToDate();
+        Date fromDate = requestBudgetDto.getFromDate();
+        Date toDate = requestBudgetDto.getToDate();
 
         if (fromDate.after(toDate)) {
             throw new InvalidOperationException("You can not create budget!");
         }
 
-        budget.fromDto(budgetDto);
+        budget.fromDto(requestBudgetDto);
         budget.setAccountId(accountId);
         return this.budgetRepository.save(budget).getId();
     }
 
-    public List<BudgetDto> getBudgetsByAccountId(long id) {
-        List<BudgetDto> budgets = new ArrayList<>();
+    public List<RequestBudgetDto> getBudgetsByAccountId(long id) {
+        List<RequestBudgetDto> budgets = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByAccountId(id)) {
             budgets.add(budget.toDto());
         }

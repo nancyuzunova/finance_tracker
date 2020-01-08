@@ -41,7 +41,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transfers")
     public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
-        List<TransferDto> accounts = accountService.getTransfersByAccountId(accountId);
+        List<RequestTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(accounts);
     }
 
@@ -53,7 +53,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping(value = "/accounts/{id}/budgets")
     public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId){
-        List<BudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
+        List<RequestBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
         return ResponseEntity.ok(budgets);
     }
 
@@ -70,8 +70,8 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/makeTransfer")
-    public ResponseEntity makeTransfer(@RequestBody @Valid TransferDto transferDto) {
-        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(transferDto)));
+    public ResponseEntity makeTransfer(@RequestBody @Valid RequestTransferDto requestTransferDto) {
+        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(requestTransferDto)));
         return ResponseEntity.created(location).build();
     }
 
@@ -82,8 +82,8 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/{id}/budgets")
-    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid BudgetDto budgetDto){
-        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(accountId, budgetDto)));
+    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid RequestBudgetDto requestBudgetDto){
+        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(accountId, requestBudgetDto)));
         return ResponseEntity.created(location).build();
     }
 

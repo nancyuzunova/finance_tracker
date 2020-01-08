@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @Entity
 @Table(name = "transactions")
-public class Transaction extends AbstractPojo<RequestTransactionDto> {
+public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTransactionDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +29,7 @@ public class Transaction extends AbstractPojo<RequestTransactionDto> {
     @Enumerated(EnumType.STRING)
     private Type type;
     private Category category;
+    @Positive
     private double amount;
     private LocalDateTime date;
     private Account account;

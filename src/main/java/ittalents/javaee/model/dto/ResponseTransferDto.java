@@ -1,7 +1,9 @@
 package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.EnumType;
@@ -12,22 +14,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class TransferDto extends AbstractDto{
-
+@NoArgsConstructor
+public class ResponseTransferDto extends AbstractDto{
     private long id;
+    private Account fromAccount;
+    private Account toAccount;
 
-    @NotNull
-    @Positive
-    private long fromAccountId;
-
-    @NotNull
-    @Positive
-    private long toAccountId;
-
-    @NotNull
     @Positive
     private double amount;
-
     private LocalDateTime date;
 
     @NotNull
