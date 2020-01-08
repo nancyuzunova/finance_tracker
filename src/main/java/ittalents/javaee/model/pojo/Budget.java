@@ -27,15 +27,16 @@ public class Budget extends AbstractPojo<BudgetDto> {
     private Date toDate;
 
     //TODO
-    @Column(name = "category_id", nullable = false)
-    private long categoryId;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private Category categoryId;
 
     @Column(name = "amount", nullable = false)
     private double amount;
 
     //TODO
-    @Column(name = "account_id", nullable = false)
-    private long accountId;
+    @ManyToOne
+    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private Account accountId;
     private String title;
 
     public void fromDto(BudgetDto dto) {

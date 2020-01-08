@@ -1,8 +1,10 @@
 package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.EnumType;
@@ -12,7 +14,8 @@ import javax.validation.constraints.Positive;
 
 @Getter
 @Setter
-public class TransactionDto extends AbstractDto{
+@NoArgsConstructor
+public class ResponseTransactionDto extends AbstractDto{
 
     private long id;
 
@@ -20,11 +23,8 @@ public class TransactionDto extends AbstractDto{
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @NotNull
-    @Positive
-    private long categoryId;
+    private Category categoryId;
 
-    @NotNull
     @Positive
     private double amount;
 

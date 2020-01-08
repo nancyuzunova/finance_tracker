@@ -5,7 +5,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Transaction;
-import ittalents.javaee.model.dto.TransactionDto;
+import ittalents.javaee.model.dto.RequestTransactionDto;
 import ittalents.javaee.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,16 +29,16 @@ public class TransactionService {
         this.categoryService = categoryService;
     }
 
-    public long createTransaction(long accountId, TransactionDto transactionDto) {
+    public long createTransaction(long accountId, RequestTransactionDto requestTransactionDto) {
         Transaction transaction = new Transaction();
-        transaction.fromDto(transactionDto);
+        transaction.fromDto(requestTransactionDto);
         transaction.setDate(LocalDateTime.now());
-        transaction.setAccountId(accountId);
-        transaction.setCurrency(transactionDto.getCurrency());
+        transaction.setAccount(accountId);
+        transaction.setCurrency(requestTransactionDto.getCurrency());
         return this.transactionRepository.save(transaction).getId();
     }
 
-    public List<TransactionDto> getTransactionsByAccountId(long id) {
+    public List<RequestTransactionDto> getTransactionsByAccountId(long id) {
         return transactionRepository.findAllByAccountId(id).stream().map(Transaction::toDto).collect(Collectors.toList());
     }
 

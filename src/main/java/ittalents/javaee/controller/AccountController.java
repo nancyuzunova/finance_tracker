@@ -1,9 +1,6 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.AuthorizationException;
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
@@ -50,7 +47,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transactions")
     public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
-        List<TransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
+        List<RequestTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(transactions);
     }
 
@@ -79,8 +76,8 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/{id}/makeTransaction")
-    public ResponseEntity makeTransaction(@PathVariable @Positive long accountId, @RequestBody @Valid TransactionDto transactionDto) {
-        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(accountId, transactionDto)));
+    public ResponseEntity makeTransaction(@PathVariable @Positive long accountId, @RequestBody @Valid RequestTransactionDto requestTransactionDto) {
+        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(accountId, requestTransactionDto)));
         return ResponseEntity.created(location).build();
     }
 
@@ -92,7 +89,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transactions/type")
     public ResponseEntity getTransactionsByType(@PathVariable@Positive long accountId, @RequestParam("type") Type type){
-        List<TransactionDto> transactionDtos = accountService.getTransactionsByType(accountId, type);
-        return ResponseEntity.ok(transactionDtos);
+        List<RequestTransactionDto> requestTransactionDtos = accountService.getTransactionsByType(accountId, type);
+        return ResponseEntity.ok(requestTransactionDtos);
     }
 }

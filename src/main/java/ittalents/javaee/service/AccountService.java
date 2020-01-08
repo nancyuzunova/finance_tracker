@@ -127,7 +127,7 @@ public class AccountService {
         return transferService.getTransfersByAccountId(id);
     }
 
-    public long makeTransaction(long id, TransactionDto transactionDto) {
+    public long makeTransaction(long id, RequestTransactionDto requestTransactionDto) {
         Optional<Account> accountById = accountRepository.findById(id);
 
         if (!accountById.isPresent()) {
@@ -135,24 +135,24 @@ public class AccountService {
         }
 
         Account account = accountById.get();
-        double amount = transactionDto.getAmount();
+        double amount = requestTransactionDto.getAmount();
 
-        if (!transactionDto.getCurrency().equals(account.getCurrency())) {
-            amount = CurrencyConverter.convert(transactionDto.getCurrency(), account.getCurrency(), amount);
+        if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
+            amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
         }
 
-        if (Type.EXPENSE.equals(transactionDto.getType()) && account.getBalance() < amount) {
+        if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
             throw new InvalidOperationException("Not enough account balance!");
         }
 
-        if (Type.EXPENSE.equals(transactionDto.getType())) {
+        if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
             account.setBalance(account.getBalance() - amount);
         } else {
             account.setBalance(account.getBalance() + amount);
         }
 
         accountRepository.save(account);
-        return this.transactionService.createTransaction(account.getId(), transactionDto);
+        return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
     }
 
     public long addBudget(long id, BudgetDto budgetDto) {
@@ -165,7 +165,7 @@ public class AccountService {
         return budgetService.createBudget(account.getId(), budgetDto);
     }
 
-    public List<TransactionDto> getTransactionsByType(long id, Type type) {
+    public List<RequestTransactionDto> getTransactionsByType(long id, Type type) {
         return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
     }
 }
