@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Optional;
 
@@ -42,6 +43,7 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
     private Account account;
+    @NotNull
     private String title;
 
     @Autowired

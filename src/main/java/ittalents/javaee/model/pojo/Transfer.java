@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     @Column(name = "amount", nullable = false, updatable = false)
     private double amount;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Currency currency;
 

@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 @Getter
@@ -25,9 +27,13 @@ public class Account extends AbstractPojo<AccountDto,AccountDto> {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
     private User user;
+
+    @NotNull
     private LocalDateTime createdOn;
+    @Positive
     private double balance;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Currency currency;
 

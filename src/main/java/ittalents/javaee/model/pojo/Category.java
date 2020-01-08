@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -35,10 +36,14 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private CategoryName name;
+
+    @NotNull
     private String iconURL;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Type type;
 

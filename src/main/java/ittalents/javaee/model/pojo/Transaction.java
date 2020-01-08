@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     private int id;
 
     @Column(name = "type")
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Type type;
     @ManyToOne
@@ -33,12 +35,14 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     private Category category;
     @Positive
     private double amount;
+    @NotNull
     private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private Account account;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
