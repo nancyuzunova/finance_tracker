@@ -3,6 +3,8 @@ package ittalents.javaee.service;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.model.dto.ResponseTransactionDto;
+import ittalents.javaee.model.dto.ResponseTransferDto;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Transaction;
 import ittalents.javaee.model.dto.RequestTransactionDto;
@@ -38,7 +40,7 @@ public class TransactionService {
         return this.transactionRepository.save(transaction).getId();
     }
 
-    public List<RequestTransactionDto> getTransactionsByAccountId(long id) {
+    public List<ResponseTransactionDto> getTransactionsByAccountId(long id) {
         return transactionRepository.findAllByAccountId(id).stream().map(Transaction::toDto).collect(Collectors.toList());
     }
 

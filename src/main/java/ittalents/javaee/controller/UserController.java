@@ -41,19 +41,11 @@ public class UserController extends AbstractController {
     @GetMapping("/users/profile")
     public ResponseEntity getUserById(HttpSession session) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-
-        if (user == null) {
-            throw new AuthorizationException("To use this service, please log in!");
-        }
-
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/users/accounts")
     public ResponseEntity getAccountsByUserId(HttpSession session) {
-        if (!SessionManager.validateLogged(session)) {
-            throw new AuthorizationException("To use this service, please log in!");
-        }
         List<AccountDto> accounts = this.accountService.
                 getAllAccountsByUserId(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
         return ResponseEntity.ok(accounts);
@@ -81,10 +73,6 @@ public class UserController extends AbstractController {
 
     @PostMapping("/users/accounts")
     public ResponseEntity addAccount(HttpSession session, @RequestBody @Valid AccountDto accountDto) {
-        if (!SessionManager.validateLogged(session)) {
-            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED.value()).build();
-        }
-
         URI location = URI.create(String.format("/accounts/%d",
                 this.userService
                         .addAccount(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), accountDto)));
@@ -93,21 +81,13 @@ public class UserController extends AbstractController {
 
     @PutMapping("/users/edit")
     public ResponseEntity updateUser(HttpSession session, @RequestBody @Valid UserDto userDto) {
-        if (SessionManager.validateLogged(session)) {
-            UserDto user = userService
-                    .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto).toDto();
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED.value()).build();
-        }
+        UserDto user = userService
+                .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto).toDto();
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/users/delete")
     public ResponseEntity deleteUser(HttpSession session) {
-        if (!SessionManager.validateLogged(session)) {
-            throw new InvalidOperationException("To use this service, please log in!");
-        }
-
         userService.deleteUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
         session.invalidate();
         return ResponseEntity.noContent().build();

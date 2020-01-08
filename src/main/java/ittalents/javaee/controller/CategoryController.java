@@ -29,9 +29,10 @@ public class CategoryController extends AbstractController{
     }
 
     @PutMapping("/categories/{categoryId}/{iconId}")
-    public void changeCategoryIcon(@PathVariable("categoryId") @Positive long categoryId,
+    public ResponseEntity changeCategoryIcon(@PathVariable("categoryId") @Positive long categoryId,
                                    @PathVariable("iconId") @Positive long iconId) throws SQLException {
         categoryService.changeCategoryIcon(categoryId, iconId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/categories/{id}/icons")

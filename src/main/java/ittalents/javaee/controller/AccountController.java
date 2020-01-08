@@ -41,19 +41,19 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transfers")
     public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
-        List<RequestTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
+        List<ResponseTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(accounts);
     }
 
     @GetMapping("/accounts/{id}/transactions")
     public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
-        List<RequestTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
+        List<ResponseTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(value = "/accounts/{id}/budgets")
     public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId){
-        List<RequestBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
+        List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
         return ResponseEntity.ok(budgets);
     }
 
@@ -89,7 +89,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transactions/type")
     public ResponseEntity getTransactionsByType(@PathVariable@Positive long accountId, @RequestParam("type") Type type){
-        List<RequestTransactionDto> requestTransactionDtos = accountService.getTransactionsByType(accountId, type);
+        List<ResponseTransactionDto> requestTransactionDtos = accountService.getTransactionsByType(accountId, type);
         return ResponseEntity.ok(requestTransactionDtos);
     }
 }

@@ -120,7 +120,7 @@ public class AccountService {
         }
     }
 
-    public List<RequestTransferDto> getTransfersByAccountId(long id) {
+    public List<ResponseTransferDto> getTransfersByAccountId(long id) {
         if (!accountRepository.existsById(id)) {
             throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
         }
@@ -165,7 +165,7 @@ public class AccountService {
         return budgetService.createBudget(account.getId(), requestBudgetDto);
     }
 
-    public List<RequestTransactionDto> getTransactionsByType(long id, Type type) {
+    public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
         return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
     }
 }

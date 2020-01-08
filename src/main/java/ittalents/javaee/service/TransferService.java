@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.model.dto.ResponseTransferDto;
 import ittalents.javaee.model.pojo.Transfer;
 import ittalents.javaee.model.dto.RequestTransferDto;
 import ittalents.javaee.repository.TransferRepository;
@@ -29,7 +30,7 @@ public class TransferService {
         return transferRepository.save(transfer).getId();
     }
 
-    public List<RequestTransferDto> getTransfersByAccountId(long id) {
+    public List<ResponseTransferDto> getTransfersByAccountId(long id) {
         List<Transfer> allTransfers = new ArrayList<>();
         allTransfers.addAll(transferRepository.findByFromAccountId(id));
         allTransfers.addAll(transferRepository.findByToAccountId(id));

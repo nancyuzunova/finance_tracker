@@ -2,6 +2,7 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Budget;
 import ittalents.javaee.model.dto.RequestBudgetDto;
@@ -99,8 +100,8 @@ public class BudgetService {
         return this.budgetRepository.save(budget).getId();
     }
 
-    public List<RequestBudgetDto> getBudgetsByAccountId(long id) {
-        List<RequestBudgetDto> budgets = new ArrayList<>();
+    public List<ResponseBudgetDto> getBudgetsByAccountId(long id) {
+        List<ResponseBudgetDto> budgets = new ArrayList<>();
         for (Budget budget : this.budgetRepository.findAllByAccountId(id)) {
             budgets.add(budget.toDto());
         }
