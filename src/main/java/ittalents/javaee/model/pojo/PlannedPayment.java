@@ -1,14 +1,18 @@
 package ittalents.javaee.model.pojo;
 
+import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
+import ittalents.javaee.repository.AccountRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -34,9 +38,22 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
     @NotNull
     private Date date;
 
+    @Transient
+    @Autowired
+    private AccountRepository accountRepository;
+
     @Override
     void fromDto(RequestPlannedPaymentDto dto) {
+        this.amount = dto.getAmount();
+        Optional<Account> acc = accountRepository.findById(dto.getAccountId());
 
+        if (!acc.isPresent()) {
+            throw new ElementNotFoundException("Account can not be found!");
+        }
+
+        this.account = acc.get();
+        this.title = dto.getTitle();
+        this.date = dto.getDate();
     }
 
     @Override
