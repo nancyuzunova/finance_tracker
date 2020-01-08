@@ -22,6 +22,8 @@ public class Transaction extends AbstractPojo<TransactionDto> {
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private Type type;
+
+    // TODO Category category
     private long categoryId;
     private double amount;
     private LocalDateTime date;
