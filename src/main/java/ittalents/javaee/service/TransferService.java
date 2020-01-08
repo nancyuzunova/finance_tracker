@@ -7,8 +7,8 @@ import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ public class TransferService {
     public long createTransfer(RequestTransferDto requestTransferDto) {
         Transfer transfer = new Transfer();
         transfer.fromDto(requestTransferDto);
-        transfer.setDate(LocalDateTime.now());
+        transfer.setDate(new Date());
         transfer.setCurrency(requestTransferDto.getCurrency());
         return transferRepository.save(transfer).getId();
     }
