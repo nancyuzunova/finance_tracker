@@ -24,7 +24,7 @@ public class Transfer extends AbstractPojo<TransferDto> {
     @Column(name = "from_account_id", nullable = false, updatable = false)
     private long fromAccountId;
 
-    // TODO
+    //TODO
     @Column(name = "to_account_id", nullable = false, updatable = false)
 //    @OneToMany
 //    @JoinColumn(name = "to_account_id")

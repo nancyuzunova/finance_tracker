@@ -1,9 +1,9 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.dto.AccountDto;
-import ittalents.javaee.model.dto.BudgetDto;
-import ittalents.javaee.model.dto.TransactionDto;
-import ittalents.javaee.model.dto.TransferDto;
+import ittalents.javaee.exceptions.AuthorizationException;
+import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
@@ -35,44 +36,39 @@ public class AccountController extends AbstractController{
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity getAllAccounts() {
-        List<AccountDto> accounts = accountService.getAllAccounts();
+    public ResponseEntity getMyAccounts(HttpSession session) {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<AccountDto> accounts = accountService.getAllAccountsByUserId(user.getId());
         return ResponseEntity.ok(accounts);
     }
 
-    @GetMapping("/accounts/{id}")
-    public ResponseEntity getAccountById(@PathVariable @Positive long id) {
-        AccountDto accountDto = accountService.getAccountById(id).toDto();
-        return ResponseEntity.ok(accountDto);
-    }
-
     @GetMapping("/accounts/{id}/transfers")
-    public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long id) {
-        List<TransferDto> accounts = accountService.getTransfersByAccountId(id);
+    public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
+        List<TransferDto> accounts = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(accounts);
     }
 
     @GetMapping("/accounts/{id}/transactions")
-    public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long id) {
-        List<TransactionDto> transactions = transactionService.getTransactionsByAccountId(id);
+    public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
+        List<TransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping(value = "/accounts/{id}/budgets")
-    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long id){
-        List<BudgetDto> budgets = budgetService.getBudgetsByAccountId(id);
+    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId){
+        List<BudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
         return ResponseEntity.ok(budgets);
     }
 
     @PutMapping("/accounts/{id}")
-    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long id, @RequestParam Currency currency) {
-        AccountDto account = accountService.changeAccountCurrency(id, currency).toDto();
+    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long accountId, @RequestParam Currency currency) {
+        AccountDto account = accountService.changeAccountCurrency(accountId, currency).toDto();
         return ResponseEntity.ok(account);
     }
 
     @DeleteMapping("/accounts/{id}")
-    public ResponseEntity deleteAccount(@PathVariable @Positive long id) {
-        this.accountService.deleteAccount(id);
+    public ResponseEntity deleteAccount(@PathVariable @Positive long accountId) {
+        this.accountService.deleteAccount(accountId);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,20 +79,20 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/{id}/makeTransaction")
-    public ResponseEntity makeTransaction(@PathVariable @Positive long id, @RequestBody @Valid TransactionDto transactionDto) {
-        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(id, transactionDto)));
+    public ResponseEntity makeTransaction(@PathVariable @Positive long accountId, @RequestBody @Valid TransactionDto transactionDto) {
+        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(accountId, transactionDto)));
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/accounts/{id}/budgets")
-    public ResponseEntity addBudget(@PathVariable @Positive long id, @RequestBody @Valid BudgetDto budgetDto){
-        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(id, budgetDto)));
+    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid BudgetDto budgetDto){
+        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(accountId, budgetDto)));
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/accounts/{id}/transactions/type")
-    public ResponseEntity getTransactionsByType(@PathVariable @Positive long id, @RequestParam("type") Type type){
-        List<TransactionDto> transactionDtos = accountService.getTransactionsByType(id, type);
+    public ResponseEntity getTransactionsByType(@PathVariable@Positive long accountId, @RequestParam("type") Type type){
+        List<TransactionDto> transactionDtos = accountService.getTransactionsByType(accountId, type);
         return ResponseEntity.ok(transactionDtos);
     }
 }

@@ -2,17 +2,13 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
-import ittalents.javaee.model.dto.AccountDto;
-import ittalents.javaee.model.dto.BudgetDto;
-import ittalents.javaee.model.dto.TransactionDto;
-import ittalents.javaee.model.dto.TransferDto;
+import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -34,14 +30,14 @@ public class AccountService {
         this.transactionService = transactionService;
         this.budgetService = budgetService;
     }
-
-    public List<AccountDto> getAllAccounts() {
-        List<AccountDto> accounts = new ArrayList<>();
-        for (Account account : accountRepository.findAll()) {
-            accounts.add(account.toDto());
-        }
-        return accounts;
-    }
+//
+//    public List<AccountDto> getAllAccounts(UserDto user) {
+//        List<AccountDto> accounts = new ArrayList<>();
+//        for (Account account : accountRepository.findAll()) {
+//            accounts.add(account.toDto());
+//        }
+//        return accounts;
+//    }
 
     public List<AccountDto> getAllAccountsByUserId(long id) {
         return accountRepository.findAllByUserId(id).stream().map(Account::toDto).collect(Collectors.toList());

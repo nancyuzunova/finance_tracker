@@ -55,7 +55,7 @@ public class UserService {
     public long createUser(UserRegisterDto userDto) {
         if (userDto.getPassword().equals(userDto.getConfirmationPassword())) {
             if (userRepository.findByEmail(userDto.getEmail()) != null) {
-                throw new InvalidOperationException("Username already exists!");
+                throw new InvalidOperationException("User already exists!");
             }
             LocalDateTime now = LocalDateTime.now();
             User user = new User();
