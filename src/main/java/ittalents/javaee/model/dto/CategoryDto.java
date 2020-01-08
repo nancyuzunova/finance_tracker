@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class CategoryDto extends AbstractDto{
+public class CategoryDto extends AbstractDto {
 
     private long id;
 

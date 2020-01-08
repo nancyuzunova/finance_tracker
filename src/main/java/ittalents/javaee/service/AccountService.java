@@ -81,31 +81,31 @@ public class AccountService {
         this.accountRepository.deleteById(id);
     }
 
-    public long makeTransfer(TransferDto transferDto) {
+    public long makeTransfer(RequestTransferDto requestTransferDto) {
         Account accountFrom;
         Account accountTo;
 
         try {
-            accountFrom = getAccountById(transferDto.getFromAccountId());
+            accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         } catch (NoSuchElementException e) {
             throw new InvalidOperationException(
-                    "Account with id " + transferDto.getFromAccountId() + " does not exists!");
+                    "Account with id " + requestTransferDto.getFromAccountId() + " does not exists!");
         }
 
         try {
-            accountTo = getAccountById(transferDto.getToAccountId());
+            accountTo = getAccountById(requestTransferDto.getToAccountId());
         } catch (NoSuchElementException e) {
             throw new InvalidOperationException(
-                    "Account with id " + transferDto.getToAccountId() + " does not exists!");
+                    "Account with id " + requestTransferDto.getToAccountId() + " does not exists!");
         }
 
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
             throw new InvalidOperationException("You can not make transfer to other users!");
         }
 
-        double amount = transferDto.getAmount();
-        double fromAmount = CurrencyConverter.convert(transferDto.getCurrency(), accountFrom.getCurrency(), amount);
-        double toAmount = CurrencyConverter.convert(transferDto.getCurrency(), accountTo.getCurrency(), amount);
+        double amount = requestTransferDto.getAmount();
+        double fromAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountFrom.getCurrency(), amount);
+        double toAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountTo.getCurrency(), amount);
 
         if (accountFrom.getBalance() >= fromAmount) {
             // make transfer
@@ -114,13 +114,13 @@ public class AccountService {
 
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
-            return this.transferService.createTransfer(transferDto);
+            return this.transferService.createTransfer(requestTransferDto);
         } else {
             throw new InvalidOperationException("Not enough balance!");
         }
     }
 
-    public List<TransferDto> getTransfersByAccountId(long id) {
+    public List<RequestTransferDto> getTransfersByAccountId(long id) {
         if (!accountRepository.existsById(id)) {
             throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
         }

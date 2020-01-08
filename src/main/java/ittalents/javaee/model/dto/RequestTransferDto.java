@@ -1,7 +1,6 @@
 package ittalents.javaee.model.dto;
 
 import ittalents.javaee.model.pojo.Currency;
-import ittalents.javaee.model.pojo.Type;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,24 +8,27 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class TransactionDto extends AbstractDto {
+public class RequestTransferDto extends AbstractDto {
 
     private long id;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    @Positive
+    private long fromAccountId;
 
     @NotNull
     @Positive
-    private long categoryId;
+    private long toAccountId;
 
     @NotNull
     @Positive
     private double amount;
+
+    private LocalDateTime date;
 
     @NotNull
     @Enumerated(EnumType.STRING)

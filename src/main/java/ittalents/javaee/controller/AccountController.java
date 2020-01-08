@@ -1,9 +1,6 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.AuthorizationException;
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
@@ -44,7 +41,7 @@ public class AccountController extends AbstractController{
 
     @GetMapping("/accounts/{id}/transfers")
     public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
-        List<TransferDto> accounts = accountService.getTransfersByAccountId(accountId);
+        List<RequestTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(accounts);
     }
 
@@ -73,8 +70,8 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/makeTransfer")
-    public ResponseEntity makeTransfer(@RequestBody @Valid TransferDto transferDto) {
-        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(transferDto)));
+    public ResponseEntity makeTransfer(@RequestBody @Valid RequestTransferDto requestTransferDto) {
+        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(requestTransferDto)));
         return ResponseEntity.created(location).build();
     }
 
