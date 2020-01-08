@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "categories")
-public class Category extends AbstractPojo<CategoryDto> {
+public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
 
     public enum CategoryName {
         // general categories
