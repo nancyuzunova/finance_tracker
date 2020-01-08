@@ -20,9 +20,11 @@ public class Transfer extends AbstractPojo<TransferDto> {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
+    //TODO
     @Column(name = "from_account_id", nullable = false, updatable = false)
     private long fromAccountId;
 
+    //TODO
     @Column(name = "to_account_id", nullable = false, updatable = false)
     private long toAccountId;
 

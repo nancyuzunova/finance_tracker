@@ -26,12 +26,14 @@ public class Budget extends AbstractPojo<BudgetDto> {
     @Column(name = "to_date", nullable = false)
     private Date toDate;
 
+    //TODO
     @Column(name = "category_id", nullable = false)
     private long categoryId;
 
     @Column(name = "amount", nullable = false)
     private double amount;
 
+    //TODO
     @Column(name = "account_id", nullable = false)
     private long accountId;
     private String title;
