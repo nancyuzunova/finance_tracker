@@ -162,7 +162,7 @@ public class AccountService {
             throw new InvalidOperationException("The budget can not exceed the account balance!");
         }
 
-        return budgetService.createBudget(account.getId(), requestBudgetDto);
+        return budgetService.createBudget(requestBudgetDto);
     }
 
     public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
