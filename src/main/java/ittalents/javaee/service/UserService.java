@@ -53,8 +53,8 @@ public class UserService {
     }
 
     public long createUser(UserRegisterDto userDto) {
-        if(userDto.getPassword().equals(userDto.getConfirmationPassword())) {
-            if(userRepository.findByEmail(userDto.getEmail()) != null){
+        if (userDto.getPassword().equals(userDto.getConfirmationPassword())) {
+            if (userRepository.findByEmail(userDto.getEmail()) != null) {
                 throw new InvalidOperationException("Username already exists!");
             }
             LocalDateTime now = LocalDateTime.now();
@@ -86,18 +86,22 @@ public class UserService {
     }
 
     public UserDto logUser(LoginUserDto userDto) {
-        boolean passwordsMatches = BCrypt.checkpw(userDto.getPassword(), userRepository.findByEmail(userDto.getEmail()).getPassword());
-        if(passwordsMatches){
-            User user = userRepository.findByEmail(userDto.getEmail());
-            if (user != null) {
-                user.setLastLogin(LocalDateTime.now());
-                return this.userRepository.save(user).toDto();
-            }
+        User user = userRepository.findByEmail(userDto.getEmail());
+
+        if (user == null) {
+            throw new AuthorizationException("User could NOT be found. Please check your credentials");
         }
+
+        boolean passwordsMatches = BCrypt.checkpw(userDto.getPassword(), userRepository.findByEmail(userDto.getEmail()).getPassword());
+        if (passwordsMatches) {
+            user.setLastLogin(LocalDateTime.now());
+            return this.userRepository.save(user).toDto();
+        }
+
         throw new AuthorizationException("User could NOT be found. Please check your credentials");
     }
 
-    public List<User> getInactiveUsers(LocalDate date){
+    public List<User> getInactiveUsers(LocalDate date) {
         return this.userRepository.findAllByLastLoginBefore(date);
     }
 }
