@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @Component
 public class MailRemainder {
 
-    private static final int MAX_INACTIVE_DAYS = 10 * 24 * 60 * 60 * 1000; // ms
     private static final int DAYS_TO_SUBTRACT = 10;
 
     private final String subject = "It's been awhile";
@@ -22,8 +21,7 @@ public class MailRemainder {
     @Autowired
     private UserService userService;
 
-    //Todo make it do it every day
-    @Scheduled(fixedRate = MAX_INACTIVE_DAYS)
+    @Scheduled(cron = "0 0 */10 * *")
     public void sendEmailToRemain() {
         for (User user : userService.getInactiveUsers(LocalDate.now().minusDays(DAYS_TO_SUBTRACT))) {
             MailSender.sendMail(user.getEmail(), subject, body);

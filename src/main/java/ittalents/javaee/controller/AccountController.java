@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @Validated
-public class AccountController extends AbstractController{
+public class AccountController extends AbstractController {
 
     private AccountService accountService;
     private TransactionService transactionService;
@@ -52,7 +52,7 @@ public class AccountController extends AbstractController{
     }
 
     @GetMapping(value = "/accounts/{id}/budgets")
-    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId){
+    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId) {
         List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
         return ResponseEntity.ok(budgets);
     }
@@ -82,14 +82,20 @@ public class AccountController extends AbstractController{
     }
 
     @PostMapping("/accounts/{id}/budgets")
-    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid RequestBudgetDto requestBudgetDto){
+    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
         URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(accountId, requestBudgetDto)));
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/accounts/{id}/transactions/type")
-    public ResponseEntity getTransactionsByType(@PathVariable@Positive long accountId, @RequestParam("type") Type type){
+    public ResponseEntity getTransactionsByType(@PathVariable @Positive long accountId, @RequestParam("type") Type type) {
         List<ResponseTransactionDto> requestTransactionDtos = accountService.getTransactionsByType(accountId, type);
         return ResponseEntity.ok(requestTransactionDtos);
+    }
+
+    @PostMapping("/accounts/makePlannedPayment")
+    public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
+        URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
+        return ResponseEntity.created(location).build();
     }
 }

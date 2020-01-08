@@ -178,16 +178,15 @@ public class AccountService {
         return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
     }
 
-    //TODO
     @Scheduled(cron = "0 0 0 * * *")
-    public void payPlannedPayments(HttpSession session){
+    public void payPlannedPayments(HttpSession session) {
         Date today = new Date();
         List<PlannedPayment> payments = paymentRepository.findAllByDateAndStatus(today, PlannedPayment.PaymentStatus.ACTIVE);
         payments.sort((p1, p2) -> Double.compare(p1.getAmount(), p2.getAmount()));
-        for(PlannedPayment payment : payments){
+        for (PlannedPayment payment : payments) {
             double amount = payment.getAmount();
             double availability = payment.getAccount().getBalance();
-            if(availability < amount){
+            if (availability < amount) {
                 UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
                 MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
                         payment.getTitle() + " has failed because of  insufficient balance of your account. " +
@@ -198,5 +197,11 @@ public class AccountService {
             payment.setStatus(PlannedPayment.PaymentStatus.PAID);
             this.paymentRepository.save(payment);
         }
+    }
+
+    public long createPlannedPayment(RequestPlannedPaymentDto dto) {
+        PlannedPayment plannedPayment = new PlannedPayment();
+        plannedPayment.fromDto(dto);
+        return this.paymentRepository.save(plannedPayment).getId();
     }
 }
