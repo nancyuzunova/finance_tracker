@@ -8,11 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Getter
@@ -43,7 +42,7 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     private Currency currency;
 
     @Column(name = "date", nullable = false, updatable = false)
-    private LocalDateTime date;
+    private Date date;
 
     @Autowired
     @Transient
@@ -60,6 +59,7 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
         this.fromAccount = fromAccountById.get();
         this.toAccount = toAccountById.get();
         this.amount = requestTransferDto.getAmount();
+        this.date = requestTransferDto.getDate();
     }
 
     public ResponseTransferDto toDto() {
