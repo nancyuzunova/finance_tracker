@@ -1,9 +1,6 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.model.dto.AccountDto;
-import ittalents.javaee.model.dto.LoginUserDto;
-import ittalents.javaee.model.dto.UserDto;
-import ittalents.javaee.model.dto.UserRegisterDto;
+import ittalents.javaee.model.dto.*;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,12 +81,8 @@ public class UserController extends AbstractController {
     }
 
     @PutMapping("/users/changePassword")
-    public ResponseEntity<UserDto> changePassword(HttpSession session,
-                                                  @RequestBody String oldPassword,
-                                                  @RequestBody String newPassword,
-                                                  @RequestBody String confirmNewPassword) {
-        UserDto user = userService.changePassword(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(),
-                oldPassword, newPassword, confirmNewPassword);
+    public ResponseEntity<UserDto> changePassword(HttpSession session, @RequestBody @Valid UserChangePasswordDto dto) {
+        UserDto user = userService.changePassword(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), dto);
         return ResponseEntity.ok(user);
     }
 

@@ -3,11 +3,8 @@ package ittalents.javaee.service;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
-import ittalents.javaee.model.dto.AccountDto;
-import ittalents.javaee.model.dto.LoginUserDto;
-import ittalents.javaee.model.dto.UserRegisterDto;
+import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.User;
-import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -105,18 +102,18 @@ public class UserService {
         return this.userRepository.findAllByLastLoginBefore(date);
     }
 
-    public UserDto changePassword(long userId, String oldPassword, String newPassword, String confirmNewPassword) {
+    public UserDto changePassword(long userId, UserChangePasswordDto userDto) {
         User user = getUserById(userId);
 
-        if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
+        if (!BCrypt.checkpw(userDto.getOldPassword(), user.getPassword())) {
             throw new InvalidOperationException("Changing password can not be proceed!");
         }
 
-        if (!newPassword.equals(confirmNewPassword)) {
-            throw new InvalidOperationException("The password and its confirmation do not match. Please try again");
+        if (!userDto.getNewPassword().equals(userDto.getConfirmNewPassword())) {
+            throw new InvalidOperationException("The new password and its confirmation do not match.");
         }
 
-        String password = encoder.encode(newPassword);
+        String password = encoder.encode(userDto.getNewPassword());
         user.setPassword(password);
         return userRepository.save(user).toDto();
     }
