@@ -37,14 +37,14 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Object> handleConstraintViolationException(RuntimeException e){
+    protected ResponseEntity<Object> handleConstraintViolationException(RuntimeException e) {
         ApiError error = new ApiError("Invalid form registration! Please check", LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected ResponseEntity<Object> handleAuthorizationException(RuntimeException e){
+    protected ResponseEntity<Object> handleAuthorizationException(RuntimeException e) {
         ApiError error = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
@@ -58,14 +58,14 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String msg = "Wrong credentials! Name and email could NOT be blank! Password must contain at least one lowercase, one uppercase and one digit! ";
+        String msg = "Invalid input data! Please check!";
         ApiError error = new ApiError(msg, LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    protected ApiError handleGlobalException(Exception e){
+    protected ApiError handleGlobalException(Exception e) {
         return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
                 HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
     }
