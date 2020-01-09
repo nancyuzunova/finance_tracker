@@ -3,12 +3,9 @@ package ittalents.javaee.model.pojo;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
-import ittalents.javaee.repository.AccountRepository;
-import ittalents.javaee.repository.CategoryRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -46,25 +43,8 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     @NotNull
     private String title;
 
-    @Autowired
-    @Transient
-    private AccountRepository accountRepository;
-    @Autowired
-    @Transient
-    private CategoryRepository categoryRepository;
-
     public void fromDto(RequestBudgetDto dto) {
-        Optional<Account> acc = accountRepository.findById(account.getId());
-        if(!acc.isPresent()){
-            throw new InvalidOperationException("Account cannot be found!");
-        }
-        this.account = acc.get();
         this.amount = dto.getAmount();
-        Optional<Category> c = categoryRepository.findById(category.getId());
-        if(!c.isPresent()){
-            throw new InvalidOperationException("No such category!");
-        }
-        this.category = c.get();
         this.fromDate = dto.getFromDate();
         this.toDate = dto.getToDate();
         this.title = dto.getTitle();

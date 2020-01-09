@@ -81,9 +81,9 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/accounts/{id}/budgets")
-    public ResponseEntity addBudget(@PathVariable @Positive long accountId, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
-        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(accountId, requestBudgetDto)));
+    @PostMapping("/accounts/budgets")
+    public ResponseEntity addBudget(@RequestBody @Valid RequestBudgetDto requestBudgetDto) {
+        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(requestBudgetDto)));
         return ResponseEntity.created(location).build();
     }
 
