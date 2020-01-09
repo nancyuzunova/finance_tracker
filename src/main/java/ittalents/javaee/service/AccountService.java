@@ -164,8 +164,8 @@ public class AccountService {
         return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
     }
 
-    public long addBudget(long id, RequestBudgetDto requestBudgetDto) {
-        Account account = getAccountById(id);
+    public long addBudget(RequestBudgetDto requestBudgetDto) {
+        Account account = getAccountById(requestBudgetDto.getAccountId());
 
         if (account.getBalance() < requestBudgetDto.getAmount()) {
             throw new InvalidOperationException("The budget can not exceed the account balance!");

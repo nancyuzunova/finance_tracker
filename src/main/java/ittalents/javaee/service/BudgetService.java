@@ -99,6 +99,17 @@ public class BudgetService {
             throw new InvalidOperationException("You can not create budget!");
         }
 
+        Optional<Account> acc = accountRepository.findById(requestBudgetDto.getAccountId());
+        if (!acc.isPresent()) {
+            throw new InvalidOperationException("Account cannot be found!");
+        }
+        budget.setAccount(acc.get());
+
+        Optional<Category> c = categoryRepository.findById(requestBudgetDto.getCategoryId());
+        if (!c.isPresent()) {
+            throw new InvalidOperationException("No such category!");
+        }
+        budget.setCategory(c.get());
         budget.fromDto(requestBudgetDto);
         return this.budgetRepository.save(budget).getId();
     }
