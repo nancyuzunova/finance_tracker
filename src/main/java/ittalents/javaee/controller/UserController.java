@@ -1,7 +1,5 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.AuthorizationException;
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.LoginUserDto;
 import ittalents.javaee.model.dto.UserDto;
@@ -9,7 +7,6 @@ import ittalents.javaee.model.dto.UserRegisterDto;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -59,14 +56,14 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity login(HttpSession session, @RequestBody @Valid LoginUserDto loginUserDto){
+    public ResponseEntity login(HttpSession session, @RequestBody @Valid LoginUserDto loginUserDto) {
         UserDto dto = this.userService.logUser(loginUserDto);
         SessionManager.logUser(session, dto);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/users/logout")
-    public ResponseEntity logout(HttpSession session){
+    public ResponseEntity logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok().build();
     }
@@ -83,6 +80,16 @@ public class UserController extends AbstractController {
     public ResponseEntity updateUser(HttpSession session, @RequestBody @Valid UserDto userDto) {
         UserDto user = userService
                 .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto).toDto();
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/users/changePassword")
+    public ResponseEntity<UserDto> changePassword(HttpSession session,
+                                                  @RequestBody String oldPassword,
+                                                  @RequestBody String newPassword,
+                                                  @RequestBody String confirmNewPassword) {
+        UserDto user = userService.changePassword(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(),
+                oldPassword, newPassword, confirmNewPassword);
         return ResponseEntity.ok(user);
     }
 

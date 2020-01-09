@@ -104,4 +104,20 @@ public class UserService {
     public List<User> getInactiveUsers(LocalDate date) {
         return this.userRepository.findAllByLastLoginBefore(date);
     }
+
+    public UserDto changePassword(long userId, String oldPassword, String newPassword, String confirmNewPassword) {
+        User user = getUserById(userId);
+
+        if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
+            throw new InvalidOperationException("Changing password can not be proceed!");
+        }
+
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw new InvalidOperationException("The password and its confirmation do not match. Please try again");
+        }
+
+        String password = encoder.encode(newPassword);
+        user.setPassword(password);
+        return userRepository.save(user).toDto();
+    }
 }
