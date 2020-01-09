@@ -32,8 +32,8 @@ public class TransferService {
 
     public List<ResponseTransferDto> getTransfersByAccountId(long id) {
         List<Transfer> allTransfers = new ArrayList<>();
-        allTransfers.addAll(transferRepository.findByFromAccountId(id));
-        allTransfers.addAll(transferRepository.findByToAccountId(id));
+        allTransfers.addAll(transferRepository.findAllByFromAccountId(id));
+        allTransfers.addAll(transferRepository.findAllByToAccountId(id));
         return allTransfers.stream().map(Transfer::toDto).collect(Collectors.toList());
     }
 
