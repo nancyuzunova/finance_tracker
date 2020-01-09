@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Date;
@@ -39,6 +40,9 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     @NotNull
     private Date date;
 
+    @NotBlank
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private Account account;
@@ -52,6 +56,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         this.amount = requestTransactionDto.getAmount();
         this.currency = requestTransactionDto.getCurrency();
         this.date = requestTransactionDto.getDate();
+        this.description = requestTransactionDto.getDescription();
     }
 
     public ResponseTransactionDto toDto() {
@@ -63,6 +68,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         responseTransactionDto.setCurrency(currency);
         responseTransactionDto.setDate(date);
         responseTransactionDto.setAccount(account);
+        responseTransactionDto.setDescription(description);
         return responseTransactionDto;
     }
 }

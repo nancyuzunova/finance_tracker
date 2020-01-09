@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Date;
@@ -39,6 +40,9 @@ public class RequestTransactionDto extends AbstractDto{
     @NotNull
     @Positive
     private long accountId;
+
+    @NotBlank
+    private String description;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")

@@ -77,7 +77,11 @@ public class TransactionService {
             document.add(new Chunk(
                     "Category: " + category.getName() + System.lineSeparator(),
                     contentFont));
+            document.add(new Chunk("Description: " + transaction.getDescription() + System.lineSeparator(),
+                    contentFont));
             document.add(new Chunk("Amount: " + transaction.getAmount() + System.lineSeparator(),
+                    contentFont));
+            document.add(new Chunk("Currency: " + transaction.getCurrency() + System.lineSeparator(),
                     contentFont));
             document.add(new Chunk("Date: " + transaction.getDate() + System.lineSeparator(),
                     contentFont));
