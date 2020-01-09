@@ -136,11 +136,11 @@ public class AccountService {
         return transferService.getTransfersByAccountId(id);
     }
 
-    public long makeTransaction(long id, RequestTransactionDto requestTransactionDto) {
-        Optional<Account> accountById = accountRepository.findById(id);
+    public long makeTransaction(RequestTransactionDto requestTransactionDto) {
+        Optional<Account> accountById = accountRepository.findById(requestTransactionDto.getAccountId());
 
         if (!accountById.isPresent()) {
-            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
+            throw new ElementNotFoundException("Account with id = " + requestTransactionDto.getAccountId() + " does not exist!");
         }
 
         Account account = accountById.get();

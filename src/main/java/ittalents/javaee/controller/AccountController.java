@@ -75,9 +75,9 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/accounts/{id}/makeTransaction")
-    public ResponseEntity makeTransaction(@PathVariable @Positive long accountId, @RequestBody @Valid RequestTransactionDto requestTransactionDto) {
-        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(accountId, requestTransactionDto)));
+    @PostMapping("/accounts/makeTransaction")
+    public ResponseEntity makeTransaction(@RequestBody @Valid RequestTransactionDto requestTransactionDto) {
+        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(requestTransactionDto)));
         return ResponseEntity.created(location).build();
     }
 
