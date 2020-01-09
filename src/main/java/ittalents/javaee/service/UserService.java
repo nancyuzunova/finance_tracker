@@ -70,10 +70,12 @@ public class UserService {
         throw new AuthorizationException("The password and its confirmation do not match. Please try again");
     }
 
-    public User updateUser(long id, UserDto userDto) {
+    public UserDto updateUser(long id, EditUserDto userDto) {
         User user = getUserById(id);
-        user.fromDto(userDto);
-        return userRepository.save(user);
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        userRepository.save(user);
+        return user.toDto();
     }
 
     public void deleteUser(long id) {

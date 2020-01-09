@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,9 @@ public class UserController extends AbstractController {
     }
 
     @PutMapping("/users/edit")
-    public ResponseEntity updateUser(HttpSession session, @RequestBody @Valid UserDto userDto) {
+    public ResponseEntity updateUser(HttpSession session, @RequestBody @Valid EditUserDto userDto) {
         UserDto user = userService
-                .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto).toDto();
+                .updateUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), userDto);
         return ResponseEntity.ok(user);
     }
 
