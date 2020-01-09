@@ -1,6 +1,7 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
@@ -25,7 +26,7 @@ public class ResponseTransactionDto extends AbstractDto{
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    private Category categoryId;
+    private Category category;
 
     @Positive
     private double amount;
@@ -37,4 +38,8 @@ public class ResponseTransactionDto extends AbstractDto{
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date date;
+
+    @NotNull
+    @Positive
+    private Account account;
 }

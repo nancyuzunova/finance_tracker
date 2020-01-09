@@ -3,6 +3,7 @@ package ittalents.javaee.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.EnumType;
@@ -13,6 +14,7 @@ import java.util.Date;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RequestTransferDto extends AbstractDto {
 
     private long id;

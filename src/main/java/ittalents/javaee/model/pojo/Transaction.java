@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -46,17 +47,8 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @Autowired
-    @Transient
-    private CategoryRepository categoryRepository;
-
     public void fromDto(RequestTransactionDto requestTransactionDto) {
         this.type = requestTransactionDto.getType();
-        Optional<Category> cat = categoryRepository.findById(requestTransactionDto.getCategoryId());
-        if(!cat.isPresent()){
-            throw new InvalidOperationException("No such category!");
-        }
-        this.category = cat.get();
         this.amount = requestTransactionDto.getAmount();
         this.currency = requestTransactionDto.getCurrency();
         this.date = requestTransactionDto.getDate();
@@ -66,10 +58,11 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         ResponseTransactionDto responseTransactionDto = new ResponseTransactionDto();
         responseTransactionDto.setId(id);
         responseTransactionDto.setType(type);
-        responseTransactionDto.setCategoryId(category);
+        responseTransactionDto.setCategory(category);
         responseTransactionDto.setAmount(amount);
         responseTransactionDto.setCurrency(currency);
         responseTransactionDto.setDate(date);
+        responseTransactionDto.setAccount(account);
         return responseTransactionDto;
     }
 }

@@ -37,6 +37,10 @@ public class RequestTransactionDto extends AbstractDto{
     private Currency currency;
 
     @NotNull
+    @Positive
+    private long accountId;
+
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date date;
 }

@@ -3,6 +3,7 @@ package ittalents.javaee.service;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
@@ -36,14 +37,14 @@ public class TransactionService {
 
     public long createTransaction(long accountId, RequestTransactionDto requestTransactionDto) {
         Transaction transaction = new Transaction();
+        Category cat = categoryService.getCategoryById(requestTransactionDto.getCategoryId());
+        transaction.setCategory(cat);
         transaction.fromDto(requestTransactionDto);
-        transaction.setDate(new Date());
         Optional<Account> acc = accountRepository.findById(accountId);
         if(!acc.isPresent()){
             throw new ElementNotFoundException("Account with id " + accountId + " does NOT exists");
         }
         transaction.setAccount(acc.get());
-        transaction.setCurrency(requestTransactionDto.getCurrency());
         return this.transactionRepository.save(transaction).getId();
     }
 
