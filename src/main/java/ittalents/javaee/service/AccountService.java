@@ -201,7 +201,16 @@ public class AccountService {
 
     public long createPlannedPayment(RequestPlannedPaymentDto dto) {
         PlannedPayment plannedPayment = new PlannedPayment();
-        plannedPayment.fromDto(dto);
+        Optional<Account> acc = accountRepository.findById(dto.getAccountId());
+        if (!acc.isPresent()) {
+            throw new ElementNotFoundException("Account can not be found!");
+        }
+        plannedPayment.setAccount(acc.get());
+        plannedPayment.setTitle(dto.getTitle());
+        plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
+        plannedPayment.setAmount(dto.getAmount());
+        plannedPayment.setDate(dto.getDate());
+        //plannedPayment.fromDto(dto);
         return this.paymentRepository.save(plannedPayment).getId();
     }
 }

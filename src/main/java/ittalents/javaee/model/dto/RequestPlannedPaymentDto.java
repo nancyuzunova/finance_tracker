@@ -1,12 +1,9 @@
 package ittalents.javaee.model.dto;
 
-import ittalents.javaee.model.pojo.PlannedPayment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -32,8 +29,4 @@ public class RequestPlannedPaymentDto extends AbstractDto {
 
     @NotNull
     private Date date;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private PlannedPayment.PaymentStatus status;
 }

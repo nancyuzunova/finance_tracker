@@ -95,6 +95,7 @@ public class AccountController extends AbstractController {
 
     @PostMapping("/accounts/makePlannedPayment")
     public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
+        System.out.println("stiga li do tuk ? ");
         URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
         return ResponseEntity.created(location).build();
     }
