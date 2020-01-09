@@ -51,7 +51,7 @@ public class UserController extends AbstractController {
     @PostMapping("/users/register")
     public ResponseEntity register(HttpSession session, @RequestBody @Valid UserRegisterDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
-        SessionManager.logUser(session, new UserDto(user));
+        SessionManager.registerAndLogUser(session, user);
         return ResponseEntity.created(location).build();
     }
 

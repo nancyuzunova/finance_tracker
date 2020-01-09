@@ -35,6 +35,7 @@ public class UserDto extends AbstractDto {
     protected List<AccountDto> accounts;
 
     public UserDto(UserRegisterDto dto){
+        this.id = dto.getId();
         this.firstName = dto.getFirstName();
         this.lastName = dto.getLastName();
         this.email = dto.getEmail();
