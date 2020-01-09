@@ -210,7 +210,6 @@ public class AccountService {
         plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
         plannedPayment.setAmount(dto.getAmount());
         plannedPayment.setDate(dto.getDate());
-        //plannedPayment.fromDto(dto);
         return this.paymentRepository.save(plannedPayment).getId();
     }
 }

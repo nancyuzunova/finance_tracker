@@ -39,13 +39,6 @@ public class UserController extends AbstractController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/users/accounts")
-    public ResponseEntity getAccountsByUserId(HttpSession session) {
-        List<AccountDto> accounts = this.accountService.
-                getAllAccountsByUserId(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
-        return ResponseEntity.ok(accounts);
-    }
-
     @PostMapping("/users/register")
     public ResponseEntity register(HttpSession session, @RequestBody @Valid UserRegisterDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
