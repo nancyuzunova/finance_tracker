@@ -1,7 +1,5 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.AuthorizationException;
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.LoginUserDto;
 import ittalents.javaee.model.dto.UserDto;
@@ -9,7 +7,6 @@ import ittalents.javaee.model.dto.UserRegisterDto;
 import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +49,7 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/register")
-    public ResponseEntity register(HttpSession session, @RequestBody UserRegisterDto user) {
+    public ResponseEntity register(HttpSession session, @RequestBody @Valid UserRegisterDto user) {
         URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
         SessionManager.logUser(session, new UserDto(user));
         return ResponseEntity.created(location).build();
