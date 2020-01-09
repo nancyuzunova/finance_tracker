@@ -26,7 +26,7 @@ public class IconDao {
             statement.setLong(1, categoryId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                urls.add(resultSet.getString("url"));
+                urls.add("/" + resultSet.getString("url"));
             }
         }
         return urls;

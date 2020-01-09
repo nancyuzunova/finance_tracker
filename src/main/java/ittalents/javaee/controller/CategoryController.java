@@ -40,10 +40,4 @@ public class CategoryController extends AbstractController{
         List<String> iconUrls = this.categoryService.getCategoryIcons(id);
         return ResponseEntity.ok(iconUrls);
     }
-
-    @DeleteMapping("/categories/{id}")
-    public ResponseEntity deleteCategory(@PathVariable @Positive long id) {
-        this.categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
-    }
 }

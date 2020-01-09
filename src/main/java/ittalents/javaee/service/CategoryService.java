@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,18 +49,16 @@ public class CategoryService {
         return iconDao.getIconsUrlsByCategoryId(id);
     }
 
-    public void deleteCategory(long id) {
-        this.categoryRepository.deleteById(id);
-    }
-
     public void changeCategoryIcon(long categoryId, long iconId) throws SQLException {
         Category category = getCategoryById(categoryId);
         List<String> urls = getCategoryIcons(categoryId);
+        Collections.sort(urls);
 
-        if (iconId < 0 || iconId >= urls.size()) {
+        if (iconId < 0 || iconId > urls.size()) {
             throw new InvalidOperationException("There is not icon with id = " + iconId);
         }
 
-        category.setIconURL(urls.get((int) categoryId));
+        category.setIconURL(urls.get((int) iconId - 1));
+        categoryRepository.save(category);
     }
 }
