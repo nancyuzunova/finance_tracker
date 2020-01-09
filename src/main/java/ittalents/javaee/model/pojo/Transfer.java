@@ -1,18 +1,14 @@
 package ittalents.javaee.model.pojo;
 
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.RequestTransferDto;
 import ittalents.javaee.model.dto.ResponseTransferDto;
-import ittalents.javaee.repository.AccountRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -44,20 +40,8 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     @Column(name = "date", nullable = false, updatable = false)
     private Date date;
 
-    @Autowired
-    @Transient
-    private AccountRepository accountRepository;
-
     public void fromDto(RequestTransferDto requestTransferDto) {
-        Optional<Account> fromAccountById = accountRepository.findById(requestTransferDto.getFromAccountId());
-        Optional<Account> toAccountById = accountRepository.findById(requestTransferDto.getToAccountId());
-
-        if (!fromAccountById.isPresent() || !toAccountById.isPresent()) {
-            throw new InvalidOperationException("Account can not be found!");
-        }
-
-        this.fromAccount = fromAccountById.get();
-        this.toAccount = toAccountById.get();
+        this.currency = requestTransferDto.getCurrency();
         this.amount = requestTransferDto.getAmount();
         this.date = requestTransferDto.getDate();
     }
