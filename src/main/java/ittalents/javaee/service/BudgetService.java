@@ -34,6 +34,7 @@ public class BudgetService {
     }
 
     public List<ResponseBudgetDto> getMyBudgets(long userId) {
+        // TODO call AccountService - getAccountsByUserId() method
         List<Account> accounts = accountRepository.findAllByUserId(userId);
         List<ResponseBudgetDto> budgets = new ArrayList<>();
         for (Account account : accounts) {
