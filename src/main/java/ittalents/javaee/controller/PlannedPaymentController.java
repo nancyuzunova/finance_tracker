@@ -1,5 +1,6 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
 import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.model.pojo.PlannedPayment;
@@ -32,6 +33,13 @@ public class PlannedPaymentController extends AbstractController {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<ResponsePlannedPaymentDto> plannedPaymentDtos = plannedPaymentService.getPaymentsByStatus(user.getId(), status);
         return ResponseEntity.ok(plannedPaymentDtos);
+    }
+
+    @PutMapping("/plannedPayments")
+    public ResponseEntity editPlannedPayment(HttpSession session, @RequestBody RequestPlannedPaymentDto paymentDto){
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponsePlannedPaymentDto response = plannedPaymentService.editPayment(user.getId(), paymentDto);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/plannedPayments/{id}")
