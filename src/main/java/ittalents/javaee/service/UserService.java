@@ -72,8 +72,14 @@ public class UserService {
 
     public UserDto updateUser(long id, EditUserDto userDto) {
         User user = getUserById(id);
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
+        String firstName = userDto.getFirstName();
+        String lastName = userDto.getLastName();
+        if(firstName != null && !firstName.isEmpty()){
+            user.setFirstName(firstName);
+        }
+        if(lastName != null && !lastName.isEmpty()){
+            user.setLastName(userDto.getLastName());
+        }
         userRepository.save(user);
         return user.toDto();
     }
