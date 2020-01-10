@@ -1,8 +1,6 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.*;
-import ittalents.javaee.model.pojo.User;
-import ittalents.javaee.service.AccountService;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +17,10 @@ import java.util.List;
 public class UserController extends AbstractController {
 
     private UserService userService;
-    private AccountService accountService;
 
     @Autowired
-    public UserController(UserService userService, AccountService accountService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.accountService = accountService;
     }
 
     @GetMapping("/users/all")

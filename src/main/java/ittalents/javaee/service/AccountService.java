@@ -39,14 +39,6 @@ public class AccountService {
         this.budgetService = budgetService;
         this.paymentRepository = paymentRepository;
     }
-//
-//    public List<AccountDto> getAllAccounts(UserDto user) {
-//        List<AccountDto> accounts = new ArrayList<>();
-//        for (Account account : accountRepository.findAll()) {
-//            accounts.add(account.toDto());
-//        }
-//        return accounts;
-//    }
 
     public List<AccountDto> getAllAccountsByUserId(long id) {
         return accountRepository.findAllByUserId(id).stream().map(Account::toDto).collect(Collectors.toList());
