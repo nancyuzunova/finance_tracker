@@ -7,10 +7,7 @@ import ittalents.javaee.service.PlannedPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -31,9 +28,16 @@ public class PlannedPaymentController extends AbstractController {
     }
 
     @GetMapping("/plannedPayments/status")
-    public ResponseEntity getPlannedPaymentsByStatus(HttpSession session, @RequestParam("status") PlannedPayment.PaymentStatus status){
+    public ResponseEntity getPlannedPaymentsByStatus(HttpSession session, @RequestParam("status") PlannedPayment.PaymentStatus status) throws SQLException {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<ResponsePlannedPaymentDto> plannedPaymentDtos = plannedPaymentService.getPaymentsByStatus(user.getId(), status);
         return ResponseEntity.ok(plannedPaymentDtos);
+    }
+
+    @DeleteMapping("/plannedPayments/{id}")
+    public ResponseEntity deletePlannedPayment(HttpSession session, @PathVariable long id) throws SQLException {
+        UserDto dto = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        plannedPaymentService.deletePlannedPayment(dto.getId(), id);
+        return ResponseEntity.noContent().build();
     }
 }

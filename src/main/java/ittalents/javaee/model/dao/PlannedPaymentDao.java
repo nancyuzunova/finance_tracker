@@ -1,5 +1,6 @@
 package ittalents.javaee.model.dao;
 
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
 import ittalents.javaee.model.pojo.Currency;
@@ -37,10 +38,10 @@ public class PlannedPaymentDao {
             "JOIN accounts AS a ON p.account_id = a.id " +
             "WHERE a.user_id = ? AND p.status = ?;";
 
+    private static final String DELETE_PLANNED_PAYMENT = "DELETE FROM planned_payments WHERE id = ?;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private AccountService accountService;
 
     public List<ResponsePlannedPaymentDto> getMyPlannedPayments(long userId) throws SQLException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -117,5 +118,20 @@ public class PlannedPaymentDao {
             }
         }
         return paymentDtos;
+    }
+
+    public void deletePayment(long userId, long paymentId) throws SQLException {
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(DELETE_PLANNED_PAYMENT)){
+            List<ResponsePlannedPaymentDto> myPlannedPayments = getMyPlannedPayments(userId);
+            for(ResponsePlannedPaymentDto dto : myPlannedPayments) {
+                if(dto.getId() == paymentId) {
+                    statement.setLong(1, paymentId);
+                    statement.executeUpdate();
+                    return;
+                }
+            }
+        }
+        throw new InvalidOperationException("You cannot delete planned payments of another user!");
     }
 }
