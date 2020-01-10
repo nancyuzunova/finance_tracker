@@ -56,7 +56,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
         responseDto.setId(id);
         responseDto.setTitle(title);
         responseDto.setAmount(amount);
-        responseDto.setAccount(account);
+        responseDto.setAccount(account.toDto());
         responseDto.setDate(date);
         responseDto.setStatus(status);
         return responseDto;

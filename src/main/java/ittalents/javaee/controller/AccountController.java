@@ -23,13 +23,11 @@ public class AccountController extends AbstractController {
 
     private AccountService accountService;
     private TransactionService transactionService;
-    private BudgetService budgetService;
 
     @Autowired
-    public AccountController(AccountService accountService, TransactionService transactionService, BudgetService budgetService) {
+    public AccountController(AccountService accountService, TransactionService transactionService) {
         this.accountService = accountService;
         this.transactionService = transactionService;
-        this.budgetService = budgetService;
     }
 
     @GetMapping("/accounts")

@@ -25,7 +25,7 @@ public class ResponsePlannedPaymentDto extends AbstractDto{
     private double amount;
 
     @NotNull
-    private Account account;
+    private AccountDto account;
 
     @NotBlank
     private String title;
