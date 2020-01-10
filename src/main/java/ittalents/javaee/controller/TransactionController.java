@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,7 +30,8 @@ public class TransactionController extends AbstractController {
     @DateTimeFormat(pattern = "dd.MM.yyyy") Date to)
             throws SQLException {
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        Map<LocalDate, Map<Double, Double>> statisticsPerDay = transactionService.getDailyStatistics(userDto.getId(), from, to);
+        Map<LocalDate, ArrayList<TransactionService.ExpenseIncomeEntity>> statisticsPerDay =
+                transactionService.getDailyStatistics(userDto.getId(), from, to);
         return ResponseEntity.ok(statisticsPerDay);
     }
 }

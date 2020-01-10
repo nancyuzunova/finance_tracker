@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +29,8 @@ public class TransactionDao {
     private JdbcTemplate jdbcTemplate;
 
 
-    public Map<Date, Map<Type, Double>> getDailyTransactions(long id, Date from, Date to) throws SQLException {
-        Map<Date, Map<Type, Double>> result = new TreeMap<>();
+    public Map<LocalDate, Map<Type, Double>> getDailyTransactions(long id, Date from, Date to) throws SQLException {
+        Map<LocalDate, Map<Type, Double>> result = new TreeMap<>();
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try(PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_AND_INCOMES_BY_DAYS)){
             statement.setLong(1, id);
@@ -38,8 +39,8 @@ public class TransactionDao {
             ResultSet set = statement.executeQuery();
             while(set.next()){
                 java.sql.Date day = set.getDate("date");
-                result.put(day, new HashMap<>());
-                result.get(day).put(Type.valueOf(set.getString("type")), set.getDouble("total"));
+                result.put(day.toLocalDate(), new HashMap<>());
+                result.get(day.toLocalDate()).put(Type.valueOf(set.getString("type")), set.getDouble("total"));
             }
         }
         return result;
