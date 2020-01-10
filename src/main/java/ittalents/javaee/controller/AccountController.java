@@ -51,12 +51,6 @@ public class AccountController extends AbstractController {
         return ResponseEntity.ok(transactions);
     }
 
-    @GetMapping(value = "/accounts/{id}/budgets")
-    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId) {
-        List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
-        return ResponseEntity.ok(budgets);
-    }
-
     @PutMapping("/accounts/{id}")
     public ResponseEntity changeAccountCurrency(@PathVariable @Positive long accountId, @RequestParam Currency currency) {
         AccountDto account = accountService.changeAccountCurrency(accountId, currency).toDto();

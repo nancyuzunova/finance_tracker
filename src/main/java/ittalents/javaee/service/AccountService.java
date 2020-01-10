@@ -158,11 +158,9 @@ public class AccountService {
 
     public long addBudget(RequestBudgetDto requestBudgetDto) {
         Account account = getAccountById(requestBudgetDto.getAccountId());
-
         if (account.getBalance() < requestBudgetDto.getAmount()) {
             throw new InvalidOperationException("The budget can not exceed the account balance!");
         }
-
         return budgetService.createBudget(requestBudgetDto);
     }
 
@@ -189,7 +187,6 @@ public class AccountService {
                     }
                 };
                 sender.start();
-                throw new InvalidOperationException("Please feed your account!");
             }
             payment.getAccount().setBalance(availability - amount);
             payment.setStatus(PlannedPayment.PaymentStatus.PAID);

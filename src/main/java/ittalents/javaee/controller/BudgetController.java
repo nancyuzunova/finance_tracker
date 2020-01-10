@@ -11,7 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,12 @@ public class BudgetController extends AbstractController {
     public ResponseEntity getBudgetById(@PathVariable @Positive long id) {
         ResponseBudgetDto dto = budgetService.getBudgetById(id).toDto();
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping(value = "/accounts/{id}/budgets")
+    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId) {
+        List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
+        return ResponseEntity.ok(budgets);
     }
 
     @DeleteMapping(value = "/budgets/{id}")
