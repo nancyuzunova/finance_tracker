@@ -4,7 +4,6 @@ import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
-import ittalents.javaee.service.BudgetService;
 import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +40,6 @@ public class AccountController extends AbstractController {
     public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
         List<ResponseTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(accounts);
-    }
-
-    @GetMapping("/accounts/{id}/transactions")
-    public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
-        List<ResponseTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
-        return ResponseEntity.ok(transactions);
     }
 
     @PutMapping("/accounts/{id}")

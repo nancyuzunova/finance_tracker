@@ -63,11 +63,11 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         ResponseTransactionDto responseTransactionDto = new ResponseTransactionDto();
         responseTransactionDto.setId(id);
         responseTransactionDto.setType(type);
-        responseTransactionDto.setCategory(category);
+        responseTransactionDto.setCategory(category.toDto());
         responseTransactionDto.setAmount(amount);
         responseTransactionDto.setCurrency(currency);
         responseTransactionDto.setDate(date);
-        responseTransactionDto.setAccount(account);
+        responseTransactionDto.setAccount(account.toDto());
         responseTransactionDto.setDescription(description);
         return responseTransactionDto;
     }

@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
+import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Transaction;
@@ -80,6 +81,14 @@ public class TransactionService {
         return transactionById.get();
     }
 
+    public List<ResponseTransactionDto> getTransactionsByUserId(long userId, long accountId) throws SQLException {
+        if(accountId == 0){
+            return transactionDao.getMyTransactions(userId);
+        }
+        else{
+            return transactionDao.getTransactionsByAccountId(userId, accountId);
+        }
+    }
 
     //TODO finish it
     public Map<LocalDate, ArrayList<ExpenseIncomeEntity>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
