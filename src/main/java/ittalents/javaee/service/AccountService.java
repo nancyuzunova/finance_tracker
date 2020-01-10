@@ -188,9 +188,15 @@ public class AccountService {
             double availability = payment.getAccount().getBalance();
             if (availability < amount) {
                 UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-                MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
-                        payment.getTitle() + " has failed because of  insufficient balance of your account. " +
-                        "Please deposit to your account and make payment manually!");
+                Thread sender = new Thread(){
+                    @Override
+                    public void run() {
+                        MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
+                                payment.getTitle() + " has failed because of  insufficient balance of your account. " +
+                                "Please deposit to your account and make payment manually!");
+                    }
+                };
+                sender.start();
                 throw new InvalidOperationException("Please feed your account!");
             }
             payment.getAccount().setBalance(availability - amount);
