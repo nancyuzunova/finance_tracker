@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -20,10 +21,10 @@ public class PlannedPaymentController extends AbstractController {
     @Autowired
     private PlannedPaymentService plannedPaymentService;
 
-    @GetMapping("/plannedPayments")
-    public ResponseEntity getMyPlannedPayments(HttpSession session) throws SQLException {
+    @GetMapping("accounts/{id}/plannedPayments")
+    public ResponseEntity getMyPlannedPayments(HttpSession session, @PathVariable long id) throws SQLException {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<ResponsePlannedPaymentDto> plannedPayments = plannedPaymentService.getAllPlannedPaymentsByUserId(user.getId());
+        List<ResponsePlannedPaymentDto> plannedPayments = plannedPaymentService.getAllPlannedPaymentsByUserId(user.getId(), id);
         return ResponseEntity.ok(plannedPayments);
     }
 }

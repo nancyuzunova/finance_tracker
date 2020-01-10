@@ -14,7 +14,12 @@ public class PlannedPaymentService {
     @Autowired
     private PlannedPaymentDao paymentDao;
 
-    public List<ResponsePlannedPaymentDto> getAllPlannedPaymentsByUserId(long userId) throws SQLException {
-        return paymentDao.getMyPlannedPayments(userId);
+    public List<ResponsePlannedPaymentDto> getAllPlannedPaymentsByUserId(long userId, long accountId) throws SQLException {
+        if(accountId == 0) {
+            return paymentDao.getMyPlannedPayments(userId);
+        }
+        else{
+            return paymentDao.getPlannedPaymentsByAccountId(userId, accountId);
+        }
     }
 }
