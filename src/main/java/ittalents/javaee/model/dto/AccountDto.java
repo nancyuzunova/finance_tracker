@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -14,6 +15,9 @@ import javax.validation.constraints.PositiveOrZero;
 public class AccountDto extends AbstractDto {
 
     private long id;
+
+    @NotBlank
+    private String name;
 
     @NotNull
     @PositiveOrZero

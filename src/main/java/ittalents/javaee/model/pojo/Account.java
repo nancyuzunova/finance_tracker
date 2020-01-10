@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ public class Account extends AbstractPojo<AccountDto,AccountDto> {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
+    @NotBlank
+    private String name;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
     private User user;
@@ -40,7 +44,7 @@ public class Account extends AbstractPojo<AccountDto,AccountDto> {
     @Override
     public void fromDto(AccountDto dto) {
         this.balance = dto.getBalance();
-
+        this.name = dto.getName();
         if (dto.getCurrency() != null) {
             this.currency = dto.getCurrency();
         }
@@ -50,6 +54,7 @@ public class Account extends AbstractPojo<AccountDto,AccountDto> {
     public AccountDto toDto() {
         AccountDto accountDto = new AccountDto();
         accountDto.setId(id);
+        accountDto.setName(name);
         accountDto.setBalance(balance);
         accountDto.setCurrency(currency);
         return accountDto;
