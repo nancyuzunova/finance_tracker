@@ -26,13 +26,13 @@ public class ResponseBudgetDto extends AbstractDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date toDate;
 
-    private Category category;
+    private CategoryDto category;
 
     @NotNull
     @PositiveOrZero
     private double amount;
 
-    private Account account;
+    private AccountDto account;
 
     @NotNull
     private String title;

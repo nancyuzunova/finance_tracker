@@ -53,9 +53,9 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     public ResponseBudgetDto toDto() {
         ResponseBudgetDto dto = new ResponseBudgetDto();
         dto.setId(id);
-        dto.setAccount(account);
+        dto.setAccount(account.toDto());
         dto.setAmount(amount);
-        dto.setCategory(category);
+        dto.setCategory(category.toDto());
         dto.setFromDate(fromDate);
         dto.setToDate(toDate);
         dto.setTitle(title);
