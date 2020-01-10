@@ -2,12 +2,14 @@ package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
 import ittalents.javaee.model.dto.UserDto;
+import ittalents.javaee.model.pojo.PlannedPayment;
 import ittalents.javaee.service.PlannedPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -26,5 +28,12 @@ public class PlannedPaymentController extends AbstractController {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<ResponsePlannedPaymentDto> plannedPayments = plannedPaymentService.getAllPlannedPaymentsByUserId(user.getId(), id);
         return ResponseEntity.ok(plannedPayments);
+    }
+
+    @GetMapping("/plannedPayments/status")
+    public ResponseEntity getPlannedPaymentsByStatus(HttpSession session, @RequestParam("status") PlannedPayment.PaymentStatus status){
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<ResponsePlannedPaymentDto> plannedPaymentDtos = plannedPaymentService.getPaymentsByStatus(user.getId(), status);
+        return ResponseEntity.ok(plannedPaymentDtos);
     }
 }

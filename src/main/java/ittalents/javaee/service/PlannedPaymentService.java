@@ -2,6 +2,7 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.model.dao.PlannedPaymentDao;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
+import ittalents.javaee.model.pojo.PlannedPayment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +22,9 @@ public class PlannedPaymentService {
         else{
             return paymentDao.getPlannedPaymentsByAccountId(userId, accountId);
         }
+    }
+
+    public List<ResponsePlannedPaymentDto> getPaymentsByStatus(long userId, PlannedPayment.PaymentStatus status) {
+        return paymentDao.getPlannedPaymentsByStatus(userId, status);
     }
 }

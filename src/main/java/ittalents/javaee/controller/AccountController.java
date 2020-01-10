@@ -81,13 +81,12 @@ public class AccountController extends AbstractController {
 
     @GetMapping("/accounts/{id}/transactions/type")
     public ResponseEntity getTransactionsByType(@PathVariable @Positive long accountId, @RequestParam("type") Type type) {
-        List<ResponseTransactionDto> requestTransactionDtos = accountService.getTransactionsByType(accountId, type);
-        return ResponseEntity.ok(requestTransactionDtos);
+        List<ResponseTransactionDto> responseTransactionDtos = accountService.getTransactionsByType(accountId, type);
+        return ResponseEntity.ok(responseTransactionDtos);
     }
 
     @PostMapping("/accounts/makePlannedPayment")
     public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
-        System.out.println("stiga li do tuk ? ");
         URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
         return ResponseEntity.created(location).build();
     }
