@@ -6,7 +6,6 @@ import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.PlannedPayment;
-import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,12 +27,11 @@ public class PlannedPaymentService {
     private AccountService accountService;
 
     public List<ResponsePlannedPaymentDto> getAllPlannedPaymentsByUserId(long userId, long accountId) throws SQLException {
-        if(accountId == 0) {
+        if (accountId == 0) {
             return paymentDao.getMyPlannedPayments(userId);
-        }
-        else{
-           List<PlannedPayment> payments =  paymentRepository.findAllByAccountId(accountId);
-           List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
+        } else {
+            List<PlannedPayment> payments = paymentRepository.findAllByAccountId(accountId);
+            List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
             for (PlannedPayment payment : payments) {
                 paymentDtos.add(payment.toDto());
             }
@@ -52,8 +50,8 @@ public class PlannedPaymentService {
     public ResponsePlannedPaymentDto editPayment(long userId, RequestPlannedPaymentDto paymentDto) {
         PlannedPayment payment = new PlannedPayment();
         payment.fromDto(paymentDto);
-        for(AccountDto account : accountService.getAllAccountsByUserId(userId)){
-            if(paymentDto.getAccountId() == account.getId()){
+        for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {
+            if (paymentDto.getAccountId() == account.getId()) {
                 Account account1 = new Account();
                 account1.fromDto(account);
                 payment.setAccount(account1);

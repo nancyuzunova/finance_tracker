@@ -22,7 +22,7 @@ public class TransferService {
         this.transferRepository = transferRepository;
     }
 
-    public long createTransfer(Account fromAccount, Account toAccount,RequestTransferDto requestTransferDto) {
+    public long createTransfer(Account fromAccount, Account toAccount, RequestTransferDto requestTransferDto) {
         Transfer transfer = new Transfer();
         transfer.fromDto(requestTransferDto);
         transfer.setFromAccount(fromAccount);
@@ -36,5 +36,4 @@ public class TransferService {
         allTransfers.addAll(transferRepository.findAllByToAccountId(id));
         return allTransfers.stream().map(Transfer::toDto).collect(Collectors.toList());
     }
-
 }

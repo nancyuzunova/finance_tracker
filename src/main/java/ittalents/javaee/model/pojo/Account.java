@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @DynamicUpdate
 @Table(name = "accounts")
-public class Account extends AbstractPojo<AccountDto,AccountDto> {
+public class Account extends AbstractPojo<AccountDto, AccountDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

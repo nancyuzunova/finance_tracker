@@ -108,6 +108,7 @@ public class TransactionDao {
                 transactionDto.setCategory(categoryDto);
                 responseTransactionDtos.add(transactionDto);
             }
+            set.close();
         }
         return responseTransactionDtos;
     }
@@ -141,6 +142,7 @@ public class TransactionDao {
                 transactionDto.setCategory(categoryDto);
                 response.add(transactionDto);
             }
+            set.close();
         }
         return response;
     }

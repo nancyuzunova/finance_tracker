@@ -15,7 +15,7 @@ public class LoggedInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession();
-        if(!SessionManager.validateLogged(session)){
+        if (!SessionManager.validateLogged(session)) {
             throw new AuthorizationException("You must log in!");
         }
         return true;

@@ -5,7 +5,6 @@ import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.PlannedPayment;
-import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -58,6 +57,7 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setAccount(accountDto);
                 paymentDtos.add(responsePlannedPaymentDto);
             }
+            rows.close();
         }
         return paymentDtos;
     }
@@ -84,6 +84,7 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setAccount(accountDto);
                 paymentDtos.add(responsePlannedPaymentDto);
             }
+            rows.close();
         }
         return paymentDtos;
     }

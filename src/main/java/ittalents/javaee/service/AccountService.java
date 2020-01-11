@@ -79,10 +79,10 @@ public class AccountService {
     }
 
     public long makeTransfer(RequestTransferDto requestTransferDto) {
-        if(requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()){
+        if (requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()) {
             throw new InvalidOperationException("You cannot make transfer to the same account!");
         }
-        if(requestTransferDto.getDate().after(new Date())){
+        if (requestTransferDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transfers!");
         }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
@@ -113,7 +113,7 @@ public class AccountService {
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
-        if(requestTransactionDto.getDate().after(new Date())){
+        if (requestTransactionDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transactions!");
         }
         Account account = getAccountById(requestTransactionDto.getAccountId());
@@ -134,7 +134,7 @@ public class AccountService {
     }
 
     public long addBudget(RequestBudgetDto requestBudgetDto) {
-        if(requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())){
+        if (requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())) {
             throw new InvalidOperationException("Incorrect dates! Please try again!");
         }
         Account account = getAccountById(requestBudgetDto.getAccountId());

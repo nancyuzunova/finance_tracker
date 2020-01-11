@@ -1,7 +1,6 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import lombok.Getter;
@@ -18,7 +17,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponseTransactionDto extends AbstractDto{
+public class ResponseTransactionDto extends AbstractDto {
 
     private long id;
 

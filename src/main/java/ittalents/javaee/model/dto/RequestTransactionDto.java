@@ -17,7 +17,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RequestTransactionDto extends AbstractDto{
+public class RequestTransactionDto extends AbstractDto {
 
     private long id;
 

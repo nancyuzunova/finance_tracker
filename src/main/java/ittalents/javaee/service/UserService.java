@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,10 +63,10 @@ public class UserService {
         User user = getUserById(id);
         String firstName = userDto.getFirstName();
         String lastName = userDto.getLastName();
-        if(firstName != null && !firstName.isEmpty()){
+        if (firstName != null && !firstName.isEmpty()) {
             user.setFirstName(firstName);
         }
-        if(lastName != null && !lastName.isEmpty()){
+        if (lastName != null && !lastName.isEmpty()) {
             user.setLastName(userDto.getLastName());
         }
         userRepository.save(user);

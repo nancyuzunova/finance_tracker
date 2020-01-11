@@ -28,6 +28,7 @@ public class IconDao {
             while (resultSet.next()) {
                 urls.add("/" + resultSet.getString("url"));
             }
+            resultSet.close();
         }
         return urls;
     }

@@ -1,6 +1,5 @@
 package ittalents.javaee.model.dto;
 
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.PlannedPayment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponsePlannedPaymentDto extends AbstractDto{
+public class ResponsePlannedPaymentDto extends AbstractDto {
 
     private long id;
 

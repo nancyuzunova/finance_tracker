@@ -3,6 +3,7 @@ package ittalents.javaee.service;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.pojo.Account;
@@ -32,7 +33,6 @@ public class TransactionService {
     @Setter
     public
     class ExpenseIncomeEntity {
-
         private Date date;
         private double expense;
         private double income;
@@ -109,6 +109,9 @@ public class TransactionService {
     }
 
     public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to) throws SQLException {
+        if (from.after(to)) {
+            throw new InvalidOperationException("Incorrect input dates. Please, check again!");
+        }
         List<TransactionDao.StatisticEntity> entities = transactionDao.getDailyTransactions(id, from, to);
         List<Date> dates = new ArrayList<>();
         for (TransactionDao.StatisticEntity entity : entities) {

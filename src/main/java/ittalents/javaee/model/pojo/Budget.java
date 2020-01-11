@@ -1,6 +1,5 @@
 package ittalents.javaee.model.pojo;
 
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Optional;
 
 @Getter
 @Setter

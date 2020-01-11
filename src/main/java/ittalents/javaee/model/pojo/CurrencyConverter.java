@@ -12,10 +12,8 @@ public class CurrencyConverter {
                 .setNumber(amount).create();
         CurrencyConversion conversion = MonetaryConversions.getConversion(currencyTo.toString());
         MonetaryAmount result = from.with(conversion);
-
         double value = result.getNumber().doubleValueExact();
         String formattedString = String.format("%.2f", value);
-
         return Double.parseDouble(formattedString);
     }
 }

@@ -47,7 +47,7 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    public Category(CategoryName name, String iconURL){
+    public Category(CategoryName name, String iconURL) {
         this.name = name;
         this.iconURL = iconURL;
         this.type = name.getType();

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @Table(name = "users", indexes = @Index(columnList = "email", name = "emailIdx"))
-public class User extends AbstractPojo<UserDto,UserDto> {
+public class User extends AbstractPojo<UserDto, UserDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

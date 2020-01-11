@@ -1,6 +1,5 @@
 package ittalents.javaee.model.pojo;
 
-
 import ittalents.javaee.model.dto.AbstractDto;
 
 public abstract class AbstractPojo<G, T extends AbstractDto> {

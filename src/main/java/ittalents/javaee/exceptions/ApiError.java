@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiError {
-
     private String message;
     private LocalDateTime date;
     private int status;
