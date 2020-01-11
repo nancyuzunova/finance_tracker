@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -37,9 +39,10 @@ public class AccountController extends AbstractController {
     }
 
     @GetMapping("/accounts/{accountId}/transfers")
-    public ResponseEntity getTransfersByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
+    public ResponseEntity getTransfersByAccountId(HttpSession session, @PathVariable @PositiveOrZero long accountId) throws SQLException {
         validateUserOwnership(session, accountId);
-        List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(accountId);
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(user.getId(), accountId);
         return ResponseEntity.ok(transfers);
     }
 

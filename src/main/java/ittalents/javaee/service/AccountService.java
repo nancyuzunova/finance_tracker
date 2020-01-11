@@ -3,6 +3,7 @@ package ittalents.javaee.service;
 import ittalents.javaee.controller.SessionManager;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dao.TransferDao;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.mail.MailSender;
 import ittalents.javaee.model.pojo.*;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,16 +30,19 @@ public class AccountService {
     private TransactionService transactionService;
     private BudgetService budgetService;
     private PlannedPaymentRepository paymentRepository;
+    private TransferDao transferDao;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
                           TransactionService transactionService, BudgetService budgetService,
-                          PlannedPaymentRepository paymentRepository) {
+                          PlannedPaymentRepository paymentRepository,
+                          TransferDao transferDao) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
         this.budgetService = budgetService;
         this.paymentRepository = paymentRepository;
+        this.transferDao = transferDao;
     }
 
     public List<AccountDto> getAllAccountsByUserId(long userId) {
@@ -96,8 +101,11 @@ public class AccountService {
         }
     }
 
-    public List<ResponseTransferDto> getTransfersByAccountId(long id) {
-        return transferService.getTransfersByAccountId(id);
+    public List<ResponseTransferDto> getTransfersByAccountId(long userId, long accountId) throws SQLException {
+        if (accountId == 0) {
+            return transferDao.getLoggedUserTransfers(userId);
+        }
+        return transferService.getTransfersByAccountId(accountId);
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
