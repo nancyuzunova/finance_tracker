@@ -31,21 +31,11 @@ public class UserService {
         this.accountService = accountService;
     }
 
-    public List<UserDto> getUsers() {
-        List<UserDto> users = new ArrayList<>();
-        for (User user : userRepository.findAll()) {
-            users.add(user.toDto());
-        }
-        return users;
-    }
-
     public User getUserById(long id) {
         Optional<User> user = userRepository.findById(id);
-
         if (user.isPresent()) {
             return user.get();
         }
-
         throw new ElementNotFoundException("User with id = " + id + " does not exist!");
     }
 
@@ -94,17 +84,14 @@ public class UserService {
 
     public UserDto logUser(LoginUserDto userDto) {
         User user = userRepository.findByEmail(userDto.getEmail());
-
         if (user == null) {
             throw new AuthorizationException("User could NOT be found. Please check your credentials");
         }
-
-        boolean passwordsMatches = BCrypt.checkpw(userDto.getPassword(), userRepository.findByEmail(userDto.getEmail()).getPassword());
+        boolean passwordsMatches = BCrypt.checkpw(userDto.getPassword(), user.getPassword());
         if (passwordsMatches) {
             user.setLastLogin(LocalDateTime.now());
             return this.userRepository.save(user).toDto();
         }
-
         throw new AuthorizationException("User could NOT be found. Please check your credentials");
     }
 
@@ -114,15 +101,12 @@ public class UserService {
 
     public UserDto changePassword(long userId, UserChangePasswordDto userDto) {
         User user = getUserById(userId);
-
         if (!BCrypt.checkpw(userDto.getOldPassword(), user.getPassword())) {
             throw new InvalidOperationException("Changing password can not be proceed!");
         }
-
         if (!userDto.getNewPassword().equals(userDto.getConfirmNewPassword())) {
             throw new InvalidOperationException("The new password and its confirmation do not match.");
         }
-
         String password = encoder.encode(userDto.getNewPassword());
         user.setPassword(password);
         return userRepository.save(user).toDto();
