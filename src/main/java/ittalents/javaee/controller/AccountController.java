@@ -39,14 +39,14 @@ public class AccountController extends AbstractController {
 
     @GetMapping("/accounts/{accountId}/transfers")
     public ResponseEntity getTransfersByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
-        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        validateUserOwnership(user.getId(), accountId);
+        validateUserOwnership(session, accountId);
         List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(transfers);
     }
 
     @GetMapping("/accounts/{accountId}/transactions")
-    public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
+    public ResponseEntity getTransactionsByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
+        validateUserOwnership(session, accountId);
         List<ResponseTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(transactions);
     }
@@ -95,8 +95,9 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    private void validateUserOwnership(long userId, long accountId) {
-        if (!isLoggedUserOwen(userId, accountId)) {
+    private void validateUserOwnership(HttpSession session, long accountId) {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        if (!isLoggedUserOwner(user.getId(), accountId)) {
             throw new ElementNotFoundException("Account not found!");
         }
     }

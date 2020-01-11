@@ -76,7 +76,7 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
                 HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
     }
 
-    protected boolean isLoggedUserOwen(long userId, long accountId) {
+    protected boolean isLoggedUserOwner(long userId, long accountId) {
         for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {
             if (account.getId() == accountId) {
                 return true;
