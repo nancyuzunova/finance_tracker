@@ -37,11 +37,9 @@ public class CategoryService {
 
     public Category getCategoryById(long id) {
         Optional<Category> categoryById = categoryRepository.findById(id);
-
         if (categoryById.isPresent()) {
             return categoryById.get();
         }
-
         throw new ElementNotFoundException("Category with id = " + id + " does not exist!");
     }
 
@@ -53,11 +51,9 @@ public class CategoryService {
         Category category = getCategoryById(categoryId);
         List<String> urls = getCategoryIcons(categoryId);
         Collections.sort(urls);
-
         if (iconId < 0 || iconId > urls.size()) {
             throw new InvalidOperationException("There is not icon with id = " + iconId);
         }
-
         category.setIconURL(urls.get((int) iconId - 1));
         categoryRepository.save(category);
     }

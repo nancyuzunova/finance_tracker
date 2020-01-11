@@ -79,11 +79,9 @@ public class TransactionService {
 
     public Transaction getTransactionById(long id) {
         Optional<Transaction> transactionById = transactionRepository.findById(id);
-
         if (!transactionById.isPresent()) {
             throw new ElementNotFoundException("Transaction with id = " + id + " does not exist!");
         }
-
         return transactionById.get();
     }
 
