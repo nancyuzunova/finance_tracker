@@ -5,6 +5,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
+import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Transaction;
@@ -12,13 +13,15 @@ import ittalents.javaee.model.dto.RequestTransactionDto;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.TransactionRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -27,6 +30,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public
+    class ExpenseIncomeEntity{
+
+        private double expense;
+        private double income;
+    }
 
     private TransactionRepository transactionRepository;
     private CategoryService categoryService;
@@ -74,26 +87,39 @@ public class TransactionService {
         return transactionById.get();
     }
 
-
-    public Map<LocalDate, Map<Double, Double>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
-        Map<Date, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);
-        Map<LocalDate, Map<Double, Double>> result = new TreeMap<>();
-        LocalDate start = from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate end = from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1);
-        for (; start.isBefore(end); start = start.plusDays(1)) {
-            result.put(start, new HashMap<>());
-            result.get(start).put(0.0, 0.0);
+    public List<ResponseTransactionDto> getTransactionsByUserId(long userId, long accountId) throws SQLException {
+        if(accountId == 0){
+            return transactionDao.getMyTransactions(userId);
         }
-        for (Map.Entry<Date, Map<Type, Double>> entry : map.entrySet()) {
-            LocalDate date = entry.getKey().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            result.get(date).put(entry.getValue().get(Type.EXPENSE), entry.getValue().get(Type.INCOME));
+        else{
+            return transactionDao.getTransactionsByAccountId(userId, accountId);
+        }
+    }
+
+    //TODO finish it
+    public Map<LocalDate, ArrayList<ExpenseIncomeEntity>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
+        Map<LocalDate, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);
+        Map<LocalDate, ArrayList<ExpenseIncomeEntity>> result = new TreeMap<>();
+        for(Map.Entry<LocalDate, Map<Type, Double>> e : map.entrySet()){
+            LocalDate date = e.getKey();
+            double expense = 0.0;
+            double income = 0.0;
+            if(e.getValue().get(Type.EXPENSE) != null){
+                expense = e.getValue().get(Type.EXPENSE);
+            }
+            if(e.getValue().get(Type.INCOME) != null){
+                income = e.getValue().get(Type.INCOME);
+            }
+            if(!result.containsKey(date)) {
+                result.put(date, new ArrayList<>());
+            }
+            result.get(date).add(new ExpenseIncomeEntity(expense, income));
         }
         return result;
     }
 
     public void exportTransactionToPDF(long id) {
         Transaction transaction = getTransactionById(id);
-
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream("transaction.pdf"));

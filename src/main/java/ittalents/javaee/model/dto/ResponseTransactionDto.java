@@ -26,7 +26,7 @@ public class ResponseTransactionDto extends AbstractDto{
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    private Category category;
+    private CategoryDto category;
 
     @Positive
     private double amount;

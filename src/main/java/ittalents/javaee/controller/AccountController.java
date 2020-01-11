@@ -1,11 +1,9 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
-import ittalents.javaee.service.BudgetService;
 import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
