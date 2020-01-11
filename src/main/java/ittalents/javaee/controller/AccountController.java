@@ -1,9 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
-import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
@@ -42,9 +40,7 @@ public class AccountController extends AbstractController {
     @GetMapping("/accounts/{accountId}/transfers")
     public ResponseEntity getTransfersByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        if (!isLoggedUserOwen(user.getId(), accountId)) {
-            throw new ElementNotFoundException("Account not found!");
-        }
+        validateUserOwnership(user.getId(), accountId);
         List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(transfers);
     }
@@ -97,5 +93,11 @@ public class AccountController extends AbstractController {
     public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
         URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
         return ResponseEntity.created(location).build();
+    }
+
+    private void validateUserOwnership(long userId, long accountId) {
+        if (!isLoggedUserOwen(userId, accountId)) {
+            throw new ElementNotFoundException("Account not found!");
+        }
     }
 }
