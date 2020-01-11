@@ -55,9 +55,7 @@ public class AccountController extends AbstractController {
     @DeleteMapping("/accounts/{accountId}")
     public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) {
         validateUserOwnership(session, accountId);
-        System.out.println("validno e");
         this.accountService.deleteAccount(accountId);
-        System.out.println("bi trqbvalo da e iztrit");
         return ResponseEntity.noContent().build();
     }
 

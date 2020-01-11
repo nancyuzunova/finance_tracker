@@ -70,12 +70,16 @@ public class AccountService {
     }
 
     public void deleteAccount(long accountId) {
-        System.out.println("pochva da trie");
         this.accountRepository.deleteById(accountId);
-        System.out.println("iztrito e");
     }
 
     public long makeTransfer(RequestTransferDto requestTransferDto) {
+        if(requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()){
+            throw new InvalidOperationException("You cannot make transfer to the same account!");
+        }
+        if(requestTransferDto.getDate().after(new Date())){
+            throw new InvalidOperationException("You cannot make future transfers!");
+        }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         Account accountTo = getAccountById(requestTransferDto.getToAccountId());
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
@@ -101,6 +105,9 @@ public class AccountService {
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
+        if(requestTransactionDto.getDate().after(new Date())){
+            throw new InvalidOperationException("You cannot make future transactions!");
+        }
         Account account = getAccountById(requestTransactionDto.getAccountId());
         double amount = requestTransactionDto.getAmount();
         if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
