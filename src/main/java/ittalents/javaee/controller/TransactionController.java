@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Positive;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,8 +29,9 @@ public class TransactionController extends AbstractController {
 
     @GetMapping("/accounts/{id}/transactions")
     public ResponseEntity getTransactionsByAccountId(HttpSession session, @PathVariable long id) throws SQLException {
+        validateUserOwnership(session, id);
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<ResponseTransactionDto> transactions = transactionService.getTransactionsByUserId(userDto.getId(), id);
+        List<ResponseTransactionDto> transactions = transactionService.getTransactions(userDto.getId(), id);
         return ResponseEntity.ok(transactions);
     }
 

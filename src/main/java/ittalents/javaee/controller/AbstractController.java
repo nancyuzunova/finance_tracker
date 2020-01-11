@@ -5,6 +5,7 @@ import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -76,12 +78,22 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
                 HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
     }
 
-    protected boolean isLoggedUserOwner(long userId, long accountId) {
+    private boolean isLoggedUserOwner(long userId, long accountId) {
+        if(accountId == 0){
+            return true;
+        }
         for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {
             if (account.getId() == accountId) {
                 return true;
             }
         }
         return false;
+    }
+
+    protected void validateUserOwnership(HttpSession session, long accountId) {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        if (!isLoggedUserOwner(user.getId(), accountId)) {
+            throw new ElementNotFoundException("Account not found!");
+        }
     }
 }

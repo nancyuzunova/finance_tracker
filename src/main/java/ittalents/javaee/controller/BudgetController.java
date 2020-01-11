@@ -38,61 +38,44 @@ public class BudgetController extends AbstractController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping(value = "/accounts/{id}/budgets")
-    public ResponseEntity getBudgetsByAccountId(@PathVariable @Positive long accountId) {
+    @GetMapping(value = "/accounts/{accountId}/budgets")
+    public ResponseEntity getBudgetsByAccountId(HttpSession session, @PathVariable@Positive long accountId) {
+        validateUserOwnership(session, accountId);
         List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
         return ResponseEntity.ok(budgets);
     }
 
     @DeleteMapping(value = "/budgets/{id}")
-    public ResponseEntity deleteBudget(@PathVariable @Positive long id) {
+    public ResponseEntity deleteBudget(HttpSession session, @PathVariable @Positive long id) {
+        validateUserOwnership(session, budgetService.getBudgetById(id).getAccount().getId());
         this.budgetService.deleteBudget(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/budgets/{id}")
-    public ResponseEntity changeBudgetAmount(@PathVariable @Positive long id, @RequestParam double amount) {
+    public ResponseEntity changeBudgetAmount(HttpSession session, @PathVariable @Positive long id, @RequestParam double amount) {
+        validateUserOwnership(session, budgetService.getBudgetById(id).getAccount().getId());
         ResponseBudgetDto dto = this.budgetService.changeBudgetAmount(id, amount).toDto();
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping(value = "/budgets/from/to")
-    public ResponseEntity getBudgetsByDateBetween(@RequestParam("from")
-                                                  @DateTimeFormat(pattern = "dd.MM.yyyy") Date fromDate,
-                                                  @RequestParam("to")
-                                                  @DateTimeFormat(pattern = "dd.MM.yyyy") Date toDate) {
-        List<ResponseBudgetDto> dtos = budgetService.getBudgetsByDate(fromDate, toDate);
-        return ResponseEntity.ok(dtos);
-    }
-
-    @GetMapping(value = "/budgets/before")
-    public ResponseEntity getBudgetsByDateBefore(@RequestParam("before")
-                                                 @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        List<ResponseBudgetDto> dtos = budgetService.getBudgetsBefore(date);
-        return ResponseEntity.ok(dtos);
-    }
-
-    @GetMapping(value = "/budgets/after")
-    public ResponseEntity getBudgetsByDateAfter(@RequestParam("after")
-                                                @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        List<ResponseBudgetDto> dtos = budgetService.getBudgetsAfter(date);
-        return ResponseEntity.ok(dtos);
-    }
-
     @PutMapping(value = "/budgets/{id}/category/change")
-    public ResponseEntity changeCategory(@PathVariable @Positive long id, @RequestParam @Positive long categoryId) {
+    public ResponseEntity changeCategory(HttpSession session, @PathVariable @Positive long id, @RequestParam @Positive long categoryId) {
+        validateUserOwnership(session, budgetService.getBudgetById(id).getAccount().getId());
         ResponseBudgetDto dto = budgetService.changeBudgetCategory(id, categoryId);
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping(value = "/budgets/{id}/title")
-    public ResponseEntity editTitle(@PathVariable @Positive long id, @RequestParam String newTitle) {
+    public ResponseEntity editTitle(HttpSession session, @PathVariable @Positive long id, @RequestParam String newTitle) {
+        validateUserOwnership(session, budgetService.getBudgetById(id).getAccount().getId());
         ResponseBudgetDto dto = budgetService.changeTitle(id, newTitle).toDto();
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping(value = "/budgets/{id}/edit/from/{from}/to/{to}")
-    public ResponseEntity updatePeriod(@PathVariable @Positive long id, @PathVariable Date from, @PathVariable Date to) {
+    public ResponseEntity updatePeriod(HttpSession session, @PathVariable @Positive long id, @PathVariable Date from, @PathVariable Date to) {
+        validateUserOwnership(session, budgetService.getBudgetById(id).getAccount().getId());
         ResponseBudgetDto dto = budgetService.changePeriod(id, from, to).toDto();
         return ResponseEntity.ok(dto);
     }

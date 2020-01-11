@@ -1,6 +1,5 @@
 package ittalents.javaee.controller;
 
-import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
@@ -93,12 +92,5 @@ public class AccountController extends AbstractController {
     public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
         URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
         return ResponseEntity.created(location).build();
-    }
-
-    private void validateUserOwnership(HttpSession session, long accountId) {
-        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        if (!isLoggedUserOwner(user.getId(), accountId)) {
-            throw new ElementNotFoundException("Account not found!");
-        }
     }
 }

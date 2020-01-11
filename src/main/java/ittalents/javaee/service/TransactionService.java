@@ -87,18 +87,19 @@ public class TransactionService {
         return transactionById.get();
     }
 
-    public List<ResponseTransactionDto> getTransactionsByUserId(long userId, long accountId) throws SQLException {
+    public List<ResponseTransactionDto> getTransactions(long userId, long accountId) throws SQLException {
         if(accountId == 0){
             return transactionDao.getMyTransactions(userId);
         }
         else{
-            return transactionDao.getTransactionsByAccountId(userId, accountId);
+            return getTransactionsByAccountId(accountId);
         }
     }
 
     //TODO finish it
     public Map<LocalDate, ArrayList<ExpenseIncomeEntity>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
         Map<LocalDate, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);
+        System.out.println(map.size());
         Map<LocalDate, ArrayList<ExpenseIncomeEntity>> result = new TreeMap<>();
         for(Map.Entry<LocalDate, Map<Type, Double>> e : map.entrySet()){
             LocalDate date = e.getKey();
