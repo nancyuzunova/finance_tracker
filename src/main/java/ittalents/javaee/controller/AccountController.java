@@ -1,6 +1,9 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.exceptions.ElementNotFoundException;
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.AccountService;
@@ -37,7 +40,11 @@ public class AccountController extends AbstractController {
     }
 
     @GetMapping("/accounts/{accountId}/transfers")
-    public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
+    public ResponseEntity getTransfersByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        if (!isLoggedUserOwen(user.getId(), accountId)) {
+            throw new ElementNotFoundException("Account not found!");
+        }
         List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(accountId);
         return ResponseEntity.ok(transfers);
     }

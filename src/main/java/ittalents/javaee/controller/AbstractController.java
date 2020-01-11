@@ -4,6 +4,9 @@ import ittalents.javaee.exceptions.ApiError;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dto.AccountDto;
+import ittalents.javaee.service.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,9 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public abstract class AbstractController extends ResponseEntityExceptionHandler {
+
+    @Autowired
+    private AccountService accountService;
 
     @ExceptionHandler(ElementNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -68,5 +74,14 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
     protected ApiError handleGlobalException(Exception e) {
         return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
                 HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
+    }
+
+    protected boolean isLoggedUserOwen(long userId, long accountId) {
+        for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {
+            if (account.getId() == accountId) {
+                return true;
+            }
+        }
+        return false;
     }
 }

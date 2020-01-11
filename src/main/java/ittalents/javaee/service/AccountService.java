@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 @Service
 public class AccountService {
 
-    public static final int MAX_AMOUNT_OF_PLANNED_PAYMENT = 2500;
+    private static final int MAX_AMOUNT_OF_PLANNED_PAYMENT = 2500;
+
     private AccountRepository accountRepository;
     private TransferService transferService;
     private TransactionService transactionService;
@@ -45,11 +46,9 @@ public class AccountService {
 
     public Account getAccountById(long id) {
         Optional<Account> account = accountRepository.findById(id);
-
         if (account.isPresent()) {
             return account.get();
         }
-
         throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
     }
 
@@ -63,13 +62,10 @@ public class AccountService {
 
     public Account changeAccountCurrency(long id, Currency currency) {
         Optional<Account> accountById = accountRepository.findById(id);
-
         if (!accountById.isPresent()) {
             throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
         }
-
         Account account = accountById.get();
-
         double balance = account.getBalance();
         double convertedBalance = CurrencyConverter.convert(account.getCurrency(), currency, balance);
         account.setBalance(convertedBalance);
@@ -84,34 +80,28 @@ public class AccountService {
     public long makeTransfer(RequestTransferDto requestTransferDto) {
         Account accountFrom;
         Account accountTo;
-
         try {
             accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         } catch (NoSuchElementException e) {
             throw new InvalidOperationException(
                     "Account with id " + requestTransferDto.getFromAccountId() + " does not exists!");
         }
-
         try {
             accountTo = getAccountById(requestTransferDto.getToAccountId());
         } catch (NoSuchElementException e) {
             throw new InvalidOperationException(
                     "Account with id " + requestTransferDto.getToAccountId() + " does not exists!");
         }
-
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
             throw new InvalidOperationException("You can not make transfer to other users!");
         }
-
         double amount = requestTransferDto.getAmount();
         double fromAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountFrom.getCurrency(), amount);
         double toAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountTo.getCurrency(), amount);
-
         if (accountFrom.getBalance() >= fromAmount) {
             // make transfer
             accountFrom.setBalance(accountFrom.getBalance() - fromAmount);
             accountTo.setBalance(accountTo.getBalance() + toAmount);
-
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
             return this.transferService.createTransfer(accountFrom, accountTo, requestTransferDto);
@@ -121,36 +111,27 @@ public class AccountService {
     }
 
     public List<ResponseTransferDto> getTransfersByAccountId(long id) {
-        if (!accountRepository.existsById(id)) {
-            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
-        }
         return transferService.getTransfersByAccountId(id);
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
         Optional<Account> accountById = accountRepository.findById(requestTransactionDto.getAccountId());
-
         if (!accountById.isPresent()) {
             throw new ElementNotFoundException("Account with id = " + requestTransactionDto.getAccountId() + " does not exist!");
         }
-
         Account account = accountById.get();
         double amount = requestTransactionDto.getAmount();
-
         if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
             amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
         }
-
         if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
             throw new InvalidOperationException("Not enough account balance!");
         }
-
         if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
             account.setBalance(account.getBalance() - amount);
         } else {
             account.setBalance(account.getBalance() + amount);
         }
-
         accountRepository.save(account);
         return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
     }
@@ -168,7 +149,6 @@ public class AccountService {
         List<ResponseTransactionDto> transactionsByType = new ArrayList<>();
         for (ResponseTransactionDto transaction : transactionsByAccountId) {
             if (transaction.getType().equals(type)) {
-                System.out.println("inside if");
                 transactionsByType.add(transaction);
             }
         }
