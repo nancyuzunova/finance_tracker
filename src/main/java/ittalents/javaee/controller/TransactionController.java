@@ -14,14 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Validated
@@ -44,17 +40,19 @@ public class TransactionController extends AbstractController {
                                                 @RequestParam("type") Type type) throws SQLException {
         validateUserOwnership(session, accountId);
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<ResponseTransactionDto> responseTransactionDtos = transactionService.getTransactionsByType(user.getId(), accountId, type);
+        List<ResponseTransactionDto> responseTransactionDtos = transactionService
+                .getTransactionsByType(user.getId(), accountId, type);
         return ResponseEntity.ok(responseTransactionDtos);
     }
 
-    @GetMapping("/transactions/expenses/incomes/days")
-    public ResponseEntity getExpensesAndIncomesByDateBetween(HttpSession session, @RequestParam("from")
-    @DateTimeFormat(pattern = "dd.MM.yyyy") Date from, @RequestParam("to")
-    @DateTimeFormat(pattern = "dd.MM.yyyy") Date to)
+    @GetMapping("/transactions")
+    public ResponseEntity
+    getExpensesAndIncomesByDateBetween(HttpSession session,
+                                       @RequestParam("from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
+                                       @RequestParam("to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to)
             throws SQLException {
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        Map<LocalDate, ArrayList<TransactionService.ExpenseIncomeEntity>> statisticsPerDay =
+        List<TransactionService.ExpenseIncomeEntity> statisticsPerDay =
                 transactionService.getDailyStatistics(userDto.getId(), from, to);
         return ResponseEntity.ok(statisticsPerDay);
     }

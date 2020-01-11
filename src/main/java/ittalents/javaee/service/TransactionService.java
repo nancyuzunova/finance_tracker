@@ -5,7 +5,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
-import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Transaction;
@@ -23,10 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -35,8 +32,9 @@ public class TransactionService {
     @Getter
     @Setter
     public
-    class ExpenseIncomeEntity{
+    class ExpenseIncomeEntity {
 
+        private LocalDate date;
         private double expense;
         private double income;
     }
@@ -86,16 +84,15 @@ public class TransactionService {
     }
 
     public List<ResponseTransactionDto> getTransactions(long userId, long accountId) throws SQLException {
-        if(accountId == 0){
+        if (accountId == 0) {
             return transactionDao.getMyTransactions(userId);
-        }
-        else{
+        } else {
             return getTransactionsByAccountId(accountId);
         }
     }
 
     public List<ResponseTransactionDto> getTransactionsByType(long userId, long accountId, Type type) throws SQLException {
-        if(accountId == 0){
+        if (accountId == 0) {
             return getAllTransactionsByType(userId, type);
         }
         List<ResponseTransactionDto> transactionsByAccountId = getTransactionsByAccountId(accountId);
@@ -113,24 +110,19 @@ public class TransactionService {
     }
 
     //TODO finish it
-    public Map<LocalDate, ArrayList<ExpenseIncomeEntity>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
+    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to) throws SQLException {
         Map<LocalDate, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);
-        System.out.println(map.size());
-        Map<LocalDate, ArrayList<ExpenseIncomeEntity>> result = new TreeMap<>();
-        for(Map.Entry<LocalDate, Map<Type, Double>> e : map.entrySet()){
-            LocalDate date = e.getKey();
+        List<ExpenseIncomeEntity> result = new ArrayList<>();
+        for (Map.Entry<LocalDate, Map<Type, Double>> e : map.entrySet()) {
             double expense = 0.0;
             double income = 0.0;
-            if(e.getValue().get(Type.EXPENSE) != null){
+            if (e.getValue().get(Type.EXPENSE) != null) {
                 expense = e.getValue().get(Type.EXPENSE);
             }
-            if(e.getValue().get(Type.INCOME) != null){
+            if (e.getValue().get(Type.INCOME) != null) {
                 income = e.getValue().get(Type.INCOME);
             }
-            if(!result.containsKey(date)) {
-                result.put(date, new ArrayList<>());
-            }
-            result.get(date).add(new ExpenseIncomeEntity(expense, income));
+            result.add(new ExpenseIncomeEntity(e.getKey(), expense, income));
         }
         return result;
     }
