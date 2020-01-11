@@ -6,8 +6,10 @@ import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +17,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Component
@@ -52,21 +52,30 @@ public class TransactionDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public
+    class StatisticEntity {
+        private Date date;
+        private Type type;
+        private double total;
+    }
 
-    //TODO Date to is exclusive ?
-    public Map<LocalDate, Map<Type, Double>> getDailyTransactions(long id, Date from, Date to) throws SQLException {
-        Map<LocalDate, Map<Type, Double>> result = new TreeMap<>();
+    public List<StatisticEntity> getDailyTransactions(long id, Date from, Date to) throws SQLException {
+        List<StatisticEntity> result = new ArrayList<>();
         Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_AND_INCOMES_BY_DAYS)){
+        try (PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_AND_INCOMES_BY_DAYS)) {
             statement.setLong(1, id);
             statement.setObject(2, from);
             statement.setObject(3, to);
             ResultSet set = statement.executeQuery();
-            while(set.next()){
-                java.sql.Date day = set.getDate("date");
-                result.put(day.toLocalDate(), new HashMap<>());
-                result.get(day.toLocalDate()).put(Type.valueOf(set.getString("type")), set.getDouble("total"));
+            while (set.next()) {
+                StatisticEntity entity = new StatisticEntity(set.getDate("date"),
+                        Type.valueOf(set.getString("type")), set.getDouble("total"));
+                result.add(entity);
             }
+            set.close();
         }
         return result;
     }
@@ -74,10 +83,10 @@ public class TransactionDao {
     public List<ResponseTransactionDto> getMyTransactions(long userId) throws SQLException {
         List<ResponseTransactionDto> responseTransactionDtos = new ArrayList<>();
         Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS)){
+        try (PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS)) {
             statement.setLong(1, userId);
             ResultSet set = statement.executeQuery();
-            while(set.next()){
+            while (set.next()) {
                 ResponseTransactionDto transactionDto = new ResponseTransactionDto();
                 transactionDto.setId(set.getLong("id"));
                 transactionDto.setDescription(set.getString("description"));
@@ -106,11 +115,11 @@ public class TransactionDao {
     public List<ResponseTransactionDto> getAllTransactionsByType(long userId, Type type) throws SQLException {
         List<ResponseTransactionDto> response = new ArrayList<>();
         Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS_BY_TYPE)){
+        try (PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS_BY_TYPE)) {
             statement.setLong(1, userId);
             statement.setString(2, type.toString());
             ResultSet set = statement.executeQuery();
-            while(set.next()){
+            while (set.next()) {
                 ResponseTransactionDto transactionDto = new ResponseTransactionDto();
                 transactionDto.setId(set.getLong("id"));
                 transactionDto.setDescription(set.getString("description"));

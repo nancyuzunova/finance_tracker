@@ -12,8 +12,8 @@ import ittalents.javaee.model.dto.RequestTransactionDto;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.TransactionRepository;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,20 +21,19 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 
 @Service
 public class TransactionService {
 
-    @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
     @Setter
     public
     class ExpenseIncomeEntity {
 
-        private LocalDate date;
+        private Date date;
         private double expense;
         private double income;
     }
@@ -109,20 +108,31 @@ public class TransactionService {
         return transactionDao.getAllTransactionsByType(userId, type);
     }
 
-    //TODO finish it
     public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to) throws SQLException {
-        Map<LocalDate, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);
+        List<TransactionDao.StatisticEntity> entities = transactionDao.getDailyTransactions(id, from, to);
+        List<Date> dates = new ArrayList<>();
+        for (TransactionDao.StatisticEntity entity : entities) {
+            dates.add(entity.getDate());
+        }
         List<ExpenseIncomeEntity> result = new ArrayList<>();
-        for (Map.Entry<LocalDate, Map<Type, Double>> e : map.entrySet()) {
-            double expense = 0.0;
-            double income = 0.0;
-            if (e.getValue().get(Type.EXPENSE) != null) {
-                expense = e.getValue().get(Type.EXPENSE);
+        for (int i = 0; i < entities.size(); i++) {
+            TransactionDao.StatisticEntity e = entities.get(i);
+            ExpenseIncomeEntity entity = new ExpenseIncomeEntity();
+            entity.setDate(e.getDate());
+            int occurrences = Collections.frequency(dates, e.getDate());
+            if (occurrences > 1) {
+                entity.setExpense(entities.get(i).getTotal());
+                entity.setIncome(entities.get(i + 1).getTotal());
+                i++;
+            } else {
+                if (e.getType().equals(Type.INCOME) && e.getTotal() != 0) {
+                    entity.setIncome(e.getTotal());
+                }
+                if (e.getType().equals(Type.EXPENSE) && e.getTotal() != 0) {
+                    entity.setExpense(e.getTotal());
+                }
             }
-            if (e.getValue().get(Type.INCOME) != null) {
-                income = e.getValue().get(Type.INCOME);
-            }
-            result.add(new ExpenseIncomeEntity(e.getKey(), expense, income));
+            result.add(entity);
         }
         return result;
     }
