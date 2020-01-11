@@ -82,15 +82,6 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping("/accounts/{accountId}/transactions/type")
-    public ResponseEntity getTransactionsByType(HttpSession session,
-                                                @PathVariable @Positive long accountId,
-                                                @RequestParam("type") Type type) {
-        validateUserOwnership(session, accountId);
-        List<ResponseTransactionDto> responseTransactionDtos = accountService.getTransactionsByType(accountId, type);
-        return ResponseEntity.ok(responseTransactionDtos);
-    }
-
     @PostMapping("/accounts/makePlannedPayment")
     public ResponseEntity createPlannedPayment(HttpSession session,
                                                @RequestBody @Valid RequestPlannedPaymentDto requestPlannedPaymentDto) {

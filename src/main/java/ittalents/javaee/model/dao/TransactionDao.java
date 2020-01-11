@@ -39,6 +39,16 @@ public class TransactionDao {
             "ON t.category_id = c.id " +
             "WHERE a.user_id = ?;";
 
+    private static final String GET_MY_TRANSACTIONS_BY_TYPE = "SELECT t.id, t.amount, t.currency, t.type, t.description, t.date, " +
+            "            a.id AS account_id, a.name, a.balance, a.currency AS account_currency, " +
+            "            c.id AS category_id, c.name AS category, c.iconurl, c.type AS cat_type " +
+            "            FROM transactions AS t " +
+            "            JOIN accounts AS a " +
+            "            ON t.account_id = a.id " +
+            "            JOIN categories AS c " +
+            "            ON t.category_id = c.id " +
+            "            WHERE a.user_id = ? AND t.type = ?;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -91,5 +101,38 @@ public class TransactionDao {
             }
         }
         return responseTransactionDtos;
+    }
+
+    public List<ResponseTransactionDto> getAllTransactionsByType(long userId, Type type) throws SQLException {
+        List<ResponseTransactionDto> response = new ArrayList<>();
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS_BY_TYPE)){
+            statement.setLong(1, userId);
+            statement.setString(2, type.toString());
+            ResultSet set = statement.executeQuery();
+            while(set.next()){
+                ResponseTransactionDto transactionDto = new ResponseTransactionDto();
+                transactionDto.setId(set.getLong("id"));
+                transactionDto.setDescription(set.getString("description"));
+                transactionDto.setDate(set.getDate("date"));
+                transactionDto.setAmount(set.getDouble("amount"));
+                transactionDto.setCurrency(Currency.valueOf(set.getString("currency")));
+                transactionDto.setType(Type.valueOf(set.getString("type")));
+                AccountDto accountDto = new AccountDto();
+                accountDto.setId(set.getLong("account_id"));
+                accountDto.setName(set.getString("name"));
+                accountDto.setCurrency(Currency.valueOf(set.getString("account_currency")));
+                accountDto.setBalance(set.getDouble("balance"));
+                transactionDto.setAccount(accountDto);
+                CategoryDto categoryDto = new CategoryDto();
+                categoryDto.setId(set.getLong("category_id"));
+                categoryDto.setCategoryName(Category.CategoryName.valueOf(set.getString("category")));
+                categoryDto.setType(Type.valueOf(set.getString("cat_type")));
+                categoryDto.setIconURL(set.getString("iconurl"));
+                transactionDto.setCategory(categoryDto);
+                response.add(transactionDto);
+            }
+        }
+        return response;
     }
 }

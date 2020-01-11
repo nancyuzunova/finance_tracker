@@ -136,17 +136,6 @@ public class AccountService {
         return budgetService.createBudget(requestBudgetDto);
     }
 
-    public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
-        List<ResponseTransactionDto> transactionsByAccountId = transactionService.getTransactionsByAccountId(id);
-        List<ResponseTransactionDto> transactionsByType = new ArrayList<>();
-        for (ResponseTransactionDto transaction : transactionsByAccountId) {
-            if (transaction.getType().equals(type)) {
-                transactionsByType.add(transaction);
-            }
-        }
-        return transactionsByType;
-    }
-
     @Scheduled(cron = "0 0 0 * * *")
     public void payPlannedPayments(HttpSession session) {
         Date today = new Date();
