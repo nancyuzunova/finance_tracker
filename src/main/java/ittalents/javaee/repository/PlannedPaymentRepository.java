@@ -11,4 +11,6 @@ import java.util.List;
 public interface PlannedPaymentRepository extends JpaRepository<PlannedPayment, Long> {
 
     List<PlannedPayment> findAllByDateAndStatus(Date today, PlannedPayment.PaymentStatus status);
+
+    List<PlannedPayment> findAllByAccountId(long accountId);
 }

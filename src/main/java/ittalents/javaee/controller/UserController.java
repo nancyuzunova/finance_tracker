@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @Validated
@@ -21,12 +20,6 @@ public class UserController extends AbstractController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @GetMapping("/users/all")
-    public ResponseEntity getUsers() {
-        List<UserDto> users = userService.getUsers();
-        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/users/profile")

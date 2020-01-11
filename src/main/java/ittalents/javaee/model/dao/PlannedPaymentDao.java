@@ -26,12 +26,6 @@ public class PlannedPaymentDao {
             "JOIN accounts AS a ON p.account_id = a.id " +
             "WHERE a.user_id = ?;";
 
-    private static final String GET_PLANNED_PAYMENTS_FOR_AN_ACCOUNT = "SELECT p.id, p.title, p.amount, p.status, p.date, " +
-            "a.id AS account_id, a.name, a.balance, a.currency " +
-            "FROM planned_payments AS p " +
-            "JOIN accounts AS a ON p.account_id = a.id " +
-            "WHERE a.user_id = ? AND p.account_id = ?;";
-
     private static final String GET_PLANNED_PAYMENTS_BY_STATUS = "SELECT p.id, p.title, p.amount, p.status, p.date, " +
             "a.id AS account_id, a.name, a.balance, a.currency " +
             "FROM planned_payments AS p " +
@@ -58,32 +52,6 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setTitle(rows.getString("title"));
                 AccountDto accountDto = new AccountDto();
                 accountDto.setId(rows.getLong("account_id"));
-                accountDto.setName(rows.getString("name"));
-                accountDto.setBalance(rows.getDouble("balance"));
-                accountDto.setCurrency(Currency.valueOf(rows.getString("currency")));
-                responsePlannedPaymentDto.setAccount(accountDto);
-                paymentDtos.add(responsePlannedPaymentDto);
-            }
-        }
-        return paymentDtos;
-    }
-
-    public List<ResponsePlannedPaymentDto> getPlannedPaymentsByAccountId(long userId, long accountId) throws SQLException{
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
-        try(PreparedStatement statement = connection.prepareStatement(GET_PLANNED_PAYMENTS_FOR_AN_ACCOUNT)){
-            statement.setLong(1, userId);
-            statement.setLong(2, accountId);
-            ResultSet rows = statement.executeQuery();
-            while(rows.next()){
-                ResponsePlannedPaymentDto responsePlannedPaymentDto = new ResponsePlannedPaymentDto();
-                responsePlannedPaymentDto.setId(rows.getLong("id"));
-                responsePlannedPaymentDto.setStatus(PlannedPayment.PaymentStatus.valueOf(rows.getString("status")));
-                responsePlannedPaymentDto.setDate(rows.getDate("date"));
-                responsePlannedPaymentDto.setAmount(rows.getDouble("amount"));
-                responsePlannedPaymentDto.setTitle(rows.getString("title"));
-                AccountDto accountDto = new AccountDto();
-                accountDto.setId(accountId);
                 accountDto.setName(rows.getString("name"));
                 accountDto.setBalance(rows.getDouble("balance"));
                 accountDto.setCurrency(Currency.valueOf(rows.getString("currency")));

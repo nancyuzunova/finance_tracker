@@ -23,6 +23,7 @@ public class PlannedPaymentController extends AbstractController {
 
     @GetMapping("accounts/{id}/plannedPayments")
     public ResponseEntity getMyPlannedPayments(HttpSession session, @PathVariable long id) throws SQLException {
+        validateUserOwnership(session, id);
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<ResponsePlannedPaymentDto> plannedPayments = plannedPaymentService.getAllPlannedPaymentsByUserId(user.getId(), id);
         return ResponseEntity.ok(plannedPayments);

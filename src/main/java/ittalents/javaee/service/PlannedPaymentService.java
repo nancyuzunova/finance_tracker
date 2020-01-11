@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,7 +32,12 @@ public class PlannedPaymentService {
             return paymentDao.getMyPlannedPayments(userId);
         }
         else{
-            return paymentDao.getPlannedPaymentsByAccountId(userId, accountId);
+           List<PlannedPayment> payments =  paymentRepository.findAllByAccountId(accountId);
+           List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
+            for (PlannedPayment payment : payments) {
+                paymentDtos.add(payment.toDto());
+            }
+            return paymentDtos;
         }
     }
 
