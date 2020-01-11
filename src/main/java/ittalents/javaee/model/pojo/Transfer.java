@@ -22,11 +22,11 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "from_account_id", referencedColumnName = "id", nullable = false)
     private Account fromAccount;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "to_account_id", referencedColumnName = "id", nullable = false)
     private Account toAccount;
 

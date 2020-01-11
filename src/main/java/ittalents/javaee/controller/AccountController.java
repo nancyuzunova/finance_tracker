@@ -43,13 +43,6 @@ public class AccountController extends AbstractController {
         return ResponseEntity.ok(transfers);
     }
 
-    @GetMapping("/accounts/{accountId}/transactions")
-    public ResponseEntity getTransactionsByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
-        validateUserOwnership(session, accountId);
-        List<ResponseTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
-        return ResponseEntity.ok(transactions);
-    }
-
     @PutMapping("/accounts/{accountId}")
     public ResponseEntity changeAccountCurrency(HttpSession session,
                                                 @PathVariable @Positive long accountId,
@@ -62,7 +55,9 @@ public class AccountController extends AbstractController {
     @DeleteMapping("/accounts/{accountId}")
     public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) {
         validateUserOwnership(session, accountId);
+        System.out.println("validno e");
         this.accountService.deleteAccount(accountId);
+        System.out.println("bi trqbvalo da e iztrit");
         return ResponseEntity.noContent().build();
     }
 

@@ -71,12 +71,12 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    protected ApiError handleGlobalException(Exception e) {
-        return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
-                HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
-    }
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+//    protected ApiError handleGlobalException(Exception e) {
+//        return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
+//                HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
+//    }
 
     private boolean isLoggedUserOwner(long userId, long accountId) {
         if(accountId == 0){

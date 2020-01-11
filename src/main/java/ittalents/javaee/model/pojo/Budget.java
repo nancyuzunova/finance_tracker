@@ -37,7 +37,7 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     @Column(name = "amount", nullable = false)
     private double amount;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
     private Account account;
     @NotNull

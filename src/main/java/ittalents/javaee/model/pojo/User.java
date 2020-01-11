@@ -40,13 +40,6 @@ public class User extends AbstractPojo<UserDto,UserDto> {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private List<Account> accounts;
 
-    public User(String firstName, String lastName, String password, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.email = email;
-    }
-
     public void fromDto(UserDto userDto) {
         this.firstName = userDto.getFirstName();
         this.lastName = userDto.getLastName();

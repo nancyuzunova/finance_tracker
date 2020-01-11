@@ -70,7 +70,9 @@ public class AccountService {
     }
 
     public void deleteAccount(long accountId) {
+        System.out.println("pochva da trie");
         this.accountRepository.deleteById(accountId);
+        System.out.println("iztrito e");
     }
 
     public long makeTransfer(RequestTransferDto requestTransferDto) {

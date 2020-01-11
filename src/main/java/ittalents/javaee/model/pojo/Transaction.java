@@ -43,7 +43,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
     @NotBlank
     private String description;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private Account account;
 

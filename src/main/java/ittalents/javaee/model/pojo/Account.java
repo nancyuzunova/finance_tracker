@@ -28,8 +28,8 @@ public class Account extends AbstractPojo<AccountDto,AccountDto> {
     @NotBlank
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @NotNull
