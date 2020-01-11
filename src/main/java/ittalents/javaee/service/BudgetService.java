@@ -9,7 +9,6 @@ import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
-import ittalents.javaee.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,16 +23,17 @@ public class BudgetService {
 
     private BudgetRepository budgetRepository;
     private AccountRepository accountRepository;
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @Autowired
-    public BudgetService(BudgetRepository budgetRepository, AccountRepository accountRepository, CategoryRepository categoryRepository) {
+    public BudgetService(BudgetRepository budgetRepository, AccountRepository accountRepository,
+                         CategoryService categoryService) {
         this.budgetRepository = budgetRepository;
         this.accountRepository = accountRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
-    public List<ResponseBudgetDto> getMyBudgets(long userId) {
+    public List<ResponseBudgetDto> getBudgets(long userId) {
         List<Account> accounts = accountRepository.findAllByUserId(userId);
         List<ResponseBudgetDto> budgets = new ArrayList<>();
         for (Account account : accounts) {
@@ -43,119 +43,69 @@ public class BudgetService {
         return budgets;
     }
 
-    public Budget getBudgetById(long id) {
-        Optional<Budget> budget = budgetRepository.findById(id);
+    public Budget getBudgetById(long budgetId) {
+        Optional<Budget> budget = budgetRepository.findById(budgetId);
         if (budget.isPresent()) {
             return budget.get();
         }
-        throw new ElementNotFoundException("Budget with id " + id + " does NOT exist");
+        throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist");
     }
 
-    public void deleteBudget(long id) {
-        this.budgetRepository.deleteById(id);
+    public void deleteBudget(long budgetId) {
+        this.budgetRepository.deleteById(budgetId);
     }
 
-    public Budget changeBudgetAmount(long id, double amount) {
-        Optional<Budget> budget = budgetRepository.findById(id);
-        if (!budget.isPresent()) {
-            throw new ElementNotFoundException("Budget with id " + id + " does NOT exists");
-        }
-        Budget budget1 = budget.get();
-        budget1.setAmount(amount);
-        return this.budgetRepository.save(budget1);
-    }
-
-    public List<ResponseBudgetDto> getBudgetsByDate(Date fromDate, Date toDate) {
-        List<ResponseBudgetDto> requestBudgetDtos = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByFromDateBetween(fromDate, toDate)) {
-            requestBudgetDtos.add(budget.toDto());
-        }
-        return requestBudgetDtos;
-    }
-
-    public List<ResponseBudgetDto> getBudgetsBefore(Date date) {
-        List<ResponseBudgetDto> requestBudgetDtos = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByFromDateBefore(date)) {
-            requestBudgetDtos.add(budget.toDto());
-        }
-        return requestBudgetDtos;
-    }
-
-    public List<ResponseBudgetDto> getBudgetsAfter(Date date) {
-        List<ResponseBudgetDto> requestBudgetDtos = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByFromDateAfter(date)) {
-            requestBudgetDtos.add(budget.toDto());
-        }
-        return requestBudgetDtos;
+    public Budget changeBudgetAmount(long budgetId, double amount) {
+        Budget budget = getBudgetById(budgetId);
+        budget.setAmount(amount);
+        return this.budgetRepository.save(budget);
     }
 
     public long createBudget(RequestBudgetDto requestBudgetDto) {
         Budget budget = new Budget();
-
         Date fromDate = requestBudgetDto.getFromDate();
         Date toDate = requestBudgetDto.getToDate();
-
         if (fromDate.after(toDate)) {
             throw new InvalidOperationException("You can not create budget!");
         }
-
         Optional<Account> acc = accountRepository.findById(requestBudgetDto.getAccountId());
         if (!acc.isPresent()) {
             throw new InvalidOperationException("Account cannot be found!");
         }
         budget.setAccount(acc.get());
-
-        Optional<Category> c = categoryRepository.findById(requestBudgetDto.getCategoryId());
-        if (!c.isPresent()) {
-            throw new InvalidOperationException("No such category!");
-        }
-        budget.setCategory(c.get());
+        Category category = categoryService.getCategoryById(requestBudgetDto.getCategoryId());
+        budget.setCategory(category);
         budget.fromDto(requestBudgetDto);
         return this.budgetRepository.save(budget).getId();
     }
 
-    public List<ResponseBudgetDto> getBudgetsByAccountId(long id) {
+    public List<ResponseBudgetDto> getBudgetsByAccountId(long accountId) {
         List<ResponseBudgetDto> budgets = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByAccountId(id)) {
+        for (Budget budget : this.budgetRepository.findAllByAccountId(accountId)) {
             budgets.add(budget.toDto());
         }
         return budgets;
     }
 
-    public ResponseBudgetDto changeBudgetCategory(long id, long categoryId) {
-        Optional<Budget> budget = this.budgetRepository.findById(id);
-        if (!budget.isPresent()) {
-            throw new ElementNotFoundException("Budget with id " + id + " does NOT exists");
-        }
-
-        Budget b = budget.get();
-
-        Optional<Category> categoryById = categoryRepository.findById(categoryId);
-        if (!categoryById.isPresent()) {
-            throw new ElementNotFoundException("Category with id " + id + " does NOT exists");
-        }
-
-        b.setCategory(categoryById.get());
+    public ResponseBudgetDto changeBudgetCategory(long budgetId, long categoryId) {
+        Budget b = getBudgetById(budgetId);
+        Category category = categoryService.getCategoryById(categoryId);
+        b.setCategory(category);
         this.budgetRepository.save(b);
         return b.toDto();
     }
 
-    public Budget changeTitle(long id, String newTitle) {
-        Optional<Budget> budget = this.budgetRepository.findById(id);
-        if (!budget.isPresent()) {
-            throw new ElementNotFoundException("Budget with id " + id + " does NOT exists");
-        }
-        Budget b = budget.get();
+    public Budget changeTitle(long budgetId, String newTitle) {
+        Budget b = getBudgetById(budgetId);
         b.setTitle(newTitle);
         return this.budgetRepository.save(b);
     }
 
-    public Budget changePeriod(long id, Date from, Date to) {
-        Optional<Budget> budget = this.budgetRepository.findById(id);
-        if (!budget.isPresent()) {
-            throw new ElementNotFoundException("Budget with id " + id + " does NOT exists");
+    public Budget changePeriod(long budgetId, Date from, Date to) {
+        if (from.after(to)) {
+            throw new InvalidOperationException("You can not change period. Please check dates!");
         }
-        Budget b = budget.get();
+        Budget b = getBudgetById(budgetId);
         b.setFromDate(from);
         b.setToDate(to);
         return this.budgetRepository.save(b);

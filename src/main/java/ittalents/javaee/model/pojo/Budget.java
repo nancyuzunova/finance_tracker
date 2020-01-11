@@ -31,7 +31,7 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     private Date toDate;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
     @Column(name = "amount", nullable = false)
