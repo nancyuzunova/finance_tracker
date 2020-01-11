@@ -48,7 +48,7 @@ public class TransactionService {
         transaction.setCategory(cat);
         transaction.fromDto(requestTransactionDto);
         Optional<Account> acc = accountRepository.findById(accountId);
-        if(!acc.isPresent()){
+        if (!acc.isPresent()) {
             throw new ElementNotFoundException("Account with id " + accountId + " does NOT exists");
         }
         transaction.setAccount(acc.get());
@@ -56,7 +56,12 @@ public class TransactionService {
     }
 
     public List<ResponseTransactionDto> getTransactionsByAccountId(long id) {
-        return transactionRepository.findAllByAccountId(id).stream().map(Transaction::toDto).collect(Collectors.toList());
+        List<Transaction> transactionsByAccountId = transactionRepository.findAllByAccountId(id);
+        List<ResponseTransactionDto> transactions = new ArrayList<>();
+        for (Transaction transaction : transactionsByAccountId) {
+            transactions.add(transaction.toDto());
+        }
+        return transactions;
     }
 
     public Transaction getTransactionById(long id) {
@@ -75,11 +80,11 @@ public class TransactionService {
         Map<LocalDate, Map<Double, Double>> result = new TreeMap<>();
         LocalDate start = from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate end = from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1);
-        for(; start.isBefore(end); start = start.plusDays(1)){
+        for (; start.isBefore(end); start = start.plusDays(1)) {
             result.put(start, new HashMap<>());
-            result.get(start).put(0.0,0.0);
+            result.get(start).put(0.0, 0.0);
         }
-        for(Map.Entry<Date, Map<Type, Double>> entry : map.entrySet()){
+        for (Map.Entry<Date, Map<Type, Double>> entry : map.entrySet()) {
             LocalDate date = entry.getKey().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             result.get(date).put(entry.getValue().get(Type.EXPENSE), entry.getValue().get(Type.INCOME));
         }

@@ -6,6 +6,7 @@ import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.mail.MailSender;
 import ittalents.javaee.model.pojo.*;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +15,13 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
 
+    public static final int MAX_AMOUNT_OF_PLANNED_PAYMENT = 2500;
     private AccountRepository accountRepository;
     private TransferService transferService;
     private TransactionService transactionService;
@@ -115,7 +114,7 @@ public class AccountService {
 
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
-            return this.transferService.createTransfer(requestTransferDto);
+            return this.transferService.createTransfer(accountFrom, accountTo, requestTransferDto);
         } else {
             throw new InvalidOperationException("Not enough balance!");
         }
@@ -165,7 +164,15 @@ public class AccountService {
     }
 
     public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
-        return transactionService.getTransactionsByAccountId(id).stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
+        List<ResponseTransactionDto> transactionsByAccountId = transactionService.getTransactionsByAccountId(id);
+        List<ResponseTransactionDto> transactionsByType = new ArrayList<>();
+        for (ResponseTransactionDto transaction : transactionsByAccountId) {
+            if (transaction.getType().equals(type)) {
+                System.out.println("inside if");
+                transactionsByType.add(transaction);
+            }
+        }
+        return transactionsByType;
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -178,7 +185,7 @@ public class AccountService {
             double availability = payment.getAccount().getBalance();
             if (availability < amount) {
                 UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-                Thread sender = new Thread(){
+                Thread sender = new Thread() {
                     @Override
                     public void run() {
                         MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
@@ -196,6 +203,9 @@ public class AccountService {
 
     public long createPlannedPayment(RequestPlannedPaymentDto dto) {
         PlannedPayment plannedPayment = new PlannedPayment();
+        if (dto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
+            throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
+        }
         Optional<Account> acc = accountRepository.findById(dto.getAccountId());
         if (!acc.isPresent()) {
             throw new ElementNotFoundException("Account can not be found!");

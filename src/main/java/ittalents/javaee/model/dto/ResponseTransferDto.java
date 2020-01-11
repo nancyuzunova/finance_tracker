@@ -1,7 +1,6 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +15,10 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponseTransferDto extends AbstractDto{
+public class ResponseTransferDto extends AbstractDto {
     private long id;
-    private Account fromAccount;
-    private Account toAccount;
+    private AccountDto fromAccount;
+    private AccountDto toAccount;
 
     @Positive
     private double amount;

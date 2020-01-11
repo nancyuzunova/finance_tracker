@@ -1,5 +1,6 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
@@ -31,31 +32,32 @@ public class AccountController extends AbstractController {
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity getMyAccounts(HttpSession session) {
+    public ResponseEntity getAccounts(HttpSession session) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<AccountDto> accounts = accountService.getAllAccountsByUserId(user.getId());
         return ResponseEntity.ok(accounts);
     }
 
-    @GetMapping("/accounts/{id}/transfers")
+    @GetMapping("/accounts/{accountId}/transfers")
     public ResponseEntity getTransfersByAccountId(@PathVariable @Positive long accountId) {
-        List<ResponseTransferDto> accounts = accountService.getTransfersByAccountId(accountId);
-        return ResponseEntity.ok(accounts);
+        List<ResponseTransferDto> transfers = accountService.getTransfersByAccountId(accountId);
+        return ResponseEntity.ok(transfers);
     }
 
-    @GetMapping("/accounts/{id}/transactions")
+    @GetMapping("/accounts/{accountId}/transactions")
     public ResponseEntity getTransactionsByAccountId(@PathVariable @Positive long accountId) {
         List<ResponseTransactionDto> transactions = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(transactions);
     }
 
-    @PutMapping("/accounts/{id}")
-    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long accountId, @RequestParam Currency currency) {
+    @PutMapping("/accounts/{accountId}")
+    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long accountId,
+                                                @RequestParam("currency") Currency currency) {
         AccountDto account = accountService.changeAccountCurrency(accountId, currency).toDto();
         return ResponseEntity.ok(account);
     }
 
-    @DeleteMapping("/accounts/{id}")
+    @DeleteMapping("/accounts/{accountId}")
     public ResponseEntity deleteAccount(@PathVariable @Positive long accountId) {
         this.accountService.deleteAccount(accountId);
         return ResponseEntity.noContent().build();
@@ -79,8 +81,9 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping("/accounts/{id}/transactions/type")
-    public ResponseEntity getTransactionsByType(@PathVariable @Positive long accountId, @RequestParam("type") Type type) {
+    @GetMapping("/accounts/{accountId}/transactions/type")
+    public ResponseEntity getTransactionsByType(@PathVariable @Positive long accountId,
+                                                @RequestParam("type") Type type) {
         List<ResponseTransactionDto> responseTransactionDtos = accountService.getTransactionsByType(accountId, type);
         return ResponseEntity.ok(responseTransactionDtos);
     }

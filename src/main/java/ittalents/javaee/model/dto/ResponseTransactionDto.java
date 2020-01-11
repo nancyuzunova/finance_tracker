@@ -1,7 +1,6 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
@@ -45,5 +44,5 @@ public class ResponseTransactionDto extends AbstractDto{
 
     @NotNull
     @Positive
-    private Account account;
+    private AccountDto account;
 }

@@ -67,7 +67,7 @@ public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTra
         responseTransactionDto.setAmount(amount);
         responseTransactionDto.setCurrency(currency);
         responseTransactionDto.setDate(date);
-        responseTransactionDto.setAccount(account);
+        responseTransactionDto.setAccount(account.toDto());
         responseTransactionDto.setDescription(description);
         return responseTransactionDto;
     }
