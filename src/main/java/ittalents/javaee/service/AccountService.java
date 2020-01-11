@@ -126,6 +126,9 @@ public class AccountService {
     }
 
     public long addBudget(RequestBudgetDto requestBudgetDto) {
+        if(requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())){
+            throw new InvalidOperationException("Incorrect dates! Please try again!");
+        }
         Account account = getAccountById(requestBudgetDto.getAccountId());
         if (account.getBalance() < requestBudgetDto.getAmount()) {
             throw new InvalidOperationException("The budget can not exceed the account balance!");
