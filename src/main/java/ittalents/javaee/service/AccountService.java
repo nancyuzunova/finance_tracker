@@ -75,12 +75,16 @@ public class AccountService {
     }
 
     public void deleteAccount(long accountId) {
-        System.out.println("pochva da trie");
         this.accountRepository.deleteById(accountId);
-        System.out.println("iztrito e");
     }
 
     public long makeTransfer(RequestTransferDto requestTransferDto) {
+        if(requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()){
+            throw new InvalidOperationException("You cannot make transfer to the same account!");
+        }
+        if(requestTransferDto.getDate().after(new Date())){
+            throw new InvalidOperationException("You cannot make future transfers!");
+        }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         Account accountTo = getAccountById(requestTransferDto.getToAccountId());
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
@@ -109,6 +113,9 @@ public class AccountService {
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
+        if(requestTransactionDto.getDate().after(new Date())){
+            throw new InvalidOperationException("You cannot make future transactions!");
+        }
         Account account = getAccountById(requestTransactionDto.getAccountId());
         double amount = requestTransactionDto.getAmount();
         if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
@@ -127,22 +134,14 @@ public class AccountService {
     }
 
     public long addBudget(RequestBudgetDto requestBudgetDto) {
+        if(requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())){
+            throw new InvalidOperationException("Incorrect dates! Please try again!");
+        }
         Account account = getAccountById(requestBudgetDto.getAccountId());
         if (account.getBalance() < requestBudgetDto.getAmount()) {
             throw new InvalidOperationException("The budget can not exceed the account balance!");
         }
         return budgetService.createBudget(requestBudgetDto);
-    }
-
-    public List<ResponseTransactionDto> getTransactionsByType(long id, Type type) {
-        List<ResponseTransactionDto> transactionsByAccountId = transactionService.getTransactionsByAccountId(id);
-        List<ResponseTransactionDto> transactionsByType = new ArrayList<>();
-        for (ResponseTransactionDto transaction : transactionsByAccountId) {
-            if (transaction.getType().equals(type)) {
-                transactionsByType.add(transaction);
-            }
-        }
-        return transactionsByType;
     }
 
     @Scheduled(cron = "0 0 0 * * *")

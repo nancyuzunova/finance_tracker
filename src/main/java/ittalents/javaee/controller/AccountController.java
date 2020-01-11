@@ -58,9 +58,7 @@ public class AccountController extends AbstractController {
     @DeleteMapping("/accounts/{accountId}")
     public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) {
         validateUserOwnership(session, accountId);
-        System.out.println("validno e");
         this.accountService.deleteAccount(accountId);
-        System.out.println("bi trqbvalo da e iztrit");
         return ResponseEntity.noContent().build();
     }
 
@@ -85,15 +83,6 @@ public class AccountController extends AbstractController {
         validateUserOwnership(session, requestBudgetDto.getAccountId());
         URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(requestBudgetDto)));
         return ResponseEntity.created(location).build();
-    }
-
-    @GetMapping("/accounts/{accountId}/transactions/type")
-    public ResponseEntity getTransactionsByType(HttpSession session,
-                                                @PathVariable @Positive long accountId,
-                                                @RequestParam("type") Type type) {
-        validateUserOwnership(session, accountId);
-        List<ResponseTransactionDto> responseTransactionDtos = accountService.getTransactionsByType(accountId, type);
-        return ResponseEntity.ok(responseTransactionDtos);
     }
 
     @PostMapping("/accounts/makePlannedPayment")

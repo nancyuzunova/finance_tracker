@@ -94,6 +94,24 @@ public class TransactionService {
         }
     }
 
+    public List<ResponseTransactionDto> getTransactionsByType(long userId, long accountId, Type type) throws SQLException {
+        if(accountId == 0){
+            return getAllTransactionsByType(userId, type);
+        }
+        List<ResponseTransactionDto> transactionsByAccountId = getTransactionsByAccountId(accountId);
+        List<ResponseTransactionDto> transactionsByType = new ArrayList<>();
+        for (ResponseTransactionDto transaction : transactionsByAccountId) {
+            if (transaction.getType().equals(type)) {
+                transactionsByType.add(transaction);
+            }
+        }
+        return transactionsByType;
+    }
+
+    private List<ResponseTransactionDto> getAllTransactionsByType(long userId, Type type) throws SQLException {
+        return transactionDao.getAllTransactionsByType(userId, type);
+    }
+
     //TODO finish it
     public Map<LocalDate, ArrayList<ExpenseIncomeEntity>> getDailyStatistics(long id, Date from, Date to) throws SQLException {
         Map<LocalDate, Map<Type, Double>> map = transactionDao.getDailyTransactions(id, from, to);

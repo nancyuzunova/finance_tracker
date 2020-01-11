@@ -2,6 +2,7 @@ package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.dto.UserDto;
+import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,6 +36,16 @@ public class TransactionController extends AbstractController {
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<ResponseTransactionDto> transactions = transactionService.getTransactions(userDto.getId(), id);
         return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping("/accounts/{accountId}/transactions/type")
+    public ResponseEntity getTransactionsByType(HttpSession session,
+                                                @PathVariable @PositiveOrZero long accountId,
+                                                @RequestParam("type") Type type) throws SQLException {
+        validateUserOwnership(session, accountId);
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<ResponseTransactionDto> responseTransactionDtos = transactionService.getTransactionsByType(user.getId(), accountId, type);
+        return ResponseEntity.ok(responseTransactionDtos);
     }
 
     @GetMapping("/transactions/expenses/incomes/days")
