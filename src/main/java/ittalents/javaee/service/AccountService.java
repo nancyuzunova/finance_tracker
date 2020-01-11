@@ -40,16 +40,16 @@ public class AccountService {
         this.paymentRepository = paymentRepository;
     }
 
-    public List<AccountDto> getAllAccountsByUserId(long id) {
-        return accountRepository.findAllByUserId(id).stream().map(Account::toDto).collect(Collectors.toList());
+    public List<AccountDto> getAllAccountsByUserId(long userId) {
+        return accountRepository.findAllByUserId(userId).stream().map(Account::toDto).collect(Collectors.toList());
     }
 
-    public Account getAccountById(long id) {
-        Optional<Account> account = accountRepository.findById(id);
+    public Account getAccountById(long accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
         if (account.isPresent()) {
             return account.get();
         }
-        throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
+        throw new ElementNotFoundException("Account with id = " + accountId + " does not exist!");
     }
 
     public long createAccount(User user, AccountDto accountDto) {
@@ -60,12 +60,8 @@ public class AccountService {
         return this.accountRepository.save(a).getId();
     }
 
-    public Account changeAccountCurrency(long id, Currency currency) {
-        Optional<Account> accountById = accountRepository.findById(id);
-        if (!accountById.isPresent()) {
-            throw new ElementNotFoundException("Account with id = " + id + " does not exist!");
-        }
-        Account account = accountById.get();
+    public Account changeAccountCurrency(long accountId, Currency currency) {
+        Account account = getAccountById(accountId);
         double balance = account.getBalance();
         double convertedBalance = CurrencyConverter.convert(account.getCurrency(), currency, balance);
         account.setBalance(convertedBalance);
@@ -73,25 +69,13 @@ public class AccountService {
         return this.accountRepository.save(account);
     }
 
-    public void deleteAccount(long id) {
-        this.accountRepository.deleteById(id);
+    public void deleteAccount(long accountId) {
+        this.accountRepository.deleteById(accountId);
     }
 
     public long makeTransfer(RequestTransferDto requestTransferDto) {
-        Account accountFrom;
-        Account accountTo;
-        try {
-            accountFrom = getAccountById(requestTransferDto.getFromAccountId());
-        } catch (NoSuchElementException e) {
-            throw new InvalidOperationException(
-                    "Account with id " + requestTransferDto.getFromAccountId() + " does not exists!");
-        }
-        try {
-            accountTo = getAccountById(requestTransferDto.getToAccountId());
-        } catch (NoSuchElementException e) {
-            throw new InvalidOperationException(
-                    "Account with id " + requestTransferDto.getToAccountId() + " does not exists!");
-        }
+        Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
+        Account accountTo = getAccountById(requestTransferDto.getToAccountId());
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
             throw new InvalidOperationException("You can not make transfer to other users!");
         }
@@ -115,11 +99,7 @@ public class AccountService {
     }
 
     public long makeTransaction(RequestTransactionDto requestTransactionDto) {
-        Optional<Account> accountById = accountRepository.findById(requestTransactionDto.getAccountId());
-        if (!accountById.isPresent()) {
-            throw new ElementNotFoundException("Account with id = " + requestTransactionDto.getAccountId() + " does not exist!");
-        }
-        Account account = accountById.get();
+        Account account = getAccountById(requestTransactionDto.getAccountId());
         double amount = requestTransactionDto.getAmount();
         if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
             amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
@@ -181,20 +161,17 @@ public class AccountService {
         }
     }
 
-    public long createPlannedPayment(RequestPlannedPaymentDto dto) {
+    public long createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
         PlannedPayment plannedPayment = new PlannedPayment();
-        if (dto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
+        if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
             throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
         }
-        Optional<Account> acc = accountRepository.findById(dto.getAccountId());
-        if (!acc.isPresent()) {
-            throw new ElementNotFoundException("Account can not be found!");
-        }
-        plannedPayment.setAccount(acc.get());
-        plannedPayment.setTitle(dto.getTitle());
+        Account account = getAccountById(requestPlannedPaymentDto.getAccountId());
+        plannedPayment.setAccount(account);
+        plannedPayment.setTitle(requestPlannedPaymentDto.getTitle());
         plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
-        plannedPayment.setAmount(dto.getAmount());
-        plannedPayment.setDate(dto.getDate());
+        plannedPayment.setAmount(requestPlannedPaymentDto.getAmount());
+        plannedPayment.setDate(requestPlannedPaymentDto.getDate());
         return this.paymentRepository.save(plannedPayment).getId();
     }
 }

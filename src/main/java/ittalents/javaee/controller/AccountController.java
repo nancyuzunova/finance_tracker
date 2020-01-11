@@ -51,46 +51,59 @@ public class AccountController extends AbstractController {
     }
 
     @PutMapping("/accounts/{accountId}")
-    public ResponseEntity changeAccountCurrency(@PathVariable @Positive long accountId,
+    public ResponseEntity changeAccountCurrency(HttpSession session,
+                                                @PathVariable @Positive long accountId,
                                                 @RequestParam("currency") Currency currency) {
+        validateUserOwnership(session, accountId);
         AccountDto account = accountService.changeAccountCurrency(accountId, currency).toDto();
         return ResponseEntity.ok(account);
     }
 
     @DeleteMapping("/accounts/{accountId}")
-    public ResponseEntity deleteAccount(@PathVariable @Positive long accountId) {
+    public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) {
+        validateUserOwnership(session, accountId);
         this.accountService.deleteAccount(accountId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/accounts/makeTransfer")
-    public ResponseEntity makeTransfer(@RequestBody @Valid RequestTransferDto requestTransferDto) {
+    public ResponseEntity makeTransfer(HttpSession session, @RequestBody @Valid RequestTransferDto requestTransferDto) {
+        validateUserOwnership(session, requestTransferDto.getFromAccountId());
+        validateUserOwnership(session, requestTransferDto.getToAccountId());
         URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(requestTransferDto)));
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/accounts/makeTransaction")
-    public ResponseEntity makeTransaction(@RequestBody @Valid RequestTransactionDto requestTransactionDto) {
+    public ResponseEntity makeTransaction(HttpSession session,
+                                          @RequestBody @Valid RequestTransactionDto requestTransactionDto) {
+        validateUserOwnership(session, requestTransactionDto.getAccountId());
         URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(requestTransactionDto)));
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping("/accounts/budgets")
-    public ResponseEntity addBudget(@RequestBody @Valid RequestBudgetDto requestBudgetDto) {
+    public ResponseEntity addBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
+        validateUserOwnership(session, requestBudgetDto.getAccountId());
         URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(requestBudgetDto)));
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/accounts/{accountId}/transactions/type")
-    public ResponseEntity getTransactionsByType(@PathVariable @Positive long accountId,
+    public ResponseEntity getTransactionsByType(HttpSession session,
+                                                @PathVariable @Positive long accountId,
                                                 @RequestParam("type") Type type) {
+        validateUserOwnership(session, accountId);
         List<ResponseTransactionDto> responseTransactionDtos = accountService.getTransactionsByType(accountId, type);
         return ResponseEntity.ok(responseTransactionDtos);
     }
 
     @PostMapping("/accounts/makePlannedPayment")
-    public ResponseEntity createPlannedPayment(@RequestBody @Valid RequestPlannedPaymentDto dto) {
-        URI location = URI.create(String.format("/plannedPayments/%d", accountService.createPlannedPayment(dto)));
+    public ResponseEntity createPlannedPayment(HttpSession session,
+                                               @RequestBody @Valid RequestPlannedPaymentDto requestPlannedPaymentDto) {
+        validateUserOwnership(session, requestPlannedPaymentDto.getAccountId());
+        URI location = URI.create(String.format("/plannedPayments/%d",
+                accountService.createPlannedPayment(requestPlannedPaymentDto)));
         return ResponseEntity.created(location).build();
     }
 }
