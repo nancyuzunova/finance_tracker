@@ -49,8 +49,8 @@ public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferD
     public ResponseTransferDto toDto() {
         ResponseTransferDto responseTransferDto = new ResponseTransferDto();
         responseTransferDto.setId(id);
-        responseTransferDto.setFromAccount(fromAccount);
-        responseTransferDto.setToAccount(toAccount);
+        responseTransferDto.setFromAccount(fromAccount.toDto());
+        responseTransferDto.setToAccount(toAccount.toDto());
         responseTransferDto.setAmount(amount);
         responseTransferDto.setDate(date);
         responseTransferDto.setCurrency(currency);
