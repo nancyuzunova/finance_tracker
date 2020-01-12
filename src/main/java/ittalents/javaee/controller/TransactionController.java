@@ -3,6 +3,7 @@ package ittalents.javaee.controller;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.dto.UserDto;
+import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Type;
 import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,5 +85,13 @@ public class TransactionController extends AbstractController {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<TransactionService.TotalExpenseByDate> expenses = transactionService.getTotalExpensesByDate(user.getId(), accountId, from, to);
         return ResponseEntity.ok(expenses);
+    }
+
+    @GetMapping("/transactions/category")
+    public ResponseEntity getTransactionsByCategory(HttpSession session,
+                                                    @RequestParam("category") Category.CategoryName category) throws SQLException {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<ResponseTransactionDto> transactions = transactionService.getTransactionsByCategory(user.getId(), category);
+        return ResponseEntity.ok(transactions);
     }
 }
