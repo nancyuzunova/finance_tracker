@@ -113,7 +113,7 @@ public class TransactionDao {
                     "WHERE a.user_id = ? AND c.name = ? ";
 
     private final String GET_TOTAL_TRANSACTION_AMOUNT_BY_CATEGORY =
-            "SELECT t.amount, t.currency, c.name " +
+            "SELECT t.amount, t.currency, c.id AS category_id, c.name AS category, c.type AS cat_type, c.iconurl " +
                     "FROM transactions AS t " +
                     "JOIN categories AS c ON t.category_id = c.id " +
                     "WHERE t.type = \"EXPENSE\" AND t.account_id = ?";

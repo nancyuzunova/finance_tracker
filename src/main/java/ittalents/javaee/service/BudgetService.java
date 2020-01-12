@@ -3,24 +3,39 @@ package ittalents.javaee.service;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
+import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Budget;
 import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.pojo.Category;
+import ittalents.javaee.model.pojo.CurrencyConverter;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class BudgetStatistics{
+        private double total;
+        private double spent;
+        private double percentage;
+        private CategoryDto category;
+    }
 
     private BudgetRepository budgetRepository;
     private AccountRepository accountRepository;
@@ -114,8 +129,40 @@ public class BudgetService {
         return this.budgetRepository.save(b);
     }
 
-    public List getBugetReferences(long accountId) {
+    public List<BudgetStatistics> getBugetReferences(long accountId) throws SQLException {
+        Optional<Account> a = accountRepository.findById(accountId);
+        if(!a.isPresent()){
+            throw new ElementNotFoundException("Account not found!");
+        }
+        Account account = a.get();
         List<ResponseBudgetDto> budgets = getBudgetsByAccountId(accountId);
-        List<> expenses = transactionDao.
+        List<TransactionDao.ExpensesByCategoryAndAccount> expenses = transactionDao.getTransactionsAmountByCategory(accountId);
+        List<Category.CategoryName> categories = new ArrayList<>();
+        List<BudgetStatistics> result = new ArrayList<>();
+        for (TransactionDao.ExpensesByCategoryAndAccount e : expenses) {
+            categories.add(e.getCategoryDto().getCategoryName());
+        }
+        for (ResponseBudgetDto budget : budgets) {
+            for (int i = 0; i < expenses.size(); i++) {
+                TransactionDao.ExpensesByCategoryAndAccount expense = expenses.get(i);
+                if (budget.getCategory().getCategoryName().equals(expense.getCategoryDto().getCategoryName())) {
+                    //convert currencies
+                    int occurrences = Collections.frequency(categories, expense.getCategoryDto().getCategoryName());
+                    double spent = 0;
+                    if(occurrences > 1){
+                        for (int j = 0; j < occurrences; j++) {
+                            spent += CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
+                            i++;
+                        }
+                    }
+                    else{
+                        spent = CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
+                    }
+                    double percentage = spent / budget.getAmount() * 100;
+                    result.add(new BudgetStatistics(budget.getAmount(), spent, percentage, expense.getCategoryDto()));
+                }
+            }
+        }
+        return result;
     }
 }
