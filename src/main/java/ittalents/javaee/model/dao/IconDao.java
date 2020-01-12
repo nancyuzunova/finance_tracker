@@ -20,9 +20,9 @@ public class IconDao {
     private JdbcTemplate jdbcTemplate;
 
     public List<String> getIconsUrlsByCategoryId(long categoryId) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
         List<String> urls = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(GET_ICONS_URLS_BY_CATEGORY_ID)) {
+        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(GET_ICONS_URLS_BY_CATEGORY_ID)) {
             statement.setLong(1, categoryId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
