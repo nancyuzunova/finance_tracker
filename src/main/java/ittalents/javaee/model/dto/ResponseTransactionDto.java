@@ -42,6 +42,5 @@ public class ResponseTransactionDto extends AbstractDto {
     private String description;
 
     @NotNull
-    @Positive
     private AccountDto account;
 }

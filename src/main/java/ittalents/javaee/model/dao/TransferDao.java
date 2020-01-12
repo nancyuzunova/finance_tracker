@@ -29,9 +29,9 @@ public class TransferDao {
             "WHERE a.user_id = ?";
 
     public List<ResponseTransferDto> getLoggedUserTransfers(long userId) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
         List<ResponseTransferDto> transfers = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(GET_LOGGED_USER_TRANSFERS)) {
+        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(GET_LOGGED_USER_TRANSFERS)) {
             statement.setLong(1, userId);
             ResultSet result = statement.executeQuery();
             while (result.next()) {

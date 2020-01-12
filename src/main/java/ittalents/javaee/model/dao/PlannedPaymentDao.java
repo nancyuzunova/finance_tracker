@@ -37,9 +37,9 @@ public class PlannedPaymentDao {
     private JdbcTemplate jdbcTemplate;
 
     public List<ResponsePlannedPaymentDto> getMyPlannedPayments(long userId) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
         List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
-        try(PreparedStatement statement = connection.prepareStatement(GET_ALL_PLANNED_PAYMENTS)){
+        try(    Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(GET_ALL_PLANNED_PAYMENTS)){
             statement.setLong(1, userId);
             ResultSet rows = statement.executeQuery();
             while(rows.next()){
@@ -63,9 +63,9 @@ public class PlannedPaymentDao {
     }
 
     public List<ResponsePlannedPaymentDto> getPlannedPaymentsByStatus(long userId, PlannedPayment.PaymentStatus status) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
         List<ResponsePlannedPaymentDto> paymentDtos = new ArrayList<>();
-        try(PreparedStatement statement = connection.prepareStatement(GET_PLANNED_PAYMENTS_BY_STATUS)){
+        try(    Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(GET_PLANNED_PAYMENTS_BY_STATUS)){
             statement.setLong(1, userId);
             statement.setString(2, status.toString());
             ResultSet rows = statement.executeQuery();
@@ -90,8 +90,8 @@ public class PlannedPaymentDao {
     }
 
     public void deletePayment(long userId, long paymentId) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement statement = connection.prepareStatement(DELETE_PLANNED_PAYMENT)){
+        try(    Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(DELETE_PLANNED_PAYMENT)){
             List<ResponsePlannedPaymentDto> myPlannedPayments = getMyPlannedPayments(userId);
             for(ResponsePlannedPaymentDto dto : myPlannedPayments) {
                 if(dto.getId() == paymentId) {

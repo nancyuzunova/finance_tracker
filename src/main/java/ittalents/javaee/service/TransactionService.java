@@ -226,6 +226,13 @@ public class TransactionService {
         return result;
     }
 
+    public List<ResponseTransactionDto> getTransactionsByPeriod(long id, Date from, Date to) throws SQLException {
+        if(from.after(to)){
+            throw new InvalidOperationException("Incorrect input dates! Please, check again!");
+        }
+        return transactionDao.getTransactionsByPeriod(id, from ,to);
+    }
+
     public void exportTransactionToPDF(long id) {
         Transaction transaction = getTransactionById(id);
         try {
