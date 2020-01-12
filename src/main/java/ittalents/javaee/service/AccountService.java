@@ -171,6 +171,9 @@ public class AccountService {
     }
 
     public long createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
+        if(requestPlannedPaymentDto.getDate().before(new Date())){
+            throw new InvalidOperationException("You cannot make planned payments with past dates!");
+        }
         PlannedPayment plannedPayment = new PlannedPayment();
         if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
             throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");

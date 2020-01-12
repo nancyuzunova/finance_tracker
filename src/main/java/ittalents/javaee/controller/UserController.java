@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class UserController extends AbstractController {
     @GetMapping("/users/profile")
     public ResponseEntity getUserById(HttpSession session) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        return ResponseEntity.ok(user);
+        UserDto logged = userService.getUserById(user.getId()).toDto();
+        return ResponseEntity.ok(logged);
     }
 
     @PostMapping("/users/register")
