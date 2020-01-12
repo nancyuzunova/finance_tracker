@@ -5,14 +5,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
+import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
-import ittalents.javaee.model.pojo.Account;
-import ittalents.javaee.model.pojo.Category;
-import ittalents.javaee.model.pojo.Transaction;
+import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.model.dto.RequestTransactionDto;
-import ittalents.javaee.model.pojo.Type;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.TransactionRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +36,15 @@ public class TransactionService {
         private Date date;
         private double expense;
         private double income;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class TotalExpenseByDate{
+        private double total;
+        private Currency currency;
+        private CategoryDto category;
     }
 
     private TransactionRepository transactionRepository;
@@ -136,6 +145,42 @@ public class TransactionService {
                 }
             }
             result.add(entity);
+        }
+        return result;
+    }
+
+    public List<TotalExpenseByDate> getTotalExpensesByDate(long id, long accountId, Date from, Date to) throws SQLException {
+        if(from.after(to)){
+            throw new InvalidOperationException("Incorrect input dates! Please, check again!");
+        }
+        List<TotalExpenseByDate> list;
+        if(accountId == 0){
+             list = this.transactionDao.getAllTotalExpensesByDate(id, from, to);
+        }
+        else{
+            list = this.transactionDao.getTotalExpensesByDateFromAccount(accountId, from, to);
+        }
+        List<Category.CategoryName> categories = new ArrayList<>();
+        for (TotalExpenseByDate totalExpenseByDate : list) {
+            categories.add(totalExpenseByDate.getCategory().getCategoryName());
+        }
+        List<TotalExpenseByDate> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            TotalExpenseByDate element = list.get(i);
+            int occurrences = Collections.frequency(categories, element.getCategory().getCategoryName());
+            if(occurrences > 1) {
+                double amount = 0;
+                for (int j = 0; j < occurrences; j++) {
+                    amount += CurrencyConverter.convert(list.get(i).getCurrency(), Currency.BGN, list.get(i).getTotal());
+                    i++;
+                }
+                TotalExpenseByDate converted = new TotalExpenseByDate(amount, Currency.BGN, element.getCategory());
+                result.add(converted);
+            }
+            else{
+                double amount = CurrencyConverter.convert(element.getCurrency(), Currency.BGN, element.getTotal());
+                result.add(new TotalExpenseByDate(amount, Currency.BGN, element.getCategory()));
+            }
         }
         return result;
     }

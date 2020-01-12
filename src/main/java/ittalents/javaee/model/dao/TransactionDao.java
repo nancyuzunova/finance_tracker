@@ -3,10 +3,10 @@ package ittalents.javaee.model.dao;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
-import ittalents.javaee.model.dto.ResponseTransferDto;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
+import ittalents.javaee.service.TransactionService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +50,24 @@ public class TransactionDao {
             "            ON t.category_id = c.id " +
             "            WHERE a.user_id = ? AND t.type = ?;";
 
+    private static final String GET_EXPENSES_BY_DATES_FROM_ACCOUNT = "SELECT SUM(t.amount) AS total, t.currency, " +
+            "c.id AS category_id, c.name AS category, c.iconurl, c.type AS cat_type " +
+            "FROM transactions AS t " +
+            "JOIN categories AS c ON t.category_id = c.id " +
+            "JOIN accounts AS a ON t.account_id = a.id " +
+            "WHERE t.type = \"EXPENSE\" AND t.account_id = ? AND t.date BETWEEN ? AND ? " +
+            "GROUP BY t.category_id, t.currency " +
+            "ORDER BY c.id;";
+
+    private static final String GET_ALL_EXPENSES_BY_DATES = "SELECT SUM(t.amount) AS total, t.currency, " +
+            "c.id AS category_id, c.name AS category, c.type AS cat_type, c.iconurl " +
+            "FROM transactions AS t " +
+            "JOIN categories AS c ON t.category_id = c.id " +
+            "JOIN accounts AS a ON t.account_id = a.id " +
+            "WHERE t.type = \"EXPENSE\" AND a.user_id = ? AND t.date BETWEEN ? AND ? " +
+            "GROUP BY t.category_id, t.currency " +
+            "ORDER BY c.id;";
+
     private final String GET_TRANSACTIONS_BY_DESCRIPTION = "SELECT t.id, t.amount, t.currency, t.date, t.type, t.description, " +
             "a.id AS account_id, a.name, a.balance, a.currency AS account_currency, " +
             "c.id AS category_id, c.name AS category, c.iconurl, c.type AS cat_type " +
@@ -61,7 +79,7 @@ public class TransactionDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @AllArgsConstructor
+     @AllArgsConstructor
     @Getter
     @Setter
     public
@@ -69,6 +87,23 @@ public class TransactionDao {
         private Date date;
         private Type type;
         private double total;
+    }
+
+    public List<TransactionService.TotalExpenseByDate> getAllTotalExpensesByDate(long id, Date from, Date to) throws SQLException {
+        List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(GET_ALL_EXPENSES_BY_DATES)){
+            statement.setLong(1, id);
+            statement.setObject(2, from);
+            statement.setObject(3, to);
+            ResultSet rows = statement.executeQuery();
+            while(rows.next()){
+                result.add(new TransactionService.TotalExpenseByDate(rows.getDouble("total"),
+                        Currency.valueOf(rows.getString("currency")), createCategoryDto(rows)));
+            }
+            rows.close();
+        }
+        return result;
     }
 
     public List<StatisticEntity> getDailyTransactions(long id, Date from, Date to) throws SQLException {
@@ -87,6 +122,23 @@ public class TransactionDao {
             set.close();
         }
         return result;
+    }
+
+    public List<TransactionService.TotalExpenseByDate> getTotalExpensesByDateFromAccount(long accountId, Date from, Date to) throws SQLException {
+         List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
+         Connection connection = jdbcTemplate.getDataSource().getConnection();
+         try(PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_DATES_FROM_ACCOUNT)){
+             statement.setLong(1, accountId);
+             statement.setObject(2, from);
+             statement.setObject(3, to);
+             ResultSet rows = statement.executeQuery();
+             while(rows.next()){
+                 result.add(new TransactionService.TotalExpenseByDate(rows.getDouble("total"),
+                         Currency.valueOf(rows.getString("currency")), createCategoryDto(rows)));
+             }
+             rows.close();
+         }
+         return result;
     }
 
     public List<ResponseTransactionDto> getMyTransactions(long userId) throws SQLException {

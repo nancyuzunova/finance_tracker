@@ -65,4 +65,14 @@ public class TransactionController extends AbstractController {
                 transactionService.getTransactionsByDescription(user.getId(), description);
         return ResponseEntity.ok(transactionsByDescription);
     }
+
+    @GetMapping("/accounts/{accountId}/expensesByCategory/period")
+    public ResponseEntity getTotalExpensesByCategoryFromDateToDate(HttpSession session, @PathVariable @PositiveOrZero long accountId,
+                                                                   @RequestParam("from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
+                                                                   @RequestParam("to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to) throws SQLException {
+        validateUserOwnership(session, accountId);
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<TransactionService.TotalExpenseByDate> expenses = transactionService.getTotalExpensesByDate(user.getId(), accountId, from, to);
+        return ResponseEntity.ok(expenses);
+    }
 }
