@@ -56,7 +56,7 @@ public class TransactionDao {
             "FROM transactions AS t " +
             "JOIN accounts AS a ON t.account_id = a.id " +
             "JOIN categories AS c ON t.category_id = c.id " +
-            "WHERE a.user_id = ? AND t.description LIKE ";
+            "WHERE a.user_id = ? AND t.description LIKE ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -127,14 +127,15 @@ public class TransactionDao {
     public List<ResponseTransactionDto> getTransactionsByDescription(long userId, String filter) throws SQLException {
         List<ResponseTransactionDto> transactions = new ArrayList<>();
         Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(
-                GET_TRANSACTIONS_BY_DESCRIPTION + "%" + filter + "%")) {
+        try (PreparedStatement statement = connection.prepareStatement(GET_TRANSACTIONS_BY_DESCRIPTION)) {
             statement.setLong(1, userId);
+            statement.setString(2, "%" + filter + "%");
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 ResponseTransactionDto transaction = createResponseTransactionDto(result);
                 transaction.setAccount(createAccountDto(result));
                 transaction.setCategory(createCategoryDto(result));
+                transactions.add(transaction);
             }
             result.close();
         }
