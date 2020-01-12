@@ -49,12 +49,7 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setDate(rows.getDate("date"));
                 responsePlannedPaymentDto.setAmount(rows.getDouble("amount"));
                 responsePlannedPaymentDto.setTitle(rows.getString("title"));
-                AccountDto accountDto = new AccountDto();
-                accountDto.setId(rows.getLong("account_id"));
-                accountDto.setName(rows.getString("name"));
-                accountDto.setBalance(rows.getDouble("balance"));
-                accountDto.setCurrency(Currency.valueOf(rows.getString("currency")));
-                responsePlannedPaymentDto.setAccount(accountDto);
+                responsePlannedPaymentDto.setAccount(createAccountDto(rows));
                 paymentDtos.add(responsePlannedPaymentDto);
             }
             rows.close();
@@ -72,16 +67,11 @@ public class PlannedPaymentDao {
             while(rows.next()){
                 ResponsePlannedPaymentDto responsePlannedPaymentDto = new ResponsePlannedPaymentDto();
                 responsePlannedPaymentDto.setId(rows.getLong("id"));
-                responsePlannedPaymentDto.setStatus(PlannedPayment.PaymentStatus.valueOf(rows.getString("status")));
+                responsePlannedPaymentDto.setStatus(status);
                 responsePlannedPaymentDto.setDate(rows.getDate("date"));
                 responsePlannedPaymentDto.setAmount(rows.getDouble("amount"));
                 responsePlannedPaymentDto.setTitle(rows.getString("title"));
-                AccountDto accountDto = new AccountDto();
-                accountDto.setId(rows.getLong("account_id"));
-                accountDto.setName(rows.getString("name"));
-                accountDto.setBalance(rows.getDouble("balance"));
-                accountDto.setCurrency(Currency.valueOf(rows.getString("currency")));
-                responsePlannedPaymentDto.setAccount(accountDto);
+                responsePlannedPaymentDto.setAccount(createAccountDto(rows));
                 paymentDtos.add(responsePlannedPaymentDto);
             }
             rows.close();
@@ -102,5 +92,14 @@ public class PlannedPaymentDao {
             }
         }
         throw new InvalidOperationException("You cannot delete planned payments of another user!");
+    }
+
+    private AccountDto createAccountDto(ResultSet rows) throws SQLException {
+        AccountDto accountDto = new AccountDto();
+        accountDto.setId(rows.getLong("account_id"));
+        accountDto.setName(rows.getString("name"));
+        accountDto.setBalance(rows.getDouble("balance"));
+        accountDto.setCurrency(Currency.valueOf(rows.getString("currency")));
+        return accountDto;
     }
 }
