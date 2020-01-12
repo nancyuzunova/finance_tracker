@@ -103,6 +103,15 @@ public class TransactionDao {
                     "WHERE t.type = \"EXPENSE\" AND a.user_id = ? " +
                     "GROUP BY t.category_id, t.currency ORDER BY c.id";
 
+    private final String GET_TRANSACTIONS_BY_CATEGORY =
+            "SELECT t.id, t.amount, t.currency, t.date, t.description, t.type, " +
+                    "a.id AS account_id, a.balance, a.currency AS account_currency, a.name, " +
+                    "c.id AS category_id, c.name AS category, c.type AS cat_type, c.iconurl " +
+                    "FROM transactions AS t " +
+                    "JOIN accounts AS a ON t.account_id = a.id " +
+                    "JOIN categories AS c ON t.category_id = c.id " +
+                    "WHERE a.user_id = ? AND c.name = ? ";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -116,7 +125,7 @@ public class TransactionDao {
         private CategoryDto categoryDto;
     }
 
-     @AllArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     public
@@ -134,7 +143,7 @@ public class TransactionDao {
             statement.setObject(2, from);
             statement.setObject(3, to);
             ResultSet rows = statement.executeQuery();
-            while(rows.next()){
+            while (rows.next()) {
                 result.add(new TransactionService.TotalExpenseByDate(rows.getDouble("total"),
                         Currency.valueOf(rows.getString("currency")), createCategoryDto(rows)));
             }
@@ -163,7 +172,7 @@ public class TransactionDao {
 
     public List<TransactionService.TotalExpenseByDate> getTotalExpensesByDateFromAccount(long accountId, Date from, Date to) throws SQLException {
          List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
-         try(   Connection connection = jdbcTemplate.getDataSource().getConnection();
+         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_DATES_FROM_ACCOUNT)){
              statement.setLong(1, accountId);
              statement.setObject(2, from);
@@ -282,6 +291,24 @@ public class TransactionDao {
                 transactionDto.setAccount(createAccountDto(result));
                 transactionDto.setCategory(createCategoryDto(result));
                 transactions.add(transactionDto);
+            }
+            result.close();
+        }
+        return transactions;
+    }
+
+    public List<ResponseTransactionDto> getTransactionsByCategory(long userId, Category.CategoryName category) throws SQLException {
+        List<ResponseTransactionDto> transactions = new ArrayList<>();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_TRANSACTIONS_BY_CATEGORY)) {
+            statement.setLong(1, userId);
+            statement.setString(2, category.toString());
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                ResponseTransactionDto transaction = createResponseTransactionDto(result);
+                transaction.setAccount(createAccountDto(result));
+                transaction.setCategory(createCategoryDto(result));
+                transactions.add(transaction);
             }
             result.close();
         }
