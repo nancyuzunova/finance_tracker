@@ -56,4 +56,13 @@ public class TransactionController extends AbstractController {
                 transactionService.getDailyStatistics(userDto.getId(), from, to);
         return ResponseEntity.ok(statisticsPerDay);
     }
+
+    @GetMapping("/transactions/filter")
+    public ResponseEntity getTransactionsByDescription(HttpSession session,
+                                                       @RequestParam("description") String description) throws SQLException {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<ResponseTransactionDto> transactionsByDescription =
+                transactionService.getTransactionsByDescription(user.getId(), description);
+        return ResponseEntity.ok(transactionsByDescription);
+    }
 }

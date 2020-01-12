@@ -140,6 +140,10 @@ public class TransactionService {
         return result;
     }
 
+    public List<ResponseTransactionDto> getTransactionsByDescription(long userId, String description) throws SQLException {
+        return transactionDao.getTransactionsByDescription(userId, description);
+    }
+
     public void exportTransactionToPDF(long id) {
         Transaction transaction = getTransactionById(id);
         try {
