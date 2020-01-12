@@ -6,11 +6,9 @@ import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
-import ittalents.javaee.model.pojo.Account;
-import ittalents.javaee.model.pojo.Category;
-import ittalents.javaee.model.pojo.Transaction;
+import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.model.dto.RequestTransactionDto;
-import ittalents.javaee.model.pojo.Type;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.TransactionRepository;
 import lombok.Getter;
@@ -142,6 +140,43 @@ public class TransactionService {
 
     public List<ResponseTransactionDto> getTransactionsByDescription(long userId, String description) throws SQLException {
         return transactionDao.getTransactionsByDescription(userId, description);
+    }
+
+    public List<TransactionDao.ExpensesByCategoryAndAccount> getExpensesByCategory(long userId, long accountId) throws SQLException {
+        List<TransactionDao.ExpensesByCategoryAndAccount> result = new ArrayList<>();
+        List<TransactionDao.ExpensesByCategoryAndAccount> expenses;
+        if (accountId == 0) {
+            expenses = transactionDao.getExpensesByCategoryForAllAccounts(userId);
+        } else {
+            expenses = transactionDao.getExpensesByCategoryAndAccountId(accountId);
+        }
+
+        List<Category.CategoryName> categories = new ArrayList<>();
+        for (TransactionDao.ExpensesByCategoryAndAccount e : expenses) {
+            categories.add(e.getCategoryDto().getCategoryName());
+        }
+
+        for (int i = 0; i < expenses.size(); i++) {
+            TransactionDao.ExpensesByCategoryAndAccount e = expenses.get(i);
+            int occurrences = Collections.frequency(categories, e.getCategoryDto().getCategoryName());
+            if (occurrences > 1) {
+                double total = 0;
+                for (int j = 0; j < occurrences; j++) {
+                    total += CurrencyConverter.convert(expenses.get(i).getCurrency(), Currency.BGN, expenses.get(i).getTotalExpenses());
+                    i++;
+                }
+                TransactionDao.ExpensesByCategoryAndAccount expense = new TransactionDao.ExpensesByCategoryAndAccount(
+                        total, Currency.BGN, e.getCategoryDto()
+                );
+                result.add(expense);
+            } else {
+                e.setTotalExpenses(CurrencyConverter.convert(e.getCurrency(), Currency.BGN, e.getTotalExpenses()));
+                e.setCurrency(Currency.BGN);
+                result.add(e);
+            }
+        }
+
+        return result;
     }
 
     public void exportTransactionToPDF(long id) {

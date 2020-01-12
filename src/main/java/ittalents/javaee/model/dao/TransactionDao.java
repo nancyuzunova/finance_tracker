@@ -3,12 +3,12 @@ package ittalents.javaee.model.dao;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
-import ittalents.javaee.model.dto.ResponseTransferDto;
 import ittalents.javaee.model.pojo.Category;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.Type;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -140,6 +140,72 @@ public class TransactionDao {
             result.close();
         }
         return transactions;
+    }
+
+    private final String GET_EXPENSES_BY_CATEGORY_AND_ACCOUNT_ID =
+            "SELECT t.id, SUM(t.amount) AS total, t.currency, " +
+                    "c.id AS category_id, c.name AS category, c.iconurl, c.type AS cat_type " +
+                    "FROM transactions AS t " +
+                    "JOIN categories AS c ON t.category_id = c.id " +
+                    "JOIN accounts AS a ON t.account_id = a.id " +
+                    "WHERE t.type = \"EXPENSE\" AND t.account_id = ? " +
+                    "GROUP BY t.category_id, t.currency";
+
+    private final String GET_EXPENSES_BY_CATEGORY_ALL_ACCOUNTS =
+            "SELECT t.id, SUM(t.amount) AS total, t.currency,  " +
+                    "c.id AS category_id, c.name AS category, c.iconurl, c.type AS cat_type " +
+                    "FROM transactions AS t " +
+                    "JOIN categories AS c ON t.category_id = c.id " +
+                    "JOIN accounts AS a ON t.account_id = a.id " +
+                    "WHERE t.type = \"EXPENSE\" AND a.user_id = ? " +
+                    "GROUP BY t.category_id, t.currency ORDER BY c.id";
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ExpensesByCategoryAndAccount {
+        private double totalExpenses;
+        private Currency currency;
+        private CategoryDto categoryDto;
+    }
+
+    public List<ExpensesByCategoryAndAccount> getExpensesByCategoryAndAccountId(long accountId) throws SQLException {
+        List<ExpensesByCategoryAndAccount> expenses = new ArrayList<>();
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_AND_ACCOUNT_ID)) {
+            statement.setLong(1, accountId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                ExpensesByCategoryAndAccount expense = new ExpensesByCategoryAndAccount(
+                        result.getDouble("total"),
+                        Currency.valueOf(result.getString("currency")),
+                        createCategoryDto(result)
+                );
+                expenses.add(expense);
+            }
+            result.close();
+        }
+        return expenses;
+    }
+
+    public List<ExpensesByCategoryAndAccount> getExpensesByCategoryForAllAccounts(long userId) throws SQLException {
+        List<ExpensesByCategoryAndAccount> expenses = new ArrayList<>();
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_ALL_ACCOUNTS)) {
+            statement.setLong(1, userId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                ExpensesByCategoryAndAccount expense = new ExpensesByCategoryAndAccount(
+                        result.getDouble("total"),
+                        Currency.valueOf(result.getString("currency")),
+                        createCategoryDto(result)
+                );
+                expenses.add(expense);
+            }
+            result.close();
+        }
+        return expenses;
     }
 
     private ResponseTransactionDto createResponseTransactionDto(ResultSet result) throws SQLException {

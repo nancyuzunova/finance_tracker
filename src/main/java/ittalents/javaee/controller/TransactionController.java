@@ -1,5 +1,6 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseTransactionDto;
 import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.model.pojo.Type;
@@ -64,5 +65,14 @@ public class TransactionController extends AbstractController {
         List<ResponseTransactionDto> transactionsByDescription =
                 transactionService.getTransactionsByDescription(user.getId(), description);
         return ResponseEntity.ok(transactionsByDescription);
+    }
+
+    @GetMapping("/accounts/{accountId}/expensesByCategory")
+    public ResponseEntity getExpensesByCategory(HttpSession session, @PathVariable @PositiveOrZero long accountId) throws SQLException {
+        validateUserOwnership(session, accountId);
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<TransactionDao.ExpensesByCategoryAndAccount> expenses =
+                transactionService.getExpensesByCategory(user.getId(), accountId);
+        return ResponseEntity.ok(expenses);
     }
 }
