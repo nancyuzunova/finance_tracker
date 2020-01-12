@@ -2,6 +2,7 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Budget;
@@ -24,13 +25,15 @@ public class BudgetService {
     private BudgetRepository budgetRepository;
     private AccountRepository accountRepository;
     private CategoryService categoryService;
+    private TransactionDao transactionDao;
 
     @Autowired
     public BudgetService(BudgetRepository budgetRepository, AccountRepository accountRepository,
-                         CategoryService categoryService) {
+                         CategoryService categoryService, TransactionDao transactionDao) {
         this.budgetRepository = budgetRepository;
         this.accountRepository = accountRepository;
         this.categoryService = categoryService;
+        this.transactionDao = transactionDao;
     }
 
     public List<ResponseBudgetDto> getBudgets(long userId) {
@@ -109,5 +112,10 @@ public class BudgetService {
         b.setFromDate(from);
         b.setToDate(to);
         return this.budgetRepository.save(b);
+    }
+
+    public List getBugetReferences(long accountId) {
+        List<ResponseBudgetDto> budgets = getBudgetsByAccountId(accountId);
+        List<> expenses = transactionDao.
     }
 }

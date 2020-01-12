@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 import java.util.List;
 
@@ -85,5 +86,12 @@ public class BudgetController extends AbstractController {
         validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
         ResponseBudgetDto dto = budgetService.changePeriod(budgetId, from, to).toDto();
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("accounts/{accountId}/budgets/references")
+    public ResponseEntity getBudgetReferences(HttpSession session, @PathVariable @Positive long accountId){
+        validateUserOwnership(session, accountId);
+        List<> references = budgetService.getBugetReferences(accountId);
+        return ResponseEntity.ok(references);
     }
 }
