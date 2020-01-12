@@ -112,6 +112,12 @@ public class TransactionDao {
                     "JOIN categories AS c ON t.category_id = c.id " +
                     "WHERE a.user_id = ? AND c.name = ? ";
 
+    private final String GET_TOTAL_TRANSACTION_AMOUNT_BY_CATEGORY =
+            "SELECT t.amount, t.currency, c.name " +
+                    "FROM transactions AS t " +
+                    "JOIN categories AS c ON t.category_id = c.id " +
+                    "WHERE t.type = \"EXPENSE\" AND t.account_id = ?";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -313,6 +319,25 @@ public class TransactionDao {
             result.close();
         }
         return transactions;
+    }
+
+    public List<ExpensesByCategoryAndAccount> getTransactionsAmountByCategory(long accountId) throws SQLException {
+        List<ExpensesByCategoryAndAccount> transactionAmounts = new ArrayList<>();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_TOTAL_TRANSACTION_AMOUNT_BY_CATEGORY)) {
+            statement.setLong(1, accountId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                ExpensesByCategoryAndAccount entity = new ExpensesByCategoryAndAccount(
+                        result.getDouble("amount"),
+                        Currency.valueOf(result.getString("currency")),
+                        createCategoryDto(result)
+                );
+                transactionAmounts.add(entity);
+            }
+            result.close();
+        }
+        return transactionAmounts;
     }
 
     private ResponseTransactionDto createResponseTransactionDto(ResultSet result) throws SQLException {
