@@ -3,8 +3,8 @@ package ittalents.javaee.controller;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.service.AccountService;
-import ittalents.javaee.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +22,10 @@ import java.util.List;
 public class AccountController extends AbstractController {
 
     private AccountService accountService;
-    private TransactionService transactionService;
 
     @Autowired
-    public AccountController(AccountService accountService, TransactionService transactionService) {
+    public AccountController(AccountService accountService) {
         this.accountService = accountService;
-        this.transactionService = transactionService;
     }
 
     @GetMapping("/accounts")
@@ -65,16 +63,16 @@ public class AccountController extends AbstractController {
     public ResponseEntity makeTransfer(HttpSession session, @RequestBody @Valid RequestTransferDto requestTransferDto) {
         validateUserOwnership(session, requestTransferDto.getFromAccountId());
         validateUserOwnership(session, requestTransferDto.getToAccountId());
-        URI location = URI.create(String.format("/transfers/%d", this.accountService.makeTransfer(requestTransferDto)));
-        return ResponseEntity.created(location).build();
+        ResponseTransferDto transfer = this.accountService.makeTransfer(requestTransferDto);
+        return new ResponseEntity(transfer, HttpStatus.CREATED);
     }
 
     @PostMapping("/accounts/makeTransaction")
     public ResponseEntity makeTransaction(HttpSession session,
                                           @RequestBody @Valid RequestTransactionDto requestTransactionDto) {
         validateUserOwnership(session, requestTransactionDto.getAccountId());
-        URI location = URI.create(String.format("/transactions/%d", accountService.makeTransaction(requestTransactionDto)));
-        return ResponseEntity.created(location).build();
+        ResponseTransactionDto transaction = accountService.makeTransaction(requestTransactionDto);
+        return new ResponseEntity(transaction, HttpStatus.CREATED);
     }
 
     @PostMapping("/accounts/budgets")

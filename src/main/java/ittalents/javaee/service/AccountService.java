@@ -78,7 +78,7 @@ public class AccountService {
         this.accountRepository.deleteById(accountId);
     }
 
-    public long makeTransfer(RequestTransferDto requestTransferDto) {
+    public ResponseTransferDto makeTransfer(RequestTransferDto requestTransferDto) {
         if (requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()) {
             throw new InvalidOperationException("You cannot make transfer to the same account!");
         }
@@ -112,25 +112,11 @@ public class AccountService {
         return transferService.getTransfersByAccountId(accountId);
     }
 
-    public long makeTransaction(RequestTransactionDto requestTransactionDto) {
+    public ResponseTransactionDto makeTransaction(RequestTransactionDto requestTransactionDto) {
         if (requestTransactionDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transactions!");
         }
-        Account account = getAccountById(requestTransactionDto.getAccountId());
-        double amount = requestTransactionDto.getAmount();
-        if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
-            amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
-        }
-        if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
-            throw new InvalidOperationException("Not enough account balance!");
-        }
-        if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
-            account.setBalance(account.getBalance() - amount);
-        } else {
-            account.setBalance(account.getBalance() + amount);
-        }
-        accountRepository.save(account);
-        return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
+        return this.transactionService.createTransaction(requestTransactionDto);
     }
 
     public long addBudget(RequestBudgetDto requestBudgetDto) {
