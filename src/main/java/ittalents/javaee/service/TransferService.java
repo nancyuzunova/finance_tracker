@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.model.dao.TransferDao;
 import ittalents.javaee.model.dto.ResponseTransferDto;
 import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Transfer;
@@ -8,6 +9,7 @@ import ittalents.javaee.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,10 +18,12 @@ import java.util.stream.Collectors;
 public class TransferService {
 
     private TransferRepository transferRepository;
+    private TransferDao transferDao;
 
     @Autowired
-    public TransferService(TransferRepository transferRepository) {
+    public TransferService(TransferRepository transferRepository, TransferDao transferDao) {
         this.transferRepository = transferRepository;
+        this.transferDao = transferDao;
     }
 
     public ResponseTransferDto createTransfer(Account fromAccount, Account toAccount, RequestTransferDto requestTransferDto) {
@@ -35,5 +39,9 @@ public class TransferService {
         allTransfers.addAll(transferRepository.findAllByFromAccountId(id));
         allTransfers.addAll(transferRepository.findAllByToAccountId(id));
         return allTransfers.stream().map(Transfer::toDto).collect(Collectors.toList());
+    }
+
+    public List<ResponseTransferDto> getAllTransfersForUser(long userId) throws SQLException {
+        return transferDao.getLoggedUserTransfers(userId);
     }
 }

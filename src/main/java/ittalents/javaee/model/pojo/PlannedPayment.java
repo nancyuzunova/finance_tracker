@@ -32,6 +32,10 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    private Category category;
+
     @NotNull
     private String title;
 
@@ -57,6 +61,7 @@ public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, Requ
         responseDto.setTitle(title);
         responseDto.setAmount(amount);
         responseDto.setAccount(account.toDto());
+        responseDto.setCategory(category.toDto());
         responseDto.setDate(date);
         responseDto.setStatus(status);
         return responseDto;

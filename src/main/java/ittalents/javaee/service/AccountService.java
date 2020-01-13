@@ -3,7 +3,6 @@ package ittalents.javaee.service;
 import ittalents.javaee.controller.SessionManager;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
-import ittalents.javaee.model.dao.TransferDao;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.mail.MailSender;
 import ittalents.javaee.model.pojo.*;
@@ -13,8 +12,8 @@ import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,17 +28,17 @@ public class AccountService {
     private TransferService transferService;
     private TransactionService transactionService;
     private PlannedPaymentRepository paymentRepository;
-    private TransferDao transferDao;
+    private CategoryService categoryService;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
                           TransactionService transactionService, PlannedPaymentRepository paymentRepository,
-                          TransferDao transferDao) {
+                          CategoryService categoryService) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
         this.paymentRepository = paymentRepository;
-        this.transferDao = transferDao;
+        this.categoryService = categoryService;
     }
 
     public List<AccountDto> getAllAccountsByUserId(long userId) {
@@ -104,7 +103,7 @@ public class AccountService {
 
     public List<ResponseTransferDto> getTransfersByAccountId(long userId, long accountId) throws SQLException {
         if (accountId == 0) {
-            return transferDao.getLoggedUserTransfers(userId);
+            return transferService.getAllTransfersForUser(userId);
         }
         return transferService.getTransfersByAccountId(accountId);
     }
@@ -117,45 +116,58 @@ public class AccountService {
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void payPlannedPayments(HttpSession session) {
+    public void payPlannedPayments() {
         Date today = new Date();
         List<PlannedPayment> payments = paymentRepository.findAllByDateAndStatus(today, PlannedPayment.PaymentStatus.ACTIVE);
-        payments.sort((p1, p2) -> Double.compare(p1.getAmount(), p2.getAmount()));
         for (PlannedPayment payment : payments) {
             double amount = payment.getAmount();
             double availability = payment.getAccount().getBalance();
             if (availability < amount) {
-                UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+                String userEmail = payment.getAccount().getUser().getEmail();
                 Thread sender = new Thread() {
                     @Override
                     public void run() {
-                        MailSender.sendMail(user.getEmail(), "NOT finished payment", "Hello,\nYour planned payment " +
+                        MailSender.sendMail(userEmail, "NOT finished payment", "Hello,\nYour planned payment " +
                                 payment.getTitle() + " has failed because of  insufficient balance of your account. " +
                                 "Please deposit to your account and make payment manually!");
                     }
                 };
                 sender.start();
             }
-            payment.getAccount().setBalance(availability - amount);
-            payment.setStatus(PlannedPayment.PaymentStatus.PAID);
-            this.paymentRepository.save(payment);
+            else {
+                pay(payment);
+            }
         }
+    }
+
+    @Transactional
+    protected void pay(PlannedPayment payment) {
+        RequestTransactionDto transaction = new RequestTransactionDto();
+        transaction.setAccountId(payment.getAccount().getId());
+        transaction.setAmount(payment.getAmount());
+        transaction.setCurrency(payment.getAccount().getCurrency());
+        transaction.setCategoryId(payment.getCategory().getId());
+        transaction.setDate(payment.getDate());
+        transaction.setType(Type.EXPENSE);
+        transaction.setDescription(payment.getTitle());
+        makeTransaction(transaction);
+        payment.setStatus(PlannedPayment.PaymentStatus.PAID);
+        this.paymentRepository.save(payment);
     }
 
     public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
         if (requestPlannedPaymentDto.getDate().before(new Date())) {
             throw new InvalidOperationException("You cannot make planned payments with past dates!");
         }
-        PlannedPayment plannedPayment = new PlannedPayment();
         if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
             throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
         }
+        PlannedPayment plannedPayment = new PlannedPayment();
         Account account = getAccountById(requestPlannedPaymentDto.getAccountId());
+        Category category = categoryService.getCategoryById(requestPlannedPaymentDto.getCategoryId());
         plannedPayment.setAccount(account);
-        plannedPayment.setTitle(requestPlannedPaymentDto.getTitle());
-        plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
-        plannedPayment.setAmount(requestPlannedPaymentDto.getAmount());
-        plannedPayment.setDate(requestPlannedPaymentDto.getDate());
+        plannedPayment.setCategory(category);
+        plannedPayment.fromDto(requestPlannedPaymentDto);
         return this.paymentRepository.save(plannedPayment).toDto();
     }
 }
