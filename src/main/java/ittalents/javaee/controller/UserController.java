@@ -1,16 +1,15 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.*;
-import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.net.URI;
 
 @RestController
 @Validated
@@ -32,9 +31,9 @@ public class UserController extends AbstractController {
 
     @PostMapping("/users/register")
     public ResponseEntity register(HttpSession session, @RequestBody @Valid UserRegisterDto user) {
-        URI location = URI.create(String.format("/users/%d", userService.createUser(user)));
+        UserDto registeredUser = userService.createUser(user);
         SessionManager.registerAndLogUser(session, user);
-        return ResponseEntity.created(location).build();
+        return new ResponseEntity(registeredUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/users/login")
@@ -52,10 +51,9 @@ public class UserController extends AbstractController {
 
     @PostMapping("/users/accounts")
     public ResponseEntity addAccount(HttpSession session, @RequestBody @Valid AccountDto accountDto) {
-        URI location = URI.create(String.format("/accounts/%d",
-                this.userService
-                        .addAccount(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), accountDto)));
-        return ResponseEntity.created(location).build();
+        AccountDto account =
+                this.userService.addAccount(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId(), accountDto);
+        return new ResponseEntity(account, HttpStatus.CREATED);
     }
 
     @PutMapping("/users/edit")

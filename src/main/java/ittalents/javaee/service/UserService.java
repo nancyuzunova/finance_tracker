@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,23 +39,31 @@ public class UserService {
         throw new ElementNotFoundException("User with id = " + id + " does not exist!");
     }
 
-    public long createUser(UserRegisterDto userDto) {
+    public UserDto createUser(UserRegisterDto userDto) {
         if (userDto.getPassword().equals(userDto.getConfirmationPassword())) {
             if (userRepository.findByEmail(userDto.getEmail()) != null) {
                 throw new InvalidOperationException("User already exists!");
             }
             LocalDateTime now = LocalDateTime.now();
             User user = new User();
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
+            String trimmedFirstName = userDto.getFirstName().trim();
+            user.setFirstName(trimmedFirstName);
+            userDto.setFirstName(trimmedFirstName);
+            String trimmedLastName = userDto.getLastName().trim();
+            user.setLastName(trimmedLastName);
+            userDto.setLastName(trimmedLastName);
             user.setEmail(userDto.getEmail());
             String pass = encoder.encode(userDto.getPassword());
             user.setPassword(pass);
             user.setDateCreated(now);
             user.setLastLogin(LocalDateTime.now());
             long id = userRepository.save(user).getId();
-            userDto.setId(id);
-            return id;
+            UserDto uDto = new UserDto(userDto);
+            uDto.setId(id);
+            uDto.setDateCreated(LocalDateTime.now());
+            uDto.setLastLogin(LocalDateTime.now());
+            uDto.setAccounts(new ArrayList<>());
+            return uDto;
         }
         throw new AuthorizationException("The password and its confirmation do not match. Please try again");
     }
@@ -77,7 +86,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public long addAccount(long id, AccountDto accountDto) {
+    public AccountDto addAccount(long id, AccountDto accountDto) {
         return accountService.createAccount(getUserById(id), accountDto);
     }
 
