@@ -57,12 +57,12 @@ public class AccountService {
         throw new ElementNotFoundException("Account with id = " + accountId + " does not exist!");
     }
 
-    public long createAccount(User user, AccountDto accountDto) {
+    public AccountDto createAccount(User user, AccountDto accountDto) {
         Account a = new Account();
         a.fromDto(accountDto);
         a.setCreatedOn(LocalDateTime.now());
         a.setUser(user);
-        return this.accountRepository.save(a).getId();
+        return this.accountRepository.save(a).toDto();
     }
 
     public Account changeAccountCurrency(long accountId, Currency currency) {
@@ -119,7 +119,7 @@ public class AccountService {
         return this.transactionService.createTransaction(requestTransactionDto);
     }
 
-    public long addBudget(RequestBudgetDto requestBudgetDto) {
+    public ResponseBudgetDto createBudget(RequestBudgetDto requestBudgetDto) {
         if (requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())) {
             throw new InvalidOperationException("Incorrect dates! Please try again!");
         }
@@ -156,8 +156,8 @@ public class AccountService {
         }
     }
 
-    public long createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
-        if(requestPlannedPaymentDto.getDate().before(new Date())){
+    public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
+        if (requestPlannedPaymentDto.getDate().before(new Date())) {
             throw new InvalidOperationException("You cannot make planned payments with past dates!");
         }
         PlannedPayment plannedPayment = new PlannedPayment();
@@ -170,6 +170,6 @@ public class AccountService {
         plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
         plannedPayment.setAmount(requestPlannedPaymentDto.getAmount());
         plannedPayment.setDate(requestPlannedPaymentDto.getDate());
-        return this.paymentRepository.save(plannedPayment).getId();
+        return this.paymentRepository.save(plannedPayment).toDto();
     }
 }

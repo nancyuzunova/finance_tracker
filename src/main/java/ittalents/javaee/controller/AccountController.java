@@ -13,7 +13,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -76,18 +75,17 @@ public class AccountController extends AbstractController {
     }
 
     @PostMapping("/accounts/budgets")
-    public ResponseEntity addBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
+    public ResponseEntity createBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
         validateUserOwnership(session, requestBudgetDto.getAccountId());
-        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(requestBudgetDto)));
-        return ResponseEntity.created(location).build();
+        ResponseBudgetDto budget = this.accountService.createBudget(requestBudgetDto);
+        return new ResponseEntity(budget, HttpStatus.CREATED);
     }
 
     @PostMapping("/accounts/makePlannedPayment")
     public ResponseEntity createPlannedPayment(HttpSession session,
                                                @RequestBody @Valid RequestPlannedPaymentDto requestPlannedPaymentDto) {
         validateUserOwnership(session, requestPlannedPaymentDto.getAccountId());
-        URI location = URI.create(String.format("/plannedPayments/%d",
-                accountService.createPlannedPayment(requestPlannedPaymentDto)));
-        return ResponseEntity.created(location).build();
+        ResponsePlannedPaymentDto plannedPayment = accountService.createPlannedPayment(requestPlannedPaymentDto);
+        return new ResponseEntity(plannedPayment, HttpStatus.CREATED);
     }
 }

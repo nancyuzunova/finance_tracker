@@ -30,7 +30,7 @@ public class BudgetService {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class BudgetStatistics{
+    public class BudgetStatistics {
         private double total;
         private double spent;
         private double percentage;
@@ -79,7 +79,7 @@ public class BudgetService {
         return this.budgetRepository.save(budget);
     }
 
-    public long createBudget(RequestBudgetDto requestBudgetDto) {
+    public ResponseBudgetDto createBudget(RequestBudgetDto requestBudgetDto) {
         Budget budget = new Budget();
         Date fromDate = requestBudgetDto.getFromDate();
         Date toDate = requestBudgetDto.getToDate();
@@ -94,7 +94,7 @@ public class BudgetService {
         Category category = categoryService.getCategoryById(requestBudgetDto.getCategoryId());
         budget.setCategory(category);
         budget.fromDto(requestBudgetDto);
-        return this.budgetRepository.save(budget).getId();
+        return this.budgetRepository.save(budget).toDto();
     }
 
     public List<ResponseBudgetDto> getBudgetsByAccountId(long accountId) {
@@ -131,7 +131,7 @@ public class BudgetService {
 
     public List<BudgetStatistics> getBugetReferences(long accountId) throws SQLException {
         Optional<Account> a = accountRepository.findById(accountId);
-        if(!a.isPresent()){
+        if (!a.isPresent()) {
             throw new ElementNotFoundException("Account not found!");
         }
         Account account = a.get();
@@ -149,13 +149,12 @@ public class BudgetService {
                     //convert currencies
                     int occurrences = Collections.frequency(categories, expense.getCategoryDto().getCategoryName());
                     double spent = 0;
-                    if(occurrences > 1){
+                    if (occurrences > 1) {
                         for (int j = 0; j < occurrences; j++) {
                             spent += CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
                             i++;
                         }
-                    }
-                    else{
+                    } else {
                         spent = CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
                     }
                     double percentage = spent / budget.getAmount() * 100;

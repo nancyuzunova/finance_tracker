@@ -1,8 +1,6 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ittalents.javaee.model.pojo.Account;
-import ittalents.javaee.model.pojo.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
