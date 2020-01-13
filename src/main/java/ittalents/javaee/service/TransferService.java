@@ -22,12 +22,12 @@ public class TransferService {
         this.transferRepository = transferRepository;
     }
 
-    public long createTransfer(Account fromAccount, Account toAccount, RequestTransferDto requestTransferDto) {
+    public ResponseTransferDto createTransfer(Account fromAccount, Account toAccount, RequestTransferDto requestTransferDto) {
         Transfer transfer = new Transfer();
         transfer.fromDto(requestTransferDto);
         transfer.setFromAccount(fromAccount);
         transfer.setToAccount(toAccount);
-        return transferRepository.save(transfer).getId();
+        return transferRepository.save(transfer).toDto();
     }
 
     public List<ResponseTransferDto> getTransfersByAccountId(long id) {

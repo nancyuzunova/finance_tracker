@@ -54,12 +54,12 @@ public class AccountService {
         throw new ElementNotFoundException("Account with id = " + accountId + " does not exist!");
     }
 
-    public long createAccount(User user, AccountDto accountDto) {
+    public AccountDto createAccount(User user, AccountDto accountDto) {
         Account a = new Account();
         a.fromDto(accountDto);
         a.setCreatedOn(LocalDateTime.now());
         a.setUser(user);
-        return this.accountRepository.save(a).getId();
+        return this.accountRepository.save(a).toDto();
     }
 
     public Account changeAccountCurrency(long accountId, Currency currency) {
@@ -75,7 +75,7 @@ public class AccountService {
         this.accountRepository.deleteById(accountId);
     }
 
-    public long makeTransfer(RequestTransferDto requestTransferDto) {
+    public ResponseTransferDto makeTransfer(RequestTransferDto requestTransferDto) {
         if (requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()) {
             throw new InvalidOperationException("You cannot make transfer to the same account!");
         }
@@ -109,25 +109,11 @@ public class AccountService {
         return transferService.getTransfersByAccountId(accountId);
     }
 
-    public long makeTransaction(RequestTransactionDto requestTransactionDto) {
+    public ResponseTransactionDto makeTransaction(RequestTransactionDto requestTransactionDto) {
         if (requestTransactionDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transactions!");
         }
-        Account account = getAccountById(requestTransactionDto.getAccountId());
-        double amount = requestTransactionDto.getAmount();
-        if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
-            amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
-        }
-        if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
-            throw new InvalidOperationException("Not enough account balance!");
-        }
-        if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
-            account.setBalance(account.getBalance() - amount);
-        } else {
-            account.setBalance(account.getBalance() + amount);
-        }
-        accountRepository.save(account);
-        return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
+        return this.transactionService.createTransaction(requestTransactionDto);
     }
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -156,8 +142,8 @@ public class AccountService {
         }
     }
 
-    public long createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
-        if(requestPlannedPaymentDto.getDate().before(new Date())){
+    public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
+        if (requestPlannedPaymentDto.getDate().before(new Date())) {
             throw new InvalidOperationException("You cannot make planned payments with past dates!");
         }
         PlannedPayment plannedPayment = new PlannedPayment();
@@ -170,6 +156,6 @@ public class AccountService {
         plannedPayment.setStatus(PlannedPayment.PaymentStatus.ACTIVE);
         plannedPayment.setAmount(requestPlannedPaymentDto.getAmount());
         plannedPayment.setDate(requestPlannedPaymentDto.getDate());
-        return this.paymentRepository.save(plannedPayment).getId();
+        return this.paymentRepository.save(plannedPayment).toDto();
     }
 }

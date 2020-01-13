@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -61,17 +62,32 @@ public class TransactionService {
         this.transactionDao = transactionDao;
     }
 
-    public long createTransaction(long accountId, RequestTransactionDto requestTransactionDto) {
+    @Transactional
+    public ResponseTransactionDto createTransaction(RequestTransactionDto requestTransactionDto) {
+        Optional<Account> acc = accountRepository.findById(requestTransactionDto.getAccountId());
+        if (!acc.isPresent()) {
+            throw new ElementNotFoundException("Account does NOT exist");
+        }
+        Account account = acc.get();
+        double amount = requestTransactionDto.getAmount();
+        if (!requestTransactionDto.getCurrency().equals(account.getCurrency())) {
+            amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
+        }
+        if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
+            throw new InvalidOperationException("Not enough account balance!");
+        }
+        if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
+            account.setBalance(account.getBalance() - amount);
+        } else {
+            account.setBalance(account.getBalance() + amount);
+        }
+        accountRepository.save(account);
         Transaction transaction = new Transaction();
         Category cat = categoryService.getCategoryById(requestTransactionDto.getCategoryId());
         transaction.setCategory(cat);
         transaction.fromDto(requestTransactionDto);
-        Optional<Account> acc = accountRepository.findById(accountId);
-        if (!acc.isPresent()) {
-            throw new ElementNotFoundException("Account with id " + accountId + " does NOT exists");
-        }
-        transaction.setAccount(acc.get());
-        return this.transactionRepository.save(transaction).getId();
+        transaction.setAccount(account);
+        return this.transactionRepository.save(transaction).toDto();
     }
 
     public List<ResponseTransactionDto> getTransactionsByAccountId(long id) {

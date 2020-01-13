@@ -7,8 +7,6 @@ import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.model.dto.RequestBudgetDto;
-import ittalents.javaee.model.pojo.Currency;
-import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +19,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
@@ -30,7 +27,7 @@ public class BudgetService {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class BudgetStatistics{
+    public class BudgetStatistics {
         private double total;
         private double spent;
         private double percentage;
@@ -159,13 +156,13 @@ public class BudgetService {
                     //convert currencies
                     int occurrences = Collections.frequency(categories, expense.getCategoryDto().getCategoryName());
                     double spent = 0;
-                    if(occurrences > 1){
+                    if (occurrences > 1) {
                         for (int j = 0; j < occurrences; j++) {
                             spent += CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                             i++;
                         }
                     }
-                    else{
+                    else {
                         spent = CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                     }
                     double percentage = spent / budget.getAmount() * 100;
