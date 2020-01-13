@@ -35,10 +35,14 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
     @Column(name = "amount", nullable = false)
     private double amount;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private Account account;
     @NotNull
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private User owner;
+
     private String title;
 
     public void fromDto(RequestBudgetDto dto) {
@@ -46,14 +50,15 @@ public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
         this.fromDate = dto.getFromDate();
         this.toDate = dto.getToDate();
         this.title = dto.getTitle();
+        this.currency = dto.getCurrency();
     }
 
     public ResponseBudgetDto toDto() {
         ResponseBudgetDto dto = new ResponseBudgetDto();
         dto.setId(id);
-        dto.setAccount(account.toDto());
         dto.setAmount(amount);
         dto.setCategory(category.toDto());
+        dto.setCurrency(currency);
         dto.setFromDate(fromDate);
         dto.setToDate(toDate);
         dto.setTitle(title);

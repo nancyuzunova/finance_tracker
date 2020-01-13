@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 public class SessionManager {
 
     public static final String LOGGED = "logged";
-    private static final int SESSION_EXPIRATION_TIME = 60 * 10; // 10 minutes
+    private static final int SESSION_EXPIRATION_TIME = 60 * 30; // 30 minutes
 
     public static boolean validateLogged(HttpSession session) {
         if (session.isNew() || session.getAttribute(LOGGED) == null) {

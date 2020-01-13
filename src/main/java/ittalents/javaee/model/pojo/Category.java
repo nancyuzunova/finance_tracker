@@ -56,7 +56,7 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
     public void fromDto(CategoryDto categoryDto) {
         this.name = categoryDto.getCategoryName();
         this.iconURL = categoryDto.getIconURL();
-//        this.type = categoryDto.getType();
+        this.type = name.getType();
     }
 
     public CategoryDto toDto() {
@@ -64,7 +64,7 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
         categoryDto.setId(id);
         categoryDto.setCategoryName(name);
         categoryDto.setIconURL(iconURL);
-//        categoryDto.setType(type);
+        categoryDto.setType(name.getType());
         return categoryDto;
     }
 }

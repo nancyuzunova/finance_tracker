@@ -1,9 +1,12 @@
 package ittalents.javaee.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ittalents.javaee.model.pojo.Currency;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Date;
@@ -31,9 +34,8 @@ public class RequestBudgetDto extends AbstractDto {
     private double amount;
 
     @NotNull
-    @Positive
-    private long accountId;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
-    @NotNull
     private String title;
 }

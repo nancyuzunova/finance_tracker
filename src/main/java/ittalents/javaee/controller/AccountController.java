@@ -77,13 +77,6 @@ public class AccountController extends AbstractController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping("/accounts/budgets")
-    public ResponseEntity addBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto requestBudgetDto) {
-        validateUserOwnership(session, requestBudgetDto.getAccountId());
-        URI location = URI.create(String.format("/budgets/%d", this.accountService.addBudget(requestBudgetDto)));
-        return ResponseEntity.created(location).build();
-    }
-
     @PostMapping("/accounts/makePlannedPayment")
     public ResponseEntity createPlannedPayment(HttpSession session,
                                                @RequestBody @Valid RequestPlannedPaymentDto requestPlannedPaymentDto) {

@@ -1,15 +1,19 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.dto.UserDto;
+import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.SQLException;
@@ -40,26 +44,26 @@ public class BudgetController extends AbstractController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping(value = "/accounts/{accountId}/budgets")
-    public ResponseEntity getBudgetsByAccountId(HttpSession session, @PathVariable @Positive long accountId) {
-        validateUserOwnership(session, accountId);
-        List<ResponseBudgetDto> budgets = budgetService.getBudgetsByAccountId(accountId);
-        return ResponseEntity.ok(budgets);
+    @PostMapping("/budgets")
+    public ResponseEntity createBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto budgetDto){
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto budget = budgetService.createBudget(user.getId(), budgetDto).toDto();
+        return ResponseEntity.status(HttpStatus.CREATED).body(budget);
     }
 
     @DeleteMapping(value = "/budgets/{budgetId}")
     public ResponseEntity deleteBudget(HttpSession session, @PathVariable @Positive long budgetId) {
-        validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
-        this.budgetService.deleteBudget(budgetId);
-        return ResponseEntity.noContent().build();
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto budget = this.budgetService.deleteBudget(budgetId, user.getId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(budget);
     }
 
     @PutMapping(value = "/budgets/{budgetId}/amount")
     public ResponseEntity changeBudgetAmount(HttpSession session,
                                              @PathVariable @Positive long budgetId,
                                              @RequestParam("amount") @Positive double amount) {
-        validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
-        ResponseBudgetDto dto = this.budgetService.changeBudgetAmount(budgetId, amount).toDto();
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto dto = this.budgetService.changeBudgetAmount(budgetId, user.getId(), amount).toDto();
         return ResponseEntity.ok(dto);
     }
 
@@ -67,16 +71,16 @@ public class BudgetController extends AbstractController {
     public ResponseEntity changeCategory(HttpSession session,
                                          @PathVariable @Positive long budgetId,
                                          @RequestParam("categoryId") @Positive int categoryId) {
-        validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
-        ResponseBudgetDto dto = budgetService.changeBudgetCategory(budgetId, categoryId);
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto dto = budgetService.changeBudgetCategory(budgetId, user.getId(), categoryId).toDto();
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping(value = "/budgets/{budgetId}/title")
     public ResponseEntity editTitle(HttpSession session, @PathVariable @Positive long budgetId,
                                     @RequestParam("title") String newTitle) {
-        validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
-        ResponseBudgetDto dto = budgetService.changeTitle(budgetId, newTitle).toDto();
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto dto = budgetService.changeTitle(budgetId, user.getId(), newTitle).toDto();
         return ResponseEntity.ok(dto);
     }
 
@@ -84,15 +88,15 @@ public class BudgetController extends AbstractController {
     public ResponseEntity updatePeriod(HttpSession session, @PathVariable @Positive long budgetId,
                                        @RequestParam("from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
                                        @RequestParam("to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to) {
-        validateUserOwnership(session, budgetService.getBudgetById(budgetId).getAccount().getId());
-        ResponseBudgetDto dto = budgetService.changePeriod(budgetId, from, to).toDto();
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponseBudgetDto dto = budgetService.changePeriod(budgetId, user.getId(), from, to).toDto();
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/accounts/{accountId}/budgets/references")
-    public ResponseEntity getBudgetReferences(HttpSession session, @PathVariable @Positive long accountId) throws SQLException {
-        validateUserOwnership(session, accountId);
-        List<BudgetService.BudgetStatistics> references = budgetService.getBugetReferences(accountId);
+    @GetMapping("/budgets/references")
+    public ResponseEntity getBudgetReferences(HttpSession session) throws SQLException {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<BudgetService.BudgetStatistics> references = budgetService.getBugetReferences(user.getId());
         return ResponseEntity.ok(references);
     }
 }

@@ -5,11 +5,9 @@ import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
-import ittalents.javaee.model.pojo.Account;
-import ittalents.javaee.model.pojo.Budget;
+import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.model.dto.RequestBudgetDto;
-import ittalents.javaee.model.pojo.Category;
-import ittalents.javaee.model.pojo.CurrencyConverter;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.BudgetRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,27 +38,26 @@ public class BudgetService {
     }
 
     private BudgetRepository budgetRepository;
-    private AccountRepository accountRepository;
+    private UserService userService;
     private CategoryService categoryService;
-    private TransactionDao transactionDao;
+    private TransactionService transactionService;
 
     @Autowired
-    public BudgetService(BudgetRepository budgetRepository, AccountRepository accountRepository,
-                         CategoryService categoryService, TransactionDao transactionDao) {
+    public BudgetService(BudgetRepository budgetRepository, UserService userService,
+                         CategoryService categoryService, TransactionService transactionService) {
         this.budgetRepository = budgetRepository;
-        this.accountRepository = accountRepository;
+        this.userService = userService;
         this.categoryService = categoryService;
-        this.transactionDao = transactionDao;
+        this.transactionService = transactionService;
     }
 
     public List<ResponseBudgetDto> getBudgets(long userId) {
-        List<Account> accounts = accountRepository.findAllByUserId(userId);
-        List<ResponseBudgetDto> budgets = new ArrayList<>();
-        for (Account account : accounts) {
-            budgets.addAll(budgetRepository.findAllByAccountId(account.getId())
-                    .stream().map(Budget::toDto).collect(Collectors.toList()));
+        List<ResponseBudgetDto> responseBudgets = new ArrayList<>();
+        List<Budget> budgets = budgetRepository.findAllByOwnerId(userId);
+        for (Budget budget : budgets) {
+            responseBudgets.add(budget.toDto());
         }
-        return budgets;
+        return responseBudgets;
     }
 
     public Budget getBudgetById(long budgetId) {
@@ -66,77 +65,88 @@ public class BudgetService {
         if (budget.isPresent()) {
             return budget.get();
         }
-        throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist");
+        throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist!");
     }
 
-    public void deleteBudget(long budgetId) {
+    public ResponseBudgetDto deleteBudget(long budgetId, long userId) {
+        Optional<Budget> budgetOptional = budgetRepository.findById(budgetId);
+        if(!budgetOptional.isPresent()){
+            throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist!");
+        }
+        Budget budget = budgetOptional.get();
+        if(budget.getOwner().getId() != userId){
+            throw new InvalidOperationException("You can delete only your own budgets!");
+        }
         this.budgetRepository.deleteById(budgetId);
+        return budget.toDto();
     }
 
-    public Budget changeBudgetAmount(long budgetId, double amount) {
+    public Budget changeBudgetAmount(long budgetId, long userId, double amount) {
         Budget budget = getBudgetById(budgetId);
+        if(budget.getOwner().getId() != userId){
+            throw new InvalidOperationException("You can edit only your own budgets!");
+        }
         budget.setAmount(amount);
         return this.budgetRepository.save(budget);
     }
 
-    public long createBudget(RequestBudgetDto requestBudgetDto) {
+    public Budget createBudget(long userId, RequestBudgetDto requestBudgetDto) {
         Budget budget = new Budget();
         Date fromDate = requestBudgetDto.getFromDate();
         Date toDate = requestBudgetDto.getToDate();
+        boolean isInappropriateDateFrom = LocalDate.of(1900, 1, 1)
+                .isAfter(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        boolean isInappropriateDateTo = LocalDate.of(1900, 1, 1)
+                .isAfter(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        if(isInappropriateDateFrom || isInappropriateDateTo){
+            throw new InvalidOperationException("Inappropriate dates! Please enter correct dates!");
+        }
         if (fromDate.after(toDate)) {
-            throw new InvalidOperationException("You can not create budget!");
+            throw new InvalidOperationException("Date range not valid! Please try again!");
         }
-        Optional<Account> acc = accountRepository.findById(requestBudgetDto.getAccountId());
-        if (!acc.isPresent()) {
-            throw new InvalidOperationException("Account cannot be found!");
-        }
-        budget.setAccount(acc.get());
+        budget.setOwner(userService.getUserById(userId));
         Category category = categoryService.getCategoryById(requestBudgetDto.getCategoryId());
         budget.setCategory(category);
         budget.fromDto(requestBudgetDto);
-        return this.budgetRepository.save(budget).getId();
+        return this.budgetRepository.save(budget);
     }
 
-    public List<ResponseBudgetDto> getBudgetsByAccountId(long accountId) {
-        List<ResponseBudgetDto> budgets = new ArrayList<>();
-        for (Budget budget : this.budgetRepository.findAllByAccountId(accountId)) {
-            budgets.add(budget.toDto());
+    public Budget changeBudgetCategory(long budgetId, long userId, long categoryId) {
+        Budget budget = getBudgetById(budgetId);
+        if(budget.getOwner().getId() != userId){
+            throw new InvalidOperationException("You can edit only your own budgets!");
         }
-        return budgets;
-    }
-
-    public ResponseBudgetDto changeBudgetCategory(long budgetId, long categoryId) {
-        Budget b = getBudgetById(budgetId);
         Category category = categoryService.getCategoryById(categoryId);
-        b.setCategory(category);
-        this.budgetRepository.save(b);
-        return b.toDto();
+        budget.setCategory(category);
+        return this.budgetRepository.save(budget);
     }
 
-    public Budget changeTitle(long budgetId, String newTitle) {
+    public Budget changeTitle(long budgetId, long userId, String newTitle) {
         Budget b = getBudgetById(budgetId);
+        if(b.getOwner().getId() != userId){
+            throw new InvalidOperationException("You can edit only your own budgets!");
+        }
         b.setTitle(newTitle);
         return this.budgetRepository.save(b);
     }
 
-    public Budget changePeriod(long budgetId, Date from, Date to) {
+    public Budget changePeriod(long budgetId, long userId, Date from, Date to) {
         if (from.after(to)) {
             throw new InvalidOperationException("You can not change period. Please check dates!");
         }
         Budget b = getBudgetById(budgetId);
+        if(b.getOwner().getId() != userId){
+            throw new InvalidOperationException("You can edit only your own budgets!");
+        }
         b.setFromDate(from);
         b.setToDate(to);
         return this.budgetRepository.save(b);
     }
 
-    public List<BudgetStatistics> getBugetReferences(long accountId) throws SQLException {
-        Optional<Account> a = accountRepository.findById(accountId);
-        if(!a.isPresent()){
-            throw new ElementNotFoundException("Account not found!");
-        }
-        Account account = a.get();
-        List<ResponseBudgetDto> budgets = getBudgetsByAccountId(accountId);
-        List<TransactionDao.ExpensesByCategoryAndAccount> expenses = transactionDao.getTransactionsAmountByCategory(accountId);
+    public List<BudgetStatistics> getBugetReferences(long userId) throws SQLException {
+        List<ResponseBudgetDto> budgets = getBudgets(userId);
+        List<TransactionDao.ExpensesByCategoryAndAccount> expenses =
+                transactionService.getTotalExpensesByCategory(userId);
         List<Category.CategoryName> categories = new ArrayList<>();
         List<BudgetStatistics> result = new ArrayList<>();
         for (TransactionDao.ExpensesByCategoryAndAccount e : expenses) {
@@ -151,12 +161,12 @@ public class BudgetService {
                     double spent = 0;
                     if(occurrences > 1){
                         for (int j = 0; j < occurrences; j++) {
-                            spent += CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
+                            spent += CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                             i++;
                         }
                     }
                     else{
-                        spent = CurrencyConverter.convert(expense.getCurrency(), account.getCurrency(), expense.getTotalExpenses());
+                        spent = CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                     }
                     double percentage = spent / budget.getAmount() * 100;
                     result.add(new BudgetStatistics(budget.getAmount(), spent, percentage, expense.getCategoryDto()));

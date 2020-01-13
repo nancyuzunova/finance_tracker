@@ -28,19 +28,16 @@ public class AccountService {
     private AccountRepository accountRepository;
     private TransferService transferService;
     private TransactionService transactionService;
-    private BudgetService budgetService;
     private PlannedPaymentRepository paymentRepository;
     private TransferDao transferDao;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
-                          TransactionService transactionService, BudgetService budgetService,
-                          PlannedPaymentRepository paymentRepository,
+                          TransactionService transactionService, PlannedPaymentRepository paymentRepository,
                           TransferDao transferDao) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
-        this.budgetService = budgetService;
         this.paymentRepository = paymentRepository;
         this.transferDao = transferDao;
     }
@@ -131,17 +128,6 @@ public class AccountService {
         }
         accountRepository.save(account);
         return this.transactionService.createTransaction(account.getId(), requestTransactionDto);
-    }
-
-    public long addBudget(RequestBudgetDto requestBudgetDto) {
-        if (requestBudgetDto.getFromDate().after(requestBudgetDto.getToDate())) {
-            throw new InvalidOperationException("Incorrect dates! Please try again!");
-        }
-        Account account = getAccountById(requestBudgetDto.getAccountId());
-        if (account.getBalance() < requestBudgetDto.getAmount()) {
-            throw new InvalidOperationException("The budget can not exceed the account balance!");
-        }
-        return budgetService.createBudget(requestBudgetDto);
     }
 
     @Scheduled(cron = "0 0 0 * * *")

@@ -195,12 +195,10 @@ public class TransactionService {
         } else {
             expenses = transactionDao.getExpensesByCategoryAndAccountId(accountId);
         }
-
         List<Category.CategoryName> categories = new ArrayList<>();
         for (TransactionDao.ExpensesByCategoryAndAccount e : expenses) {
             categories.add(e.getCategoryDto().getCategoryName());
         }
-
         for (int i = 0; i < expenses.size(); i++) {
             TransactionDao.ExpensesByCategoryAndAccount e = expenses.get(i);
             int occurrences = Collections.frequency(categories, e.getCategoryDto().getCategoryName());
@@ -222,6 +220,10 @@ public class TransactionService {
         }
 
         return result;
+    }
+
+    public List<TransactionDao.ExpensesByCategoryAndAccount> getTotalExpensesByCategory(long userId) throws SQLException {
+        return transactionDao.getExpensesByCategoryForAllAccounts(userId);
     }
 
     public List<ResponseTransactionDto> getTransactionsByPeriod(long id, Date from, Date to) throws SQLException {

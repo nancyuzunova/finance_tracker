@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface BudgetRepository extends CrudRepository<Budget, Long> {
 
-    List<Budget> findAllByAccountId(long id);
+    List<Budget> findAllByOwnerId(long id);
 }
