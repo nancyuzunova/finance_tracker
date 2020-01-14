@@ -58,12 +58,9 @@ public class UserService {
             user.setDateCreated(now);
             user.setLastLogin(LocalDateTime.now());
             long id = userRepository.save(user).getId();
-            UserDto uDto = new UserDto(userDto);
-            uDto.setId(id);
-            uDto.setDateCreated(LocalDateTime.now());
-            uDto.setLastLogin(LocalDateTime.now());
-            uDto.setAccounts(new ArrayList<>());
-            return uDto;
+            userDto.setId(id);
+            user.setId(id);
+            return user.toDto();
         }
         throw new AuthorizationException("The password and its confirmation do not match. Please try again");
     }
