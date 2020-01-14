@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "transactions")
-public class Transaction extends AbstractPojo<ResponseTransactionDto, RequestTransactionDto> {
+public class Transaction extends AbstractPojo<RequestTransactionDto, ResponseTransactionDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

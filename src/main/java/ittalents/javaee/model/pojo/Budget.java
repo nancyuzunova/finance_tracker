@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "budgets")
-public class Budget extends AbstractPojo<ResponseBudgetDto, RequestBudgetDto> {
+public class Budget extends AbstractPojo<RequestBudgetDto, ResponseBudgetDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

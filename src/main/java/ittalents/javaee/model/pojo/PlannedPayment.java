@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "planned_payments")
-public class PlannedPayment extends AbstractPojo<ResponsePlannedPaymentDto, RequestPlannedPaymentDto> {
+public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, ResponsePlannedPaymentDto> {
 
     public enum PaymentStatus {
         PAID, ACTIVE

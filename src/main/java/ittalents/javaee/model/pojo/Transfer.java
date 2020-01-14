@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "transfers")
-public class Transfer extends AbstractPojo<ResponseTransferDto, RequestTransferDto> {
+public class Transfer extends AbstractPojo<RequestTransferDto, ResponseTransferDto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

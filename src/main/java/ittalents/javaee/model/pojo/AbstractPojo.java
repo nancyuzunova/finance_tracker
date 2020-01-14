@@ -2,9 +2,9 @@ package ittalents.javaee.model.pojo;
 
 import ittalents.javaee.model.dto.AbstractDto;
 
-public abstract class AbstractPojo<G, T extends AbstractDto> {
+public abstract class AbstractPojo<F, T extends AbstractDto> {
 
-    abstract void fromDto(T dto);
+    abstract void fromDto(F dto);
 
-    abstract G toDto();
+    abstract T toDto();
 }
