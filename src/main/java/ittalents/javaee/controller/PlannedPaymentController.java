@@ -38,8 +38,8 @@ public class PlannedPaymentController extends AbstractController {
 
     @PutMapping("/plannedPayments")
     public ResponseEntity editPlannedPayment(HttpSession session, @RequestBody RequestPlannedPaymentDto paymentDto){
-        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        ResponsePlannedPaymentDto response = plannedPaymentService.editPayment(user.getId(), paymentDto);
+        validateUserOwnership(session, paymentDto.getAccountId());
+        ResponsePlannedPaymentDto response = plannedPaymentService.editPayment(paymentDto);
         return ResponseEntity.ok(response);
     }
 

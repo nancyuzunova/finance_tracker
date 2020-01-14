@@ -46,7 +46,7 @@ public class UserController extends AbstractController {
     @PostMapping("/users/logout")
     public ResponseEntity logout(HttpSession session) {
         session.invalidate();
-        return ResponseEntity.ok().build();
+        return new ResponseEntity("You have logged out!", HttpStatus.RESET_CONTENT);
     }
 
     @PostMapping("/users/accounts")
@@ -71,8 +71,9 @@ public class UserController extends AbstractController {
 
     @DeleteMapping("/users/delete")
     public ResponseEntity deleteUser(HttpSession session) {
-        userService.deleteUser(((UserDto) session.getAttribute(SessionManager.LOGGED)).getId());
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        userService.deleteUser(user.getId());
         session.invalidate();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(user);
     }
 }

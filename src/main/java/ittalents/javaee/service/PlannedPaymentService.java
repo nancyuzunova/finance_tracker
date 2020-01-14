@@ -26,6 +26,9 @@ public class PlannedPaymentService {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     public List<ResponsePlannedPaymentDto> getAllPlannedPaymentsByUserId(long userId, long accountId) throws SQLException {
         if (accountId == 0) {
             return paymentDao.getMyPlannedPayments(userId);
@@ -47,17 +50,11 @@ public class PlannedPaymentService {
         paymentDao.deletePayment(userId, paymentId);
     }
 
-    public ResponsePlannedPaymentDto editPayment(long userId, RequestPlannedPaymentDto paymentDto) {
+    public ResponsePlannedPaymentDto editPayment(RequestPlannedPaymentDto paymentDto) {
         PlannedPayment payment = new PlannedPayment();
         payment.fromDto(paymentDto);
-        for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {
-            if (paymentDto.getAccountId() == account.getId()) {
-                Account account1 = new Account();
-                account1.fromDto(account);
-                payment.setAccount(account1);
-                return paymentRepository.save(payment).toDto();
-            }
-        }
-        return null;
+        payment.setAccount(accountService.getAccountById(paymentDto.getAccountId()));
+        payment.setCategory(categoryService.getCategoryById(paymentDto.getCategoryId()));
+        return paymentRepository.save(payment).toDto();
     }
 }

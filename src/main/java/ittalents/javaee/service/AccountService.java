@@ -9,13 +9,17 @@ import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Pageable;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +86,10 @@ public class AccountService {
         if (requestTransferDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transfers!");
         }
+        if(LocalDate.of(1900, 1, 1).isAfter(requestTransferDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())){
+            throw new InvalidOperationException("Invalid date! Please try again!");
+        }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         Account accountTo = getAccountById(requestTransferDto.getToAccountId());
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
@@ -110,6 +118,10 @@ public class AccountService {
     }
 
     public ResponseTransactionDto makeTransaction(RequestTransactionDto requestTransactionDto) {
+        if(LocalDate.of(1900, 1, 1).isAfter(requestTransactionDto.getDate().toInstant()
+        .atZone(ZoneId.systemDefault()).toLocalDate())){
+            throw new InvalidOperationException("Invalid date! Please try again!");
+        }
         if (requestTransactionDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transactions!");
         }

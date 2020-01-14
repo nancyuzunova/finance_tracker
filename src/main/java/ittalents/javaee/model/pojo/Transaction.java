@@ -27,9 +27,11 @@ public class Transaction extends AbstractPojo<RequestTransactionDto, ResponseTra
     @NotNull
     @Enumerated(EnumType.STRING)
     private Type type;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
+
     @Positive
     private double amount;
     @NotNull
