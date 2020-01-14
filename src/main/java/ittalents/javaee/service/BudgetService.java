@@ -7,11 +7,9 @@ import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.pojo.*;
 import ittalents.javaee.model.dto.RequestBudgetDto;
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.BudgetRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +28,7 @@ public class BudgetService {
     public class BudgetStatistics {
         private double total;
         private double spent;
+        private Currency currency;
         private double percentage;
         private CategoryDto category;
     }
@@ -67,11 +66,11 @@ public class BudgetService {
 
     public ResponseBudgetDto deleteBudget(long budgetId, long userId) {
         Optional<Budget> budgetOptional = budgetRepository.findById(budgetId);
-        if(!budgetOptional.isPresent()){
+        if (!budgetOptional.isPresent()) {
             throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist!");
         }
         Budget budget = budgetOptional.get();
-        if(budget.getOwner().getId() != userId){
+        if (budget.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can delete only your own budgets!");
         }
         this.budgetRepository.deleteById(budgetId);
@@ -80,7 +79,7 @@ public class BudgetService {
 
     public Budget changeBudgetAmount(long budgetId, long userId, double amount) {
         Budget budget = getBudgetById(budgetId);
-        if(budget.getOwner().getId() != userId){
+        if (budget.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can edit only your own budgets!");
         }
         budget.setAmount(amount);
@@ -95,7 +94,7 @@ public class BudgetService {
                 .isAfter(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         boolean isInappropriateDateTo = LocalDate.of(1900, 1, 1)
                 .isAfter(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        if(isInappropriateDateFrom || isInappropriateDateTo){
+        if (isInappropriateDateFrom || isInappropriateDateTo) {
             throw new InvalidOperationException("Inappropriate dates! Please enter correct dates!");
         }
         if (fromDate.after(toDate)) {
@@ -110,7 +109,7 @@ public class BudgetService {
 
     public Budget changeBudgetCategory(long budgetId, long userId, long categoryId) {
         Budget budget = getBudgetById(budgetId);
-        if(budget.getOwner().getId() != userId){
+        if (budget.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can edit only your own budgets!");
         }
         Category category = categoryService.getCategoryById(categoryId);
@@ -120,7 +119,7 @@ public class BudgetService {
 
     public Budget changeTitle(long budgetId, long userId, String newTitle) {
         Budget b = getBudgetById(budgetId);
-        if(b.getOwner().getId() != userId){
+        if (b.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can edit only your own budgets!");
         }
         b.setTitle(newTitle);
@@ -132,7 +131,7 @@ public class BudgetService {
             throw new InvalidOperationException("You can not change period. Please check dates!");
         }
         Budget b = getBudgetById(budgetId);
-        if(b.getOwner().getId() != userId){
+        if (b.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can edit only your own budgets!");
         }
         b.setFromDate(from);
@@ -140,7 +139,7 @@ public class BudgetService {
         return this.budgetRepository.save(b);
     }
 
-    public List<BudgetStatistics> getBugetReferences(long userId) throws SQLException {
+    public List<BudgetStatistics> getBudgetReferences(long userId, boolean export) throws SQLException {
         List<ResponseBudgetDto> budgets = getBudgets(userId);
         List<TransactionDao.ExpensesByCategoryAndAccount> expenses =
                 transactionService.getTotalExpensesByCategory(userId);
@@ -161,15 +160,31 @@ public class BudgetService {
                             spent += CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                             i++;
                         }
-                    }
-                    else {
+                    } else {
                         spent = CurrencyConverter.convert(expense.getCurrency(), budget.getCurrency(), expense.getTotalExpenses());
                     }
                     double percentage = spent / budget.getAmount() * 100;
-                    result.add(new BudgetStatistics(budget.getAmount(), spent, percentage, expense.getCategoryDto()));
+                    result.add(new BudgetStatistics(budget.getAmount(), spent, budget.getCurrency(), percentage, expense.getCategoryDto()));
                 }
             }
         }
+        if(export) {
+            prepareReferenceForExporting(result);
+        }
         return result;
+    }
+
+    private void prepareReferenceForExporting(List<BudgetStatistics> references) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= references.size(); i++) {
+            BudgetStatistics reference = references.get(i - 1);
+            sb.append("Budget: " + i).append(System.lineSeparator());
+            sb.append("Total: " + reference.getTotal()).append(" "+reference.getCurrency()).append(System.lineSeparator());
+            sb.append("Spent: " + reference.getSpent()).append(" "+reference.getCurrency()).append(System.lineSeparator());
+            sb.append(String.format("Percentage: %.2f", reference.getPercentage())).append("%").append(System.lineSeparator());
+            sb.append("Category: " + reference.getCategory().getCategoryName()).append(System.lineSeparator());
+            sb.append("---------------------------------------------------").append(System.lineSeparator());
+        }
+        ExporterToPdf.export(sb.toString(), "Budgets");
     }
 }
