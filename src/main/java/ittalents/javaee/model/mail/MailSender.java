@@ -26,7 +26,6 @@ public class MailSender {
                         return new PasswordAuthentication(username, password);
                     }
                 });
-
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(SENDER));
@@ -36,10 +35,7 @@ public class MailSender {
             );
             message.setSubject(subject);
             message.setText(body);
-
             Transport.send(message);
-
-            System.out.println("Done");
         } catch (MessagingException e) {
             e.printStackTrace();
         }

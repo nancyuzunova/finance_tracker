@@ -1,7 +1,5 @@
 package ittalents.javaee.service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
@@ -20,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
@@ -133,7 +129,7 @@ public class TransactionService {
         return transactionDao.getAllTransactionsByType(userId, type);
     }
 
-    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to) throws SQLException {
+    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to, boolean export) throws SQLException {
         if (from.after(to)) {
             throw new InvalidOperationException("Incorrect input dates. Please, check again!");
         }
@@ -161,6 +157,9 @@ public class TransactionService {
                 }
             }
             result.add(entity);
+        }
+        if (export) {
+            prepareDailyStatisticForExporting(result);
         }
         return result;
     }
@@ -253,35 +252,14 @@ public class TransactionService {
         return transactionDao.getTransactionsByCategory(userId, category);
     }
 
-    public void exportTransactionToPDF(long id) {
-        Transaction transaction = getTransactionById(id);
-        try {
-            Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream("transaction.pdf"));
-            document.open();
-            Font titleFont = FontFactory.getFont(FontFactory.TIMES_BOLDITALIC, 20, BaseColor.BLACK);
-            document.add(new Paragraph("Transaction Information" + System.lineSeparator(), titleFont));
-            Font contentFont = FontFactory.getFont(FontFactory.TIMES_ITALIC, 15, BaseColor.LIGHT_GRAY);
-            document.add(new Chunk(
-                    "Type: " + transaction.getType() + System.lineSeparator(),
-                    contentFont)); // income or expense
-            Category category = categoryService.getCategoryById(transaction.getCategory().getId());
-            document.add(new Chunk(
-                    "Category: " + category.getName() + System.lineSeparator(),
-                    contentFont));
-            document.add(new Chunk("Description: " + transaction.getDescription() + System.lineSeparator(),
-                    contentFont));
-            document.add(new Chunk("Amount: " + transaction.getAmount() + System.lineSeparator(),
-                    contentFont));
-            document.add(new Chunk("Currency: " + transaction.getCurrency() + System.lineSeparator(),
-                    contentFont));
-            document.add(new Chunk("Date: " + transaction.getDate() + System.lineSeparator(),
-                    contentFont));
-            document.close();
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    private void prepareDailyStatisticForExporting(List<ExpenseIncomeEntity> references) {
+        StringBuilder sb = new StringBuilder();
+        for (ExpenseIncomeEntity reference : references) {
+            sb.append("Date: " + reference.getDate()).append(System.lineSeparator());
+            sb.append("Expense: " + reference.getExpense()).append(" " + Currency.BGN).append(System.lineSeparator());
+            sb.append("Income: " + reference.getIncome()).append(" " + Currency.BGN).append(System.lineSeparator());
+            sb.append("---------------------------------------------------").append(System.lineSeparator());
         }
+        ExporterToPdf.export(sb.toString(), "Transaction");
     }
 }

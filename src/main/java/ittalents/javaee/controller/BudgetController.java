@@ -3,7 +3,6 @@ package ittalents.javaee.controller;
 import ittalents.javaee.model.dto.RequestBudgetDto;
 import ittalents.javaee.model.dto.ResponseBudgetDto;
 import ittalents.javaee.model.dto.UserDto;
-import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -93,9 +92,9 @@ public class BudgetController extends AbstractController {
     }
 
     @GetMapping("/budgets/references")
-    public ResponseEntity getBudgetReferences(HttpSession session) throws SQLException {
+    public ResponseEntity getBudgetReferences(HttpSession session, @RequestParam("export") boolean export) throws SQLException {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<BudgetService.BudgetStatistics> references = budgetService.getBugetReferences(user.getId());
+        List<BudgetService.BudgetStatistics> references = budgetService.getBudgetReferences(user.getId(), export);
         return ResponseEntity.ok(references);
     }
 }

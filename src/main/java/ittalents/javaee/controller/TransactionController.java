@@ -51,11 +51,12 @@ public class TransactionController extends AbstractController {
     public ResponseEntity
     getExpensesAndIncomesByDateBetween(HttpSession session,
                                        @RequestParam("from") @DateTimeFormat(pattern = "dd.MM.yyyy") Date from,
-                                       @RequestParam("to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to)
+                                       @RequestParam("to") @DateTimeFormat(pattern = "dd.MM.yyyy") Date to,
+                                       @RequestParam("export") boolean export)
             throws SQLException {
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
         List<TransactionService.ExpenseIncomeEntity> statisticsPerDay =
-                transactionService.getDailyStatistics(userDto.getId(), from, to);
+                transactionService.getDailyStatistics(userDto.getId(), from, to, export);
         return ResponseEntity.ok(statisticsPerDay);
     }
 
