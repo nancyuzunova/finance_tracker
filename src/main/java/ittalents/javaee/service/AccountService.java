@@ -1,6 +1,5 @@
 package ittalents.javaee.service;
 
-import ittalents.javaee.controller.SessionManager;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dto.*;
@@ -10,6 +9,7 @@ import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@EnableScheduling
 public class AccountService {
 
     private static final int MAX_AMOUNT_OF_PLANNED_PAYMENT = 2500;
@@ -115,7 +116,7 @@ public class AccountService {
         return this.transactionService.createTransaction(requestTransactionDto);
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void payPlannedPayments() {
         Date today = new Date();
         List<PlannedPayment> payments = paymentRepository.findAllByDateAndStatus(today, PlannedPayment.PaymentStatus.ACTIVE);

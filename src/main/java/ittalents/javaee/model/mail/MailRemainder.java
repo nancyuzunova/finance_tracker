@@ -3,12 +3,14 @@ package ittalents.javaee.model.mail;
 import ittalents.javaee.model.pojo.User;
 import ittalents.javaee.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Component
+@EnableScheduling
 public class MailRemainder {
 
     private static final int DAYS_TO_SUBTRACT = 10;
@@ -21,9 +23,11 @@ public class MailRemainder {
     @Autowired
     private UserService userService;
 
-    @Scheduled(cron = "0 0 */10 * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void sendEmailToRemain() {
-        for (User user : userService.getInactiveUsers(LocalDate.now().minusDays(DAYS_TO_SUBTRACT))) {
+        System.out.println("send email?");
+        for (User user : userService.getInactiveUsers(LocalDate.now().plusDays(DAYS_TO_SUBTRACT))) {
+            System.out.println(user.getEmail());
             MailSender.sendMail(user.getEmail(), subject, body);
         }
     }
