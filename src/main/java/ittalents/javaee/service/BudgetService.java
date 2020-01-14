@@ -87,19 +87,10 @@ public class BudgetService {
     }
 
     public Budget createBudget(long userId, RequestBudgetDto requestBudgetDto) {
-        Budget budget = new Budget();
         Date fromDate = requestBudgetDto.getFromDate();
         Date toDate = requestBudgetDto.getToDate();
-        boolean isInappropriateDateFrom = LocalDate.of(1900, 1, 1)
-                .isAfter(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        boolean isInappropriateDateTo = LocalDate.of(1900, 1, 1)
-                .isAfter(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        if (isInappropriateDateFrom || isInappropriateDateTo) {
-            throw new InvalidOperationException("Inappropriate dates! Please enter correct dates!");
-        }
-        if (fromDate.after(toDate)) {
-            throw new InvalidOperationException("Date range not valid! Please try again!");
-        }
+        validateDates(fromDate, toDate);
+        Budget budget = new Budget();
         budget.setOwner(userService.getUserById(userId));
         Category category = categoryService.getCategoryById(requestBudgetDto.getCategoryId());
         budget.setCategory(category);
@@ -127,9 +118,7 @@ public class BudgetService {
     }
 
     public Budget changePeriod(long budgetId, long userId, Date from, Date to) {
-        if (from.after(to)) {
-            throw new InvalidOperationException("You can not change period. Please check dates!");
-        }
+        validateDates(from, to);
         Budget b = getBudgetById(budgetId);
         if (b.getOwner().getId() != userId) {
             throw new InvalidOperationException("You can edit only your own budgets!");
@@ -186,5 +175,22 @@ public class BudgetService {
             sb.append("---------------------------------------------------").append(System.lineSeparator());
         }
         ExporterToPdf.export(sb.toString(), "Budgets");
+    }
+
+    private void validateDates(Date fromDate, Date toDate) {
+        if (fromDate.after(toDate)) {
+            throw new InvalidOperationException("Date range not valid! Please try again!");
+        }
+        boolean isTooPastFromDate = LocalDate.of(1900, 1, 1)
+                .isAfter(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        boolean isTooPastToDate = LocalDate.of(1900, 1, 1)
+                .isAfter(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        boolean isTooFutureFromDate = LocalDate.of(2150, 1, 1)
+                .isBefore(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        boolean isTooFutureToDate = LocalDate.of(2150, 1, 1)
+                .isBefore(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        if (isTooPastFromDate || isTooPastToDate || isTooFutureFromDate || isTooFutureToDate) {
+            throw new InvalidOperationException("Inappropriate dates! Please enter correct dates!");
+        }
     }
 }

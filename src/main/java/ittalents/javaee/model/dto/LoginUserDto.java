@@ -24,7 +24,7 @@ public class LoginUserDto extends AbstractDto {
     protected String email;
 
     @NotBlank
-    //@Length(min = 8)
+    @Length(min = 8)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$")
     protected String password;
 

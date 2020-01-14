@@ -172,6 +172,10 @@ public class AccountService {
         if (requestPlannedPaymentDto.getDate().before(new Date())) {
             throw new InvalidOperationException("You cannot make planned payments with past dates!");
         }
+        if(LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
+            .atZone(ZoneId.systemDefault()).toLocalDate())){
+            throw new InvalidOperationException("Payment too far into the future! Please check!");
+        }
         if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
             throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
         }

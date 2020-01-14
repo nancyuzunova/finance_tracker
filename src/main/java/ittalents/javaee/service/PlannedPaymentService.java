@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.PlannedPaymentDao;
 import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +54,12 @@ public class PlannedPaymentService {
     }
 
     public ResponsePlannedPaymentDto editPayment(RequestPlannedPaymentDto paymentDto) {
+        if(LocalDate.of(1900, 1, 1).isAfter(paymentDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate()) ||
+            LocalDate.of(2150, 1, 1).isBefore(paymentDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())){
+            throw new InvalidOperationException("Incorrect date! Please try again!");
+        }
         PlannedPayment payment = new PlannedPayment();
         payment.fromDto(paymentDto);
         payment.setAccount(accountService.getAccountById(paymentDto.getAccountId()));
