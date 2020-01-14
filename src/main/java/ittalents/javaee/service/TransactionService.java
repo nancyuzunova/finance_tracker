@@ -129,7 +129,7 @@ public class TransactionService {
         return transactionDao.getAllTransactionsByType(userId, type);
     }
 
-    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to) throws SQLException {
+    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to, boolean export) throws SQLException {
         if (from.after(to)) {
             throw new InvalidOperationException("Incorrect input dates. Please, check again!");
         }
@@ -157,6 +157,9 @@ public class TransactionService {
                 }
             }
             result.add(entity);
+        }
+        if (export) {
+            prepareDailyStatisticForExporting(result);
         }
         return result;
     }
@@ -247,5 +250,16 @@ public class TransactionService {
 
     public List<ResponseTransactionDto> getTransactionsByCategory(long userId, Category.CategoryName category) throws SQLException {
         return transactionDao.getTransactionsByCategory(userId, category);
+    }
+
+    private void prepareDailyStatisticForExporting(List<ExpenseIncomeEntity> references) {
+        StringBuilder sb = new StringBuilder();
+        for (ExpenseIncomeEntity reference : references) {
+            sb.append("Date: " + reference.getDate()).append(System.lineSeparator());
+            sb.append("Expense: " + reference.getExpense()).append(" " + Currency.BGN).append(System.lineSeparator());
+            sb.append("Income: " + reference.getIncome()).append(" " + Currency.BGN).append(System.lineSeparator());
+            sb.append("---------------------------------------------------").append(System.lineSeparator());
+        }
+        ExporterToPdf.export(sb.toString(), "Transaction");
     }
 }
