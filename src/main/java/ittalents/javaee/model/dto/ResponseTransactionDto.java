@@ -38,7 +38,6 @@ public class ResponseTransactionDto extends AbstractDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
     private Date date;
 
-    @NotBlank
     private String description;
 
     @NotNull

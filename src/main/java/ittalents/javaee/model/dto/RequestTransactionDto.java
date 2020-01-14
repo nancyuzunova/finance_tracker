@@ -41,7 +41,6 @@ public class RequestTransactionDto extends AbstractDto {
     @Positive
     private long accountId;
 
-    @NotBlank
     private String description;
 
     @NotNull

@@ -36,7 +36,6 @@ public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, Respo
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
-    @NotNull
     private String title;
 
     @NotNull

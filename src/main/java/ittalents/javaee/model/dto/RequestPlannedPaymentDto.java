@@ -29,7 +29,6 @@ public class RequestPlannedPaymentDto extends AbstractDto {
     @Positive
     private long categoryId;
 
-    @NotBlank
     private String title;
 
     @NotNull

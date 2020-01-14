@@ -37,7 +37,6 @@ public class Transaction extends AbstractPojo<RequestTransactionDto, ResponseTra
     @NotNull
     private Date date;
 
-    @NotBlank
     private String description;
 
     @ManyToOne(cascade = CascadeType.ALL)
