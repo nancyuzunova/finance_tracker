@@ -51,13 +51,6 @@ public class AccountController extends AbstractController {
         return ResponseEntity.ok(account);
     }
 
-    @DeleteMapping("/accounts/{accountId}")
-    public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) throws SQLException {
-        validateUserOwnership(session, accountId);
-        this.accountService.deleteAccount(accountId);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/accounts/makeTransfer")
     public ResponseEntity makeTransfer(HttpSession session, @RequestBody @Valid RequestTransferDto requestTransferDto) {
         validateUserOwnership(session, requestTransferDto.getFromAccountId());
@@ -80,5 +73,12 @@ public class AccountController extends AbstractController {
         validateUserOwnership(session, requestPlannedPaymentDto.getAccountId());
         ResponsePlannedPaymentDto plannedPayment = accountService.createPlannedPayment(requestPlannedPaymentDto);
         return new ResponseEntity(plannedPayment, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/accounts/{accountId}")
+    public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) throws SQLException {
+        validateUserOwnership(session, accountId);
+        this.accountService.deleteAccount(accountId);
+        return ResponseEntity.noContent().build();
     }
 }

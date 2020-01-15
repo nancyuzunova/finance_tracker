@@ -42,18 +42,18 @@ public class BudgetController extends AbstractController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/budgets/references")
+    public ResponseEntity getBudgetReferences(HttpSession session, @RequestParam("export") boolean export) throws SQLException {
+        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        List<BudgetService.BudgetStatistics> references = budgetService.getBudgetReferences(user.getId(), export);
+        return ResponseEntity.ok(references);
+    }
+
     @PostMapping("/budgets")
     public ResponseEntity createBudget(HttpSession session, @RequestBody @Valid RequestBudgetDto budgetDto){
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         ResponseBudgetDto budget = budgetService.createBudget(user.getId(), budgetDto).toDto();
         return ResponseEntity.status(HttpStatus.CREATED).body(budget);
-    }
-
-    @DeleteMapping(value = "/budgets/{budgetId}")
-    public ResponseEntity deleteBudget(HttpSession session, @PathVariable @Positive long budgetId) {
-        UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        ResponseBudgetDto budget = this.budgetService.deleteBudget(budgetId, user.getId());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(budget);
     }
 
     @PutMapping(value = "/budgets/{budgetId}/amount")
@@ -91,10 +91,10 @@ public class BudgetController extends AbstractController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/budgets/references")
-    public ResponseEntity getBudgetReferences(HttpSession session, @RequestParam("export") boolean export) throws SQLException {
+    @DeleteMapping(value = "/budgets/{budgetId}")
+    public ResponseEntity deleteBudget(HttpSession session, @PathVariable @Positive long budgetId) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<BudgetService.BudgetStatistics> references = budgetService.getBudgetReferences(user.getId(), export);
-        return ResponseEntity.ok(references);
+        ResponseBudgetDto budget = this.budgetService.deleteBudget(budgetId, user.getId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(budget);
     }
 }

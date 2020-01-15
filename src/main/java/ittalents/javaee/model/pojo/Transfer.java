@@ -40,12 +40,14 @@ public class Transfer extends AbstractPojo<RequestTransferDto, ResponseTransferD
     @Column(name = "date", nullable = false, updatable = false)
     private Date date;
 
+    @Override
     public void fromDto(RequestTransferDto requestTransferDto) {
         this.currency = requestTransferDto.getCurrency();
         this.amount = requestTransferDto.getAmount();
         this.date = requestTransferDto.getDate();
     }
 
+    @Override
     public ResponseTransferDto toDto() {
         ResponseTransferDto responseTransferDto = new ResponseTransferDto();
         responseTransferDto.setId(id);

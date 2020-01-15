@@ -2,10 +2,8 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.PlannedPaymentDao;
-import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
 import ittalents.javaee.model.dto.ResponsePlannedPaymentDto;
-import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.PlannedPayment;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +18,19 @@ import java.util.List;
 @Service
 public class PlannedPaymentService {
 
-    @Autowired
-    private PlannedPaymentRepository paymentRepository;
+    private final PlannedPaymentRepository paymentRepository;
+    private final PlannedPaymentDao paymentDao;
+    private final AccountService accountService;
+    private final CategoryService categoryService;
 
     @Autowired
-    private PlannedPaymentDao paymentDao;
-
-    @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private CategoryService categoryService;
+    public PlannedPaymentService(PlannedPaymentRepository paymentRepository, PlannedPaymentDao paymentDao,
+                                 AccountService accountService, CategoryService categoryService) {
+        this.paymentRepository = paymentRepository;
+        this.paymentDao = paymentDao;
+        this.accountService = accountService;
+        this.categoryService = categoryService;
+    }
 
     public List<ResponsePlannedPaymentDto> getAllPlannedPaymentsByUserId(long userId, long accountId) throws SQLException {
         if (accountId == 0) {
@@ -54,10 +54,10 @@ public class PlannedPaymentService {
     }
 
     public ResponsePlannedPaymentDto editPayment(RequestPlannedPaymentDto paymentDto) {
-        if(LocalDate.of(1900, 1, 1).isAfter(paymentDto.getDate().toInstant()
+        if (LocalDate.of(1900, 1, 1).isAfter(paymentDto.getDate().toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate()) ||
-            LocalDate.of(2150, 1, 1).isBefore(paymentDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())){
+                LocalDate.of(2150, 1, 1).isBefore(paymentDto.getDate().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDate())) {
             throw new InvalidOperationException("Incorrect date! Please try again!");
         }
         PlannedPayment payment = new PlannedPayment();

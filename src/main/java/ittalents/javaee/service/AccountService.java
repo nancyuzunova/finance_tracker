@@ -33,19 +33,18 @@ public class AccountService {
     private TransactionService transactionService;
     private PlannedPaymentRepository paymentRepository;
     private CategoryService categoryService;
-
-    @Autowired
     private TransactionDao transactionDao;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
                           TransactionService transactionService, PlannedPaymentRepository paymentRepository,
-                          CategoryService categoryService) {
+                          CategoryService categoryService, TransactionDao transactionDao) {
         this.accountRepository = accountRepository;
         this.transferService = transferService;
         this.transactionService = transactionService;
         this.paymentRepository = paymentRepository;
         this.categoryService = categoryService;
+        this.transactionDao = transactionDao;
     }
 
     public List<AccountDto> getAllAccountsByUserId(long userId) {
@@ -75,14 +74,6 @@ public class AccountService {
         account.setBalance(convertedBalance);
         account.setCurrency(currency);
         return this.accountRepository.save(account);
-    }
-
-    @Transactional
-    public void deleteAccount(long accountId) throws SQLException {
-        this.transactionService.deleteTransactionByAccountId(accountId);
-        this.transferService.deleteTransferByAccountId(accountId);
-        this.paymentRepository.deleteByAccount_Id(accountId);
-        transactionDao.deleteAccountById(accountId);
     }
 
     public ResponseTransferDto makeTransfer(RequestTransferDto requestTransferDto) {
@@ -134,6 +125,26 @@ public class AccountService {
         return this.transactionService.createTransaction(requestTransactionDto);
     }
 
+    public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
+        if (requestPlannedPaymentDto.getDate().before(new Date())) {
+            throw new InvalidOperationException("You cannot make planned payments with past dates!");
+        }
+        if (LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())) {
+            throw new InvalidOperationException("Payment too far into the future! Please check!");
+        }
+        if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
+            throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
+        }
+        PlannedPayment plannedPayment = new PlannedPayment();
+        Account account = getAccountById(requestPlannedPaymentDto.getAccountId());
+        Category category = categoryService.getCategoryById(requestPlannedPaymentDto.getCategoryId());
+        plannedPayment.setAccount(account);
+        plannedPayment.setCategory(category);
+        plannedPayment.fromDto(requestPlannedPaymentDto);
+        return this.paymentRepository.save(plannedPayment).toDto();
+    }
+
     @Scheduled(cron = "0 0 * * * *")
     public void payPlannedPayments() {
         Date today = new Date();
@@ -173,23 +184,11 @@ public class AccountService {
         this.paymentRepository.save(payment);
     }
 
-    public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
-        if (requestPlannedPaymentDto.getDate().before(new Date())) {
-            throw new InvalidOperationException("You cannot make planned payments with past dates!");
-        }
-        if (LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())) {
-            throw new InvalidOperationException("Payment too far into the future! Please check!");
-        }
-        if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
-            throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
-        }
-        PlannedPayment plannedPayment = new PlannedPayment();
-        Account account = getAccountById(requestPlannedPaymentDto.getAccountId());
-        Category category = categoryService.getCategoryById(requestPlannedPaymentDto.getCategoryId());
-        plannedPayment.setAccount(account);
-        plannedPayment.setCategory(category);
-        plannedPayment.fromDto(requestPlannedPaymentDto);
-        return this.paymentRepository.save(plannedPayment).toDto();
+    @Transactional
+    public void deleteAccount(long accountId) throws SQLException {
+        this.transactionService.deleteTransactionByAccountId(accountId);
+        this.transferService.deleteTransferByAccountId(accountId);
+        this.paymentRepository.deleteByAccount_Id(accountId);
+        transactionDao.deleteAccountById(accountId);
     }
 }

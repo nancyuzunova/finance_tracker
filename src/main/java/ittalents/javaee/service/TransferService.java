@@ -48,5 +48,4 @@ public class TransferService {
     public void deleteTransferByAccountId(long accountId){
         transferRepository.deleteByToAccount_IdOrFromAccount_Id(accountId, accountId);
     }
-
 }

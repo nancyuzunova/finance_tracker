@@ -20,7 +20,8 @@ public class TransferDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private final String GET_LOGGED_USER_TRANSFERS = "SELECT t.id, t.amount, t.currency, t.date, t.from_account_id, t.to_account_id, " +
+    private final String GET_LOGGED_USER_TRANSFERS =
+            "SELECT t.id, t.amount, t.currency, t.date, t.from_account_id, t.to_account_id, " +
             "a.name AS from_name, a.balance AS from_balance, a.currency AS from_currency, " +
             "ac.name AS to_name, ac.balance AS to_balance, ac.currency AS to_currency  " +
             "FROM transfers AS t " +
