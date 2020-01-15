@@ -262,4 +262,8 @@ public class TransactionService {
         }
         ExporterToPdf.export(sb.toString(), "Transaction");
     }
+
+    public void deleteTransactionByAccountId(long accountId){
+        this.transactionRepository.deleteTransactionByAccount_Id(accountId);
+    }
 }

@@ -2,6 +2,7 @@ package ittalents.javaee.service;
 
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
+import ittalents.javaee.model.dao.TransactionDao;
 import ittalents.javaee.model.dto.*;
 import ittalents.javaee.model.mail.MailSender;
 import ittalents.javaee.model.pojo.*;
@@ -9,13 +10,11 @@ import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.repository.AccountRepository;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +33,9 @@ public class AccountService {
     private TransactionService transactionService;
     private PlannedPaymentRepository paymentRepository;
     private CategoryService categoryService;
+
+    @Autowired
+    private TransactionDao transactionDao;
 
     @Autowired
     public AccountService(AccountRepository accountRepository, TransferService transferService,
@@ -75,8 +77,12 @@ public class AccountService {
         return this.accountRepository.save(account);
     }
 
-    public void deleteAccount(long accountId) {
-        this.accountRepository.deleteById(accountId);
+    @Transactional
+    public void deleteAccount(long accountId) throws SQLException {
+        this.transactionService.deleteTransactionByAccountId(accountId);
+        this.transferService.deleteTransferByAccountId(accountId);
+        this.paymentRepository.deleteByAccount_Id(accountId);
+        transactionDao.deleteAccountById(accountId);
     }
 
     public ResponseTransferDto makeTransfer(RequestTransferDto requestTransferDto) {
@@ -86,8 +92,8 @@ public class AccountService {
         if (requestTransferDto.getDate().after(new Date())) {
             throw new InvalidOperationException("You cannot make future transfers!");
         }
-        if(LocalDate.of(1900, 1, 1).isAfter(requestTransferDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())){
+        if (LocalDate.of(1900, 1, 1).isAfter(requestTransferDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())) {
             throw new InvalidOperationException("Invalid date! Please try again!");
         }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
@@ -118,8 +124,8 @@ public class AccountService {
     }
 
     public ResponseTransactionDto makeTransaction(RequestTransactionDto requestTransactionDto) {
-        if(LocalDate.of(1900, 1, 1).isAfter(requestTransactionDto.getDate().toInstant()
-        .atZone(ZoneId.systemDefault()).toLocalDate())){
+        if (LocalDate.of(1900, 1, 1).isAfter(requestTransactionDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())) {
             throw new InvalidOperationException("Invalid date! Please try again!");
         }
         if (requestTransactionDto.getDate().after(new Date())) {
@@ -146,8 +152,7 @@ public class AccountService {
                     }
                 };
                 sender.start();
-            }
-            else {
+            } else {
                 pay(payment);
             }
         }
@@ -172,8 +177,8 @@ public class AccountService {
         if (requestPlannedPaymentDto.getDate().before(new Date())) {
             throw new InvalidOperationException("You cannot make planned payments with past dates!");
         }
-        if(LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
-            .atZone(ZoneId.systemDefault()).toLocalDate())){
+        if (LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate())) {
             throw new InvalidOperationException("Payment too far into the future! Please check!");
         }
         if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {

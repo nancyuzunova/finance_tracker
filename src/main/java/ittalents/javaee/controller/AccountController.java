@@ -52,7 +52,7 @@ public class AccountController extends AbstractController {
     }
 
     @DeleteMapping("/accounts/{accountId}")
-    public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) {
+    public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) throws SQLException {
         validateUserOwnership(session, accountId);
         this.accountService.deleteAccount(accountId);
         return ResponseEntity.noContent().build();

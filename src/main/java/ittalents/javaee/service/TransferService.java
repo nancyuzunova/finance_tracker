@@ -44,4 +44,9 @@ public class TransferService {
     public List<ResponseTransferDto> getAllTransfersForUser(long userId) throws SQLException {
         return transferDao.getLoggedUserTransfers(userId);
     }
+
+    public void deleteTransferByAccountId(long accountId){
+        transferRepository.deleteByToAccount_IdOrFromAccount_Id(accountId, accountId);
+    }
+
 }

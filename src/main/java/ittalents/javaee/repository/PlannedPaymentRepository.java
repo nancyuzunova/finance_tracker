@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface PlannedPaymentRepository extends JpaRepository<PlannedPayment, Long> {
 
+    void deleteByAccount_Id(long accountId);
+
     List<PlannedPayment> findAllByDateAndStatus(Date today, PlannedPayment.PaymentStatus status);
 
     List<PlannedPayment> findAllByAccountId(long accountId);

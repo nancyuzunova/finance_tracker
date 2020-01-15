@@ -11,6 +11,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -28,7 +30,7 @@ public class Account extends AbstractPojo<AccountDto, AccountDto> {
     @NotBlank
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
@@ -40,6 +42,9 @@ public class Account extends AbstractPojo<AccountDto, AccountDto> {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Currency currency;
+
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE, mappedBy = "account")
+    private List<Transaction> transactions;
 
     @Override
     public void fromDto(AccountDto dto) {
@@ -57,6 +62,7 @@ public class Account extends AbstractPojo<AccountDto, AccountDto> {
         accountDto.setName(name);
         accountDto.setBalance(balance);
         accountDto.setCurrency(currency);
+//        accountDto.setTransactions(transactions.stream().map(Transaction::toDto).collect(Collectors.toList()));
         return accountDto;
     }
 }

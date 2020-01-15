@@ -28,11 +28,11 @@ public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, Respo
     @NotNull
     private double amount;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 

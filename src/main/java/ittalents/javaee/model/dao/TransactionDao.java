@@ -115,7 +115,7 @@ public class TransactionDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-   @Getter
+    @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
@@ -137,8 +137,8 @@ public class TransactionDao {
 
     public List<TransactionService.TotalExpenseByDate> getAllTotalExpensesByDate(long id, Date from, Date to) throws SQLException {
         List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
-        try(    Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_ALL_EXPENSES_BY_DATES)){
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_ALL_EXPENSES_BY_DATES)) {
             statement.setLong(1, id);
             statement.setObject(2, from);
             statement.setObject(3, to);
@@ -154,8 +154,8 @@ public class TransactionDao {
 
     public List<StatisticEntity> getDailyTransactions(long id, Date from, Date to) throws SQLException {
         List<StatisticEntity> result = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_AND_INCOMES_BY_DAYS)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_AND_INCOMES_BY_DAYS)) {
             statement.setLong(1, id);
             statement.setObject(2, from);
             statement.setObject(3, to);
@@ -171,26 +171,26 @@ public class TransactionDao {
     }
 
     public List<TransactionService.TotalExpenseByDate> getTotalExpensesByDateFromAccount(long accountId, Date from, Date to) throws SQLException {
-         List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
-         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_DATES_FROM_ACCOUNT)){
-             statement.setLong(1, accountId);
-             statement.setObject(2, from);
-             statement.setObject(3, to);
-             ResultSet rows = statement.executeQuery();
-             while(rows.next()){
-                 result.add(new TransactionService.TotalExpenseByDate(rows.getDouble("total"),
-                         Currency.valueOf(rows.getString("currency")), createCategoryDto(rows)));
-             }
-             rows.close();
-         }
-         return result;
+        List<TransactionService.TotalExpenseByDate> result = new ArrayList<>();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_DATES_FROM_ACCOUNT)) {
+            statement.setLong(1, accountId);
+            statement.setObject(2, from);
+            statement.setObject(3, to);
+            ResultSet rows = statement.executeQuery();
+            while (rows.next()) {
+                result.add(new TransactionService.TotalExpenseByDate(rows.getDouble("total"),
+                        Currency.valueOf(rows.getString("currency")), createCategoryDto(rows)));
+            }
+            rows.close();
+        }
+        return result;
     }
 
     public List<ResponseTransactionDto> getMyTransactions(long userId) throws SQLException {
         List<ResponseTransactionDto> responseTransactionDtos = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS)) {
             statement.setLong(1, userId);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
@@ -206,8 +206,8 @@ public class TransactionDao {
 
     public List<ResponseTransactionDto> getAllTransactionsByType(long userId, Type type) throws SQLException {
         List<ResponseTransactionDto> response = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS_BY_TYPE)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_MY_TRANSACTIONS_BY_TYPE)) {
             statement.setLong(1, userId);
             statement.setString(2, type.toString());
             ResultSet result = statement.executeQuery();
@@ -224,8 +224,8 @@ public class TransactionDao {
 
     public List<ResponseTransactionDto> getTransactionsByDescription(long userId, String filter) throws SQLException {
         List<ResponseTransactionDto> transactions = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_TRANSACTIONS_BY_DESCRIPTION)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_TRANSACTIONS_BY_DESCRIPTION)) {
             statement.setLong(1, userId);
             statement.setString(2, "%" + filter + "%");
             ResultSet result = statement.executeQuery();
@@ -242,8 +242,8 @@ public class TransactionDao {
 
     public List<ExpensesByCategoryAndAccount> getExpensesByCategoryAndAccountId(long accountId) throws SQLException {
         List<ExpensesByCategoryAndAccount> expenses = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_AND_ACCOUNT_ID)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_AND_ACCOUNT_ID)) {
             statement.setLong(1, accountId);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
@@ -261,8 +261,8 @@ public class TransactionDao {
 
     public List<ExpensesByCategoryAndAccount> getExpensesByCategoryForAllAccounts(long userId) throws SQLException {
         List<ExpensesByCategoryAndAccount> expenses = new ArrayList<>();
-        try (   Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_ALL_ACCOUNTS)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_EXPENSES_BY_CATEGORY_ALL_ACCOUNTS)) {
             statement.setLong(1, userId);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
@@ -280,13 +280,13 @@ public class TransactionDao {
 
     public List<ResponseTransactionDto> getTransactionsByPeriod(long id, Date from, Date to) throws SQLException {
         List<ResponseTransactionDto> transactions = new ArrayList<>();
-        try(    Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_ALL_TRANSACTIONS_BY_PERIOD)){
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_ALL_TRANSACTIONS_BY_PERIOD)) {
             statement.setLong(1, id);
             statement.setObject(2, from);
             statement.setObject(3, to);
             ResultSet result = statement.executeQuery();
-            while(result.next()){
+            while (result.next()) {
                 ResponseTransactionDto transactionDto = createResponseTransactionDto(result);
                 transactionDto.setAccount(createAccountDto(result));
                 transactionDto.setCategory(createCategoryDto(result));
@@ -342,5 +342,15 @@ public class TransactionDao {
         category.setType(Type.valueOf(result.getString("cat_type")));
         category.setIconURL(result.getString("iconurl"));
         return category;
+    }
+
+    public void deleteAccountById(long accountId) throws SQLException {
+        String sql = "DELETE FROM accounts WHERE id = ?";
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, accountId);
+            ps.executeUpdate();
+        }
     }
 }

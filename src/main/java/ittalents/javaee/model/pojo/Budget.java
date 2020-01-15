@@ -28,7 +28,7 @@ public class Budget extends AbstractPojo<RequestBudgetDto, ResponseBudgetDto> {
     @Column(name = "to_date", nullable = false)
     private Date toDate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private Category category;
 
