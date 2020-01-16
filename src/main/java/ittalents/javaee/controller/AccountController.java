@@ -81,6 +81,6 @@ public class AccountController extends AbstractController {
         validateUserOwnership(session, accountId);
         AccountDto accountToBeDeleted = accountService.getAccountById(accountId).toDto();
         this.accountService.deleteAccount(accountId);
-        return ResponseEntity.ok(accountToBeDeleted);git s
+        return ResponseEntity.ok(accountToBeDeleted);
     }
 }
