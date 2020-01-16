@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @EnableScheduling
@@ -25,7 +26,7 @@ public class MailRemainder {
 
     @Scheduled(cron = "0 0 * * * *")
     public void sendEmailToRemain() {
-        for (User user : userService.getInactiveUsers(LocalDate.now().plusDays(DAYS_TO_SUBTRACT))) {
+        for (User user : userService.getInactiveUsers(LocalDateTime.now().minusDays(DAYS_TO_SUBTRACT))) {
             Thread thread = new Thread(){
                 @Override
                 public void run() {

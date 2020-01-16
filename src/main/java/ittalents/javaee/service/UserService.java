@@ -99,7 +99,7 @@ public class UserService {
         throw new AuthorizationException("User could NOT be found. Please check your credentials");
     }
 
-    public List<User> getInactiveUsers(LocalDate date) {
+    public List<User> getInactiveUsers(LocalDateTime date) {
         return this.userRepository.findAllByLastLoginBefore(date);
     }
 
