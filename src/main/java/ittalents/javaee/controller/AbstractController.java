@@ -1,6 +1,5 @@
 package ittalents.javaee.controller;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ittalents.javaee.exceptions.ApiError;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
@@ -9,7 +8,6 @@ import ittalents.javaee.model.dto.AccountDto;
 import ittalents.javaee.model.dto.UserDto;
 import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,14 +68,6 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String msg = "Invalid input data! Please check!";
         ApiError error = new ApiError(msg, LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
-        return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidFormatException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException e) {
-        ApiError error = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
-                e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
