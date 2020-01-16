@@ -45,6 +45,7 @@ public class Budget extends AbstractPojo<RequestBudgetDto, ResponseBudgetDto> {
 
     private String title;
 
+    @Override
     public void fromDto(RequestBudgetDto dto) {
         this.amount = dto.getAmount();
         this.fromDate = dto.getFromDate();
@@ -53,6 +54,7 @@ public class Budget extends AbstractPojo<RequestBudgetDto, ResponseBudgetDto> {
         this.currency = dto.getCurrency();
     }
 
+    @Override
     public ResponseBudgetDto toDto() {
         ResponseBudgetDto dto = new ResponseBudgetDto();
         dto.setId(id);

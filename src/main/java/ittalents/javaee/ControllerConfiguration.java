@@ -17,6 +17,7 @@ public class ControllerConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(interceptor).excludePathPatterns("resources/static/icons/").excludePathPatterns("/users/register", "/users/login");
+        registry.addInterceptor(interceptor).excludePathPatterns("resources/static/icons/")
+                .excludePathPatterns("/users/register", "/users/login");
     }
 }

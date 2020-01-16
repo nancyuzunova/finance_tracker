@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Date;
@@ -47,6 +46,7 @@ public class Transaction extends AbstractPojo<RequestTransactionDto, ResponseTra
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
+    @Override
     public void fromDto(RequestTransactionDto requestTransactionDto) {
         this.type = requestTransactionDto.getType();
         this.amount = requestTransactionDto.getAmount();
@@ -55,6 +55,7 @@ public class Transaction extends AbstractPojo<RequestTransactionDto, ResponseTra
         this.description = requestTransactionDto.getDescription();
     }
 
+    @Override
     public ResponseTransactionDto toDto() {
         ResponseTransactionDto responseTransactionDto = new ResponseTransactionDto();
         responseTransactionDto.setId(id);

@@ -1,5 +1,6 @@
 package ittalents.javaee.controller;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ittalents.javaee.exceptions.ApiError;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
@@ -72,9 +73,9 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ConversionFailedException.class)
+    @ExceptionHandler(InvalidFormatException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity<Object> handleEnumFails(Exception e){
+    protected ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException e) {
         ApiError error = new ApiError(e.getMessage(), LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
                 e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -88,7 +89,7 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
     }
 
     private boolean isLoggedUserOwner(long userId, long accountId) {
-        if(accountId == 0){
+        if (accountId == 0) {
             return true;
         }
         for (AccountDto account : accountService.getAllAccountsByUserId(userId)) {

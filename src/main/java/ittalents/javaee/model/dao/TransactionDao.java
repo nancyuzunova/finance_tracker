@@ -315,6 +315,16 @@ public class TransactionDao {
         return transactions;
     }
 
+    public void deleteAccountById(long accountId) throws SQLException {
+        String sql = "DELETE FROM accounts WHERE id = ?";
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, accountId);
+            ps.executeUpdate();
+        }
+    }
+
     private ResponseTransactionDto createResponseTransactionDto(ResultSet result) throws SQLException {
         ResponseTransactionDto transaction = new ResponseTransactionDto();
         transaction.setId(result.getLong("id"));
@@ -342,15 +352,5 @@ public class TransactionDao {
         category.setType(Type.valueOf(result.getString("cat_type")));
         category.setIconURL(result.getString("iconurl"));
         return category;
-    }
-
-    public void deleteAccountById(long accountId) throws SQLException {
-        String sql = "DELETE FROM accounts WHERE id = ?";
-        try (
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, accountId);
-            ps.executeUpdate();
-        }
     }
 }

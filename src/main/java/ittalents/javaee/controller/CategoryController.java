@@ -28,16 +28,16 @@ public class CategoryController extends AbstractController{
         return ResponseEntity.ok(categories);
     }
 
+    @GetMapping("/categories/{id}/icons")
+    public ResponseEntity getCategoryIcons(@PathVariable @Positive long id) throws SQLException {
+        List<String> iconUrls = this.categoryService.getCategoryIcons(id);
+        return ResponseEntity.ok(iconUrls);
+    }
+
     @PutMapping("/categories/{categoryId}/{iconId}")
     public ResponseEntity changeCategoryIcon(@PathVariable("categoryId") @Positive long categoryId,
                                    @PathVariable("iconId") @Positive long iconId) throws SQLException {
         categoryService.changeCategoryIcon(categoryId, iconId);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/categories/{id}/icons")
-    public ResponseEntity getCategoryIcons(@PathVariable @Positive long id) throws SQLException {
-        List<String> iconUrls = this.categoryService.getCategoryIcons(id);
-        return ResponseEntity.ok(iconUrls);
     }
 }

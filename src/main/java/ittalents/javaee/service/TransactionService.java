@@ -252,6 +252,10 @@ public class TransactionService {
         return transactionDao.getTransactionsByCategory(userId, category);
     }
 
+    public void deleteTransactionByAccountId(long accountId){
+        this.transactionRepository.deleteTransactionByAccount_Id(accountId);
+    }
+
     private void prepareDailyStatisticForExporting(List<ExpenseIncomeEntity> references) {
         StringBuilder sb = new StringBuilder();
         for (ExpenseIncomeEntity reference : references) {
@@ -261,9 +265,5 @@ public class TransactionService {
             sb.append("---------------------------------------------------").append(System.lineSeparator());
         }
         ExporterToPdf.export(sb.toString(), "Transaction");
-    }
-
-    public void deleteTransactionByAccountId(long accountId){
-        this.transactionRepository.deleteTransactionByAccount_Id(accountId);
     }
 }

@@ -41,6 +41,7 @@ public class User extends AbstractPojo<UserDto, UserDto> {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private List<Account> accounts = new ArrayList<>();
 
+    @Override
     public void fromDto(UserDto userDto) {
         this.firstName = userDto.getFirstName();
         this.lastName = userDto.getLastName();
@@ -55,6 +56,7 @@ public class User extends AbstractPojo<UserDto, UserDto> {
         }
     }
 
+    @Override
     public UserDto toDto() {
         UserDto userDto = new UserDto();
         userDto.setId(id);

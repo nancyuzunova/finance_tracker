@@ -53,12 +53,14 @@ public class Category extends AbstractPojo<CategoryDto, CategoryDto> {
         this.type = name.getType();
     }
 
+    @Override
     public void fromDto(CategoryDto categoryDto) {
         this.name = categoryDto.getCategoryName();
         this.iconURL = categoryDto.getIconURL();
         this.type = name.getType();
     }
 
+    @Override
     public CategoryDto toDto() {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(id);

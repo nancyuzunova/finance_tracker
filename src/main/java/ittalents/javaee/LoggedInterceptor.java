@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 public class LoggedInterceptor extends HandlerInterceptorAdapter {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         HttpSession session = request.getSession();
         if (!SessionManager.validateLogged(session)) {
             throw new AuthorizationException("You must log in!");
