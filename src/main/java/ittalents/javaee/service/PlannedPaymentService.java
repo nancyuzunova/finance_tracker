@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.PlannedPaymentDao;
 import ittalents.javaee.model.dto.RequestPlannedPaymentDto;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlannedPaymentService {
@@ -65,5 +67,13 @@ public class PlannedPaymentService {
         payment.setAccount(accountService.getAccountById(paymentDto.getAccountId()));
         payment.setCategory(categoryService.getCategoryById(paymentDto.getCategoryId()));
         return paymentRepository.save(payment).toDto();
+    }
+
+    public PlannedPayment getPaymentById(long id) {
+        Optional<PlannedPayment> x = this.paymentRepository.findById(id);
+        if(x.isPresent()){
+            return x.get();
+        }
+        throw new ElementNotFoundException("Planned payment NOT found!");
     }
 }

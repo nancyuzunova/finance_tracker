@@ -48,7 +48,7 @@ public class Account extends AbstractPojo<AccountDto, AccountDto> {
     @Override
     public void fromDto(AccountDto dto) {
         this.balance = dto.getBalance();
-        this.name = dto.getName();
+        this.name = dto.getName().trim();
         if (dto.getCurrency() != null) {
             this.currency = dto.getCurrency();
         }

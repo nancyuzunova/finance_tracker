@@ -1,6 +1,7 @@
 package ittalents.javaee.controller;
 
 import ittalents.javaee.model.dto.*;
+import ittalents.javaee.model.pojo.Account;
 import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,8 @@ public class AccountController extends AbstractController {
     @DeleteMapping("/accounts/{accountId}")
     public ResponseEntity deleteAccount(HttpSession session, @PathVariable @Positive long accountId) throws SQLException {
         validateUserOwnership(session, accountId);
+        AccountDto accountToBeDeleted = accountService.getAccountById(accountId).toDto();
         this.accountService.deleteAccount(accountId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(accountToBeDeleted);git s
     }
 }

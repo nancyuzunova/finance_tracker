@@ -46,7 +46,8 @@ public class PlannedPaymentController extends AbstractController {
     @DeleteMapping("/plannedPayments/{id}")
     public ResponseEntity deletePlannedPayment(HttpSession session, @PathVariable long id) throws SQLException {
         UserDto dto = (UserDto) session.getAttribute(SessionManager.LOGGED);
+        ResponsePlannedPaymentDto plannedPaymentDto = plannedPaymentService.getPaymentById(id).toDto();
         plannedPaymentService.deletePlannedPayment(dto.getId(), id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(plannedPaymentDto);
     }
 }
