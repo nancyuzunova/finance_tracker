@@ -1,5 +1,6 @@
 package ittalents.javaee.model.dto;
 
+import ittalents.javaee.model.pojo.Currency;
 import ittalents.javaee.model.pojo.PlannedPayment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,10 @@ public class ResponsePlannedPaymentDto extends AbstractDto {
     @NotNull
     @Positive
     private double amount;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     @NotNull
     private AccountDto account;

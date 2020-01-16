@@ -19,13 +19,15 @@ import java.util.List;
 @Component
 public class PlannedPaymentDao {
 
-    private static final String GET_ALL_PLANNED_PAYMENTS = "SELECT p.id, p.title, p.amount, p.status, p.date, " +
+    private static final String GET_ALL_PLANNED_PAYMENTS =
+            "SELECT p.id, p.title, p.amount, p.status, p.date, p.currency AS pp_currency, " +
             "a.id AS account_id, a.name, a.balance, a.currency " +
             "FROM planned_payments AS p " +
             "JOIN accounts AS a ON p.account_id = a.id " +
             "WHERE a.user_id = ?;";
 
-    private static final String GET_PLANNED_PAYMENTS_BY_STATUS = "SELECT p.id, p.title, p.amount, p.status, p.date, " +
+    private static final String GET_PLANNED_PAYMENTS_BY_STATUS =
+            "SELECT p.id, p.title, p.amount, p.status, p.date, p.currency AS pp_currency,  " +
             "a.id AS account_id, a.name, a.balance, a.currency " +
             "FROM planned_payments AS p " +
             "JOIN accounts AS a ON p.account_id = a.id " +
@@ -48,6 +50,7 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setStatus(PlannedPayment.PaymentStatus.valueOf(rows.getString("status")));
                 responsePlannedPaymentDto.setDate(rows.getDate("date"));
                 responsePlannedPaymentDto.setAmount(rows.getDouble("amount"));
+                responsePlannedPaymentDto.setCurrency(Currency.valueOf(rows.getString("pp_currency")));
                 responsePlannedPaymentDto.setTitle(rows.getString("title"));
                 responsePlannedPaymentDto.setAccount(createAccountDto(rows));
                 paymentDtos.add(responsePlannedPaymentDto);
@@ -70,6 +73,7 @@ public class PlannedPaymentDao {
                 responsePlannedPaymentDto.setStatus(status);
                 responsePlannedPaymentDto.setDate(rows.getDate("date"));
                 responsePlannedPaymentDto.setAmount(rows.getDouble("amount"));
+                responsePlannedPaymentDto.setCurrency(Currency.valueOf(rows.getString("pp_currency")));
                 responsePlannedPaymentDto.setTitle(rows.getString("title"));
                 responsePlannedPaymentDto.setAccount(createAccountDto(rows));
                 paymentDtos.add(responsePlannedPaymentDto);

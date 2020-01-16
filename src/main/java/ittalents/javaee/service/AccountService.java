@@ -174,7 +174,7 @@ public class AccountService {
         RequestTransactionDto transaction = new RequestTransactionDto();
         transaction.setAccountId(payment.getAccount().getId());
         transaction.setAmount(payment.getAmount());
-        transaction.setCurrency(payment.getAccount().getCurrency());
+        transaction.setCurrency(payment.getCurrency());
         transaction.setCategoryId(payment.getCategory().getId());
         transaction.setDate(payment.getDate());
         transaction.setType(Type.EXPENSE);

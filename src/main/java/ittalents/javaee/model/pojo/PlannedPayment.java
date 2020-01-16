@@ -28,6 +28,10 @@ public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, Respo
     @NotNull
     private double amount;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
+
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
@@ -48,6 +52,7 @@ public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, Respo
     @Override
     public void fromDto(RequestPlannedPaymentDto dto) {
         this.amount = dto.getAmount();
+        this.currency = dto.getCurrency();
         this.title = dto.getTitle();
         this.date = dto.getDate();
         this.status = PaymentStatus.ACTIVE;
@@ -59,6 +64,7 @@ public class PlannedPayment extends AbstractPojo<RequestPlannedPaymentDto, Respo
         responseDto.setId(id);
         responseDto.setTitle(title);
         responseDto.setAmount(amount);
+        responseDto.setCurrency(currency);
         responseDto.setAccount(account.toDto());
         responseDto.setCategory(category.toDto());
         responseDto.setDate(date);
