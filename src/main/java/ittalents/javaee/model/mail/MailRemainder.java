@@ -26,8 +26,12 @@ public class MailRemainder {
     @Scheduled(cron = "0 0 * * * *")
     public void sendEmailToRemain() {
         for (User user : userService.getInactiveUsers(LocalDate.now().plusDays(DAYS_TO_SUBTRACT))) {
-            System.out.println(user.getEmail());
-            MailSender.sendMail(user.getEmail(), subject, body);
+            Thread thread = new Thread(){
+                @Override
+                public void run() {
+                    MailSender.sendMail(user.getEmail(), subject, body);
+                }
+            };
         }
     }
 }
