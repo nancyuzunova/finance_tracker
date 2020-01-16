@@ -19,18 +19,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
 
 @Service
 public class TransactionService {
 
+    @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Setter
     public
     class ExpenseIncomeEntity {
-        private Date date;
         private double expense;
         private double income;
     }
@@ -129,36 +131,37 @@ public class TransactionService {
         return transactionDao.getAllTransactionsByType(userId, type);
     }
 
-    public List<ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to, boolean export) throws SQLException {
+    public Map<LocalDate, ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to, boolean export) throws SQLException {
         if (from.after(to)) {
             throw new InvalidOperationException("Incorrect input dates. Please, check again!");
         }
         List<TransactionDao.StatisticEntity> entities = transactionDao.getDailyTransactions(id, from, to);
-        List<Date> dates = new ArrayList<>();
-        for (TransactionDao.StatisticEntity entity : entities) {
-            dates.add(entity.getDate());
-        }
-        List<ExpenseIncomeEntity> result = new ArrayList<>();
+        Map<LocalDate, List<ExpenseIncomeEntity>> map = new TreeMap<>();
         for (int i = 0; i < entities.size(); i++) {
-            TransactionDao.StatisticEntity e = entities.get(i);
-            ExpenseIncomeEntity entity = new ExpenseIncomeEntity();
-            entity.setDate(e.getDate());
-            int occurrences = Collections.frequency(dates, e.getDate());
-            if (occurrences > 1) {
-                entity.setExpense(entities.get(i).getTotal());
-                entity.setIncome(entities.get(i + 1).getTotal());
-                i++;
-            } else {
-                if (e.getType().equals(Type.INCOME) && e.getTotal() != 0) {
-                    entity.setIncome(e.getTotal());
-                }
-                if (e.getType().equals(Type.EXPENSE) && e.getTotal() != 0) {
-                    entity.setExpense(e.getTotal());
-                }
+            if(!map.containsKey(entities.get(i).getDate())){
+                map.put(entities.get(i).getDate(), new ArrayList<>());
             }
-            result.add(entity);
+            ExpenseIncomeEntity row = new ExpenseIncomeEntity();
+            double total = CurrencyConverter.convert(entities.get(i).getCurrency(), Currency.BGN, entities.get(i).getTotal());
+            if(entities.get(i).getType().equals(Type.EXPENSE)){
+                row.setExpense(total);
+            }
+            if(entities.get(i).getType().equals(Type.INCOME)){
+                row.setIncome(total);
+            }
+            map.get(entities.get(i).getDate()).add(row);
         }
-        if (export) {
+        Map<LocalDate, ExpenseIncomeEntity> result = new TreeMap<>();
+        for (Map.Entry<LocalDate, List<ExpenseIncomeEntity>> entry : map.entrySet()) {
+            double totalExpenseInBGN = 0;
+            double totalIncomeInBGN = 0;
+            for(ExpenseIncomeEntity t : entry.getValue()){
+                totalExpenseInBGN += t.getExpense();
+                totalIncomeInBGN += t.getIncome();
+            }
+            result.put(entry.getKey(), new ExpenseIncomeEntity(totalExpenseInBGN, totalIncomeInBGN));
+        }
+        if(export){
             prepareDailyStatisticForExporting(result);
         }
         return result;
@@ -256,12 +259,12 @@ public class TransactionService {
         this.transactionRepository.deleteTransactionByAccount_Id(accountId);
     }
 
-    private void prepareDailyStatisticForExporting(List<ExpenseIncomeEntity> references) {
+    private void prepareDailyStatisticForExporting(Map<LocalDate, ExpenseIncomeEntity> references) {
         StringBuilder sb = new StringBuilder();
-        for (ExpenseIncomeEntity reference : references) {
-            sb.append("Date: " + reference.getDate()).append(System.lineSeparator());
-            sb.append("Expense: " + reference.getExpense()).append(" " + Currency.BGN).append(System.lineSeparator());
-            sb.append("Income: " + reference.getIncome()).append(" " + Currency.BGN).append(System.lineSeparator());
+        for (Map.Entry<LocalDate, ExpenseIncomeEntity> reference : references.entrySet()) {
+            sb.append("Date: " + reference.getKey()).append(System.lineSeparator());
+            sb.append("Expense: " + reference.getValue().getExpense()).append(" " + Currency.BGN).append(System.lineSeparator());
+            sb.append("Income: " + reference.getValue().getIncome()).append(" " + Currency.BGN).append(System.lineSeparator());
             sb.append("---------------------------------------------------").append(System.lineSeparator());
         }
         ExporterToPdf.export(sb.toString(), "Transaction");

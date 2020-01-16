@@ -19,16 +19,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 @Component
 public class TransactionDao {
 
-    private static final String GET_EXPENSES_AND_INCOMES_BY_DAYS = "SELECT t.date, t. type, SUM(t.amount) AS total " +
+    private static final String GET_EXPENSES_AND_INCOMES_BY_DAYS = "SELECT t.date, t. type, SUM(t.amount) AS total, t.currency " +
             "FROM transactions AS t " +
             "JOIN accounts AS a ON t.account_id = a.id " +
             "WHERE a.user_id = ? AND t.date BETWEEN ? AND ? " +
-            "GROUP BY t.date, t.type " +
+            "GROUP BY t.date, t.type, t.currency " +
             "ORDER BY t.date";
 
     private static final String GET_MY_TRANSACTIONS = "SELECT t.id, t.amount, t.currency, t.type, t.description, t.date, " +
@@ -130,9 +131,10 @@ public class TransactionDao {
     @Setter
     public
     class StatisticEntity {
-        private Date date;
+        private LocalDate date;
         private Type type;
         private double total;
+        private Currency currency;
     }
 
     public List<TransactionService.TotalExpenseByDate> getAllTotalExpensesByDate(long id, Date from, Date to) throws SQLException {
@@ -161,8 +163,9 @@ public class TransactionDao {
             statement.setObject(3, to);
             ResultSet set = statement.executeQuery();
             while (set.next()) {
-                StatisticEntity entity = new StatisticEntity(set.getDate("date"),
-                        Type.valueOf(set.getString("type")), set.getDouble("total"));
+                StatisticEntity entity = new StatisticEntity(set.getTimestamp("date").toLocalDateTime().toLocalDate(),
+                        Type.valueOf(set.getString("type")), set.getDouble("total"),
+                        Currency.valueOf(set.getString("currency")));
                 result.add(entity);
             }
             set.close();

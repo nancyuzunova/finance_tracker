@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Validated
@@ -55,7 +57,7 @@ public class TransactionController extends AbstractController {
                                        @RequestParam("export") boolean export)
             throws SQLException {
         UserDto userDto = (UserDto) session.getAttribute(SessionManager.LOGGED);
-        List<TransactionService.ExpenseIncomeEntity> statisticsPerDay =
+        Map<LocalDate, TransactionService.ExpenseIncomeEntity> statisticsPerDay =
                 transactionService.getDailyStatistics(userDto.getId(), from, to, export);
         return ResponseEntity.ok(statisticsPerDay);
     }
