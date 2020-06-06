@@ -7,10 +7,14 @@ import java.util.Date;
 public class Util {
 
     private static final String PLACEHOLDER = "%@";
-    public static final String NOT_EXISTING_ACCOUNT = "Account with id = %@ does not exist!";
+    public static final String NOT_EXISTING_ACCOUNT = "Account with id = %@ does NOT exist!";
+    public static final String NOT_EXISTING_BUDGET = "Budget with id = %@ does NOT exist!";
+    public static final String FOREIGN_BUDGET_OPERATION = "You can %@ only your own budgets!";
     public static final String DUPLICATED_ACCOUNT = "You cannot make transfer to the same account!";
     public static final String FUTURE_OPERATION = "You cannot make future %@!";
     public static final String INVALID_DATE = "Invalid date! Please try again!";
+    public static final String INVALID_DATE_RANGE = "Date range not valid! Please try again!";
+    public static final String INCORRECT_DATES = "Inappropriate dates! Please enter correct dates!";
     public static final String TRANSFER_TO_OTHER_USER = "You can not make transfer to other users!";
     public static final String NOT_ENOUGH_BALANCE = "Not enough balance!";
     public static final String PAST_PLANNED_PAYMENTS = "You cannot make planned payments with past dates!";

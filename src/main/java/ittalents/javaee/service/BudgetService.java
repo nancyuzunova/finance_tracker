@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
@@ -12,10 +13,7 @@ import ittalents.javaee.repository.BudgetRepository;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -61,27 +59,23 @@ public class BudgetService {
         if (budget.isPresent()) {
             return budget.get();
         }
-        throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist!");
+        throw new ElementNotFoundException(Util.replacePlaceholder(budgetId, Util.NOT_EXISTING_BUDGET));
     }
 
     public ResponseBudgetDto deleteBudget(long budgetId, long userId) {
         Optional<Budget> budgetOptional = budgetRepository.findById(budgetId);
         if (!budgetOptional.isPresent()) {
-            throw new ElementNotFoundException("Budget with id " + budgetId + " does NOT exist!");
+            throw new ElementNotFoundException(Util.replacePlaceholder(budgetId, Util.NOT_EXISTING_BUDGET));
         }
         Budget budget = budgetOptional.get();
-        if (budget.getOwner().getId() != userId) {
-            throw new InvalidOperationException("You can delete only your own budgets!");
-        }
+        validateOwnership(userId, budget, "delete");
         this.budgetRepository.deleteById(budgetId);
         return budget.toDto();
     }
 
     public Budget changeBudgetAmount(long budgetId, long userId, double amount) {
         Budget budget = getBudgetById(budgetId);
-        if (budget.getOwner().getId() != userId) {
-            throw new InvalidOperationException("You can edit only your own budgets!");
-        }
+        validateOwnership(userId, budget, "edit");
         budget.setAmount(amount);
         return this.budgetRepository.save(budget);
     }
@@ -100,32 +94,26 @@ public class BudgetService {
 
     public Budget changeBudgetCategory(long budgetId, long userId, long categoryId) {
         Budget budget = getBudgetById(budgetId);
-        if (budget.getOwner().getId() != userId) {
-            throw new InvalidOperationException("You can edit only your own budgets!");
-        }
+        validateOwnership(userId, budget, "edit");
         Category category = categoryService.getCategoryById(categoryId);
         budget.setCategory(category);
         return this.budgetRepository.save(budget);
     }
 
     public Budget changeTitle(long budgetId, long userId, String newTitle) {
-        Budget b = getBudgetById(budgetId);
-        if (b.getOwner().getId() != userId) {
-            throw new InvalidOperationException("You can edit only your own budgets!");
-        }
-        b.setTitle(newTitle);
-        return this.budgetRepository.save(b);
+        Budget budget = getBudgetById(budgetId);
+        validateOwnership(userId, budget, "edit");
+        budget.setTitle(newTitle);
+        return this.budgetRepository.save(budget);
     }
 
     public Budget changePeriod(long budgetId, long userId, Date from, Date to) {
         validateDates(from, to);
-        Budget b = getBudgetById(budgetId);
-        if (b.getOwner().getId() != userId) {
-            throw new InvalidOperationException("You can edit only your own budgets!");
-        }
-        b.setFromDate(from);
-        b.setToDate(to);
-        return this.budgetRepository.save(b);
+        Budget budget = getBudgetById(budgetId);
+        validateOwnership(userId, budget, "edit");
+        budget.setFromDate(from);
+        budget.setToDate(to);
+        return this.budgetRepository.save(budget);
     }
 
     public List<BudgetStatistics> getBudgetReferences(long userId, boolean export) throws SQLException {
@@ -163,6 +151,12 @@ public class BudgetService {
         return result;
     }
 
+    private void validateOwnership(long userId, Budget budget, String operation) {
+        if (budget.getOwner().getId() != userId) {
+            throw new InvalidOperationException(Util.replacePlaceholder(operation, Util.FOREIGN_BUDGET_OPERATION));
+        }
+    }
+
     private void prepareReferenceForExporting(List<BudgetStatistics> references) {
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= references.size(); i++) {
@@ -179,18 +173,18 @@ public class BudgetService {
 
     private void validateDates(Date fromDate, Date toDate) {
         if (fromDate.after(toDate)) {
-            throw new InvalidOperationException("Date range not valid! Please try again!");
+            throw new InvalidOperationException(Util.INVALID_DATE_RANGE);
         }
-        boolean isTooPastFromDate = LocalDate.of(1900, 1, 1)
-                .isAfter(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        boolean isTooPastToDate = LocalDate.of(1900, 1, 1)
-                .isAfter(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        boolean isTooFutureFromDate = LocalDate.of(2150, 1, 1)
-                .isBefore(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        boolean isTooFutureToDate = LocalDate.of(2150, 1, 1)
-                .isBefore(toDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        boolean isTooPastFromDate = Util.MIN_DATE
+                .isAfter(Util.getConvertedDate(fromDate));
+        boolean isTooPastToDate = Util.MIN_DATE
+                .isAfter(Util.getConvertedDate(toDate));
+        boolean isTooFutureFromDate = Util.MAX_DATE
+                .isBefore(Util.getConvertedDate(fromDate));
+        boolean isTooFutureToDate = Util.MAX_DATE
+                .isBefore(Util.getConvertedDate(toDate));
         if (isTooPastFromDate || isTooPastToDate || isTooFutureFromDate || isTooFutureToDate) {
-            throw new InvalidOperationException("Inappropriate dates! Please enter correct dates!");
+            throw new InvalidOperationException(Util.INCORRECT_DATES);
         }
     }
 }
