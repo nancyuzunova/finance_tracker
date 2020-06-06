@@ -60,11 +60,11 @@ public class AccountService {
     }
 
     public AccountDto createAccount(User user, AccountDto accountDto) {
-        Account a = new Account();
-        a.fromDto(accountDto);
-        a.setCreatedOn(LocalDateTime.now());
-        a.setUser(user);
-        return this.accountRepository.save(a).toDto();
+        Account account = new Account();
+        account.fromDto(accountDto);
+        account.setCreatedOn(LocalDateTime.now());
+        account.setUser(user);
+        return this.accountRepository.save(account).toDto();
     }
 
     public Account changeAccountCurrency(long accountId, Currency currency) {
@@ -93,12 +93,12 @@ public class AccountService {
             throw new InvalidOperationException("You can not make transfer to other users!");
         }
         double amount = requestTransferDto.getAmount();
-        double fromAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountFrom.getCurrency(), amount);
-        double toAmount = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountTo.getCurrency(), amount);
-        if (accountFrom.getBalance() >= fromAmount) {
+        double amountInSenderCurrency = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountFrom.getCurrency(), amount);
+        double amountInReceiverCurrency = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountTo.getCurrency(), amount);
+        if (accountFrom.getBalance() >= amountInSenderCurrency) {
             // make transfer
-            accountFrom.setBalance(accountFrom.getBalance() - fromAmount);
-            accountTo.setBalance(accountTo.getBalance() + toAmount);
+            accountFrom.setBalance(accountFrom.getBalance() - amountInSenderCurrency);
+            accountTo.setBalance(accountTo.getBalance() + amountInReceiverCurrency);
             this.accountRepository.save(accountFrom);
             this.accountRepository.save(accountTo);
             return this.transferService.createTransfer(accountFrom, accountTo, requestTransferDto);
