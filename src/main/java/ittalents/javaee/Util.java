@@ -7,8 +7,8 @@ import java.util.Date;
 public class Util {
 
     private static final String PLACEHOLDER = "%@";
-    public static final String NOT_EXISTING_ACCOUNT = "Account with id = %@ does NOT exist!";
-    public static final String NOT_EXISTING_BUDGET = "Budget with id = %@ does NOT exist!";
+    private static final String NOT_EXISTING = " with id = %@ does NOT exist!";
+
     public static final String FOREIGN_BUDGET_OPERATION = "You can %@ only your own budgets!";
     public static final String DUPLICATED_ACCOUNT = "You cannot make transfer to the same account!";
     public static final String FUTURE_OPERATION = "You cannot make future %@!";
@@ -36,5 +36,9 @@ public class Util {
 
     public static LocalDate getConvertedDate(Date date){
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static String getNotExistingErrorMessage(String item, long id){
+        return item + replacePlaceholder(id, NOT_EXISTING);
     }
 }

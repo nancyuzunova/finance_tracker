@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.IconDao;
@@ -8,7 +9,6 @@ import ittalents.javaee.model.dto.CategoryDto;
 import ittalents.javaee.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class CategoryService {
         if (categoryById.isPresent()) {
             return categoryById.get();
         }
-        throw new ElementNotFoundException("Category with id = " + id + " does not exist!");
+        throw new ElementNotFoundException(Util.getNotExistingErrorMessage("Category", id));
     }
 
     public List<String> getCategoryIcons(long id) throws SQLException {
@@ -52,7 +52,7 @@ public class CategoryService {
         List<String> urls = getCategoryIcons(categoryId);
         Collections.sort(urls);
         if (iconId < 0 || iconId > urls.size()) {
-            throw new InvalidOperationException("There is not icon with id = " + iconId);
+            throw new InvalidOperationException(Util.getNotExistingErrorMessage("Icon", iconId));
         }
         category.setIconURL(urls.get((int) iconId - 1));
         categoryRepository.save(category);

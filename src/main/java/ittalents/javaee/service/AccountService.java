@@ -57,7 +57,7 @@ public class AccountService {
         if (account.isPresent()) {
             return account.get();
         }
-        throw new ElementNotFoundException(Util.replacePlaceholder(account, Util.NOT_EXISTING_ACCOUNT));
+        throw new ElementNotFoundException(Util.getNotExistingErrorMessage("Account", accountId));
     }
 
     public AccountDto createAccount(User user, AccountDto accountDto) {

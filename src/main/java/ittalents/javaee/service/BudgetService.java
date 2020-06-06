@@ -59,13 +59,13 @@ public class BudgetService {
         if (budget.isPresent()) {
             return budget.get();
         }
-        throw new ElementNotFoundException(Util.replacePlaceholder(budgetId, Util.NOT_EXISTING_BUDGET));
+        throw new ElementNotFoundException(Util.getNotExistingErrorMessage("Budget", budgetId));
     }
 
     public ResponseBudgetDto deleteBudget(long budgetId, long userId) {
         Optional<Budget> budgetOptional = budgetRepository.findById(budgetId);
         if (!budgetOptional.isPresent()) {
-            throw new ElementNotFoundException(Util.replacePlaceholder(budgetId, Util.NOT_EXISTING_BUDGET));
+            throw new ElementNotFoundException(Util.getNotExistingErrorMessage("Budget", budgetId));
         }
         Budget budget = budgetOptional.get();
         validateOwnership(userId, budget, "delete");
