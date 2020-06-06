@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
@@ -56,7 +57,7 @@ public class AccountService {
         if (account.isPresent()) {
             return account.get();
         }
-        throw new ElementNotFoundException("Account with id = " + accountId + " does not exist!");
+        throw new ElementNotFoundException(Util.replacePlaceholder(account, Util.NOT_EXISTING_ACCOUNT));
     }
 
     public AccountDto createAccount(User user, AccountDto accountDto) {
@@ -78,19 +79,18 @@ public class AccountService {
 
     public ResponseTransferDto makeTransfer(RequestTransferDto requestTransferDto) {
         if (requestTransferDto.getFromAccountId() == requestTransferDto.getToAccountId()) {
-            throw new InvalidOperationException("You cannot make transfer to the same account!");
+            throw new InvalidOperationException(Util.DUPLICATED_ACCOUNT);
         }
         if (requestTransferDto.getDate().after(new Date())) {
-            throw new InvalidOperationException("You cannot make future transfers!");
+            throw new InvalidOperationException(Util.replacePlaceholder("transfers", Util.FUTURE_OPERATION));
         }
-        if (LocalDate.of(1900, 1, 1).isAfter(requestTransferDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())) {
-            throw new InvalidOperationException("Invalid date! Please try again!");
+        if (Util.MIN_DATE.isAfter(Util.getConvertedDate(requestTransferDto.getDate()))) {
+            throw new InvalidOperationException(Util.INVALID_DATE);
         }
         Account accountFrom = getAccountById(requestTransferDto.getFromAccountId());
         Account accountTo = getAccountById(requestTransferDto.getToAccountId());
         if (accountFrom.getUser().getId() != accountTo.getUser().getId()) {
-            throw new InvalidOperationException("You can not make transfer to other users!");
+            throw new InvalidOperationException(Util.TRANSFER_TO_OTHER_USER);
         }
         double amount = requestTransferDto.getAmount();
         double amountInSenderCurrency = CurrencyConverter.convert(requestTransferDto.getCurrency(), accountFrom.getCurrency(), amount);
@@ -103,7 +103,7 @@ public class AccountService {
             this.accountRepository.save(accountTo);
             return this.transferService.createTransfer(accountFrom, accountTo, requestTransferDto);
         } else {
-            throw new InvalidOperationException("Not enough balance!");
+            throw new InvalidOperationException(Util.NOT_ENOUGH_BALANCE);
         }
     }
 
@@ -115,26 +115,24 @@ public class AccountService {
     }
 
     public ResponseTransactionDto makeTransaction(RequestTransactionDto requestTransactionDto) {
-        if (LocalDate.of(1900, 1, 1).isAfter(requestTransactionDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())) {
-            throw new InvalidOperationException("Invalid date! Please try again!");
+        if (Util.MIN_DATE.isAfter(Util.getConvertedDate(requestTransactionDto.getDate()))) {
+            throw new InvalidOperationException(Util.INVALID_DATE);
         }
         if (requestTransactionDto.getDate().after(new Date())) {
-            throw new InvalidOperationException("You cannot make future transactions!");
+            throw new InvalidOperationException(Util.replacePlaceholder("transactions", Util.FUTURE_OPERATION));
         }
         return this.transactionService.createTransaction(requestTransactionDto);
     }
 
     public ResponsePlannedPaymentDto createPlannedPayment(RequestPlannedPaymentDto requestPlannedPaymentDto) {
         if (requestPlannedPaymentDto.getDate().before(new Date())) {
-            throw new InvalidOperationException("You cannot make planned payments with past dates!");
+            throw new InvalidOperationException(Util.PAST_PLANNED_PAYMENTS);
         }
-        if (LocalDate.of(2150, 1, 1).isBefore(requestPlannedPaymentDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate())) {
-            throw new InvalidOperationException("Payment too far into the future! Please check!");
+        if (Util.MAX_DATE.isBefore(Util.getConvertedDate(requestPlannedPaymentDto.getDate()))) {
+            throw new InvalidOperationException(Util.FAR_PLANNED_PAYMENTS);
         }
         if (requestPlannedPaymentDto.getAmount() > MAX_AMOUNT_OF_PLANNED_PAYMENT) {
-            throw new InvalidOperationException("You can not make planned payment exceeding the maximum amount!");
+            throw new InvalidOperationException(Util.EXCEEDING_PLANNED_PAYMENTS);
         }
         PlannedPayment plannedPayment = new PlannedPayment();
         Account account = getAccountById(requestPlannedPaymentDto.getAccountId());
@@ -157,9 +155,8 @@ public class AccountService {
                 Thread sender = new Thread() {
                     @Override
                     public void run() {
-                        MailSender.sendMail(userEmail, "NOT finished payment", "Hello,\nYour planned payment " +
-                                payment.getTitle() + " has failed because of  insufficient balance of your account. " +
-                                "Please deposit to your account and make payment manually!");
+                        MailSender.sendMail(userEmail, Util.EMAIL_SUBJECT,
+                                Util.replacePlaceholder(payment.getTitle(), Util.EMAIL_BODY));
                     }
                 };
                 sender.start();
