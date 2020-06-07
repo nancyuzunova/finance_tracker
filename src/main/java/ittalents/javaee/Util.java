@@ -12,6 +12,7 @@ public class Util {
     public static final String FOREIGN_BUDGET_OPERATION = "You can %@ only your own budgets!";
     public static final String DUPLICATED_ACCOUNT = "You cannot make transfer to the same account!";
     public static final String FUTURE_OPERATION = "You cannot make future %@!";
+    public static final String NOT_FOUND = "%@ NOT found!";
     public static final String INVALID_DATE = "Invalid date! Please try again!";
     public static final String INVALID_DATE_RANGE = "Date range not valid! Please try again!";
     public static final String INCORRECT_DATES = "Inappropriate dates! Please enter correct dates!";

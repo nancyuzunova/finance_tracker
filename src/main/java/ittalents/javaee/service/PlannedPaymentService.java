@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.PlannedPaymentDao;
@@ -9,10 +10,7 @@ import ittalents.javaee.model.pojo.PlannedPayment;
 import ittalents.javaee.repository.PlannedPaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,11 +54,9 @@ public class PlannedPaymentService {
     }
 
     public ResponsePlannedPaymentDto editPayment(RequestPlannedPaymentDto paymentDto) {
-        if (LocalDate.of(1900, 1, 1).isAfter(paymentDto.getDate().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate()) ||
-                LocalDate.of(2150, 1, 1).isBefore(paymentDto.getDate().toInstant()
-                        .atZone(ZoneId.systemDefault()).toLocalDate())) {
-            throw new InvalidOperationException("Incorrect date! Please try again!");
+        if (Util.MIN_DATE.isAfter(Util.getConvertedDate(paymentDto.getDate())) ||
+                Util.MAX_DATE.isBefore(Util.getConvertedDate(paymentDto.getDate()))) {
+            throw new InvalidOperationException(Util.INCORRECT_DATES);
         }
         PlannedPayment payment = new PlannedPayment();
         payment.fromDto(paymentDto);
@@ -74,6 +70,6 @@ public class PlannedPaymentService {
         if(x.isPresent()){
             return x.get();
         }
-        throw new ElementNotFoundException("Planned payment NOT found!");
+        throw new ElementNotFoundException(Util.replacePlaceholder("Planned payment", Util.NOT_FOUND));
     }
 }
