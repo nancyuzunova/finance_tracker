@@ -19,9 +19,7 @@ public abstract class ExporterToPdf {
             Font contentFont = FontFactory.getFont(FontFactory.TIMES_ITALIC, 15, BaseColor.BLACK);
             document.add(new Chunk(references, contentFont));
             document.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (DocumentException e) {
+        } catch (FileNotFoundException | DocumentException e) {
             e.printStackTrace();
         }
     }

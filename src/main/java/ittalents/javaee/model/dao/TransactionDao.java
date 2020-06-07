@@ -320,8 +320,7 @@ public class TransactionDao {
 
     public void deleteAccountById(long accountId) throws SQLException {
         String sql = "DELETE FROM accounts WHERE id = ?";
-        try (
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, accountId);
             ps.executeUpdate();

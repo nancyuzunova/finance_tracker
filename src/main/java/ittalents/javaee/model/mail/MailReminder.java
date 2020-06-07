@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Component
 @EnableScheduling
-public class MailRemainder {
+public class MailReminder {
 
     private static final int DAYS_TO_SUBTRACT = 10;
 
