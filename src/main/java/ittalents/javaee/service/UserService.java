@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
@@ -11,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,13 +35,13 @@ public class UserService {
         if (user.isPresent()) {
             return user.get();
         }
-        throw new ElementNotFoundException("User with id = " + id + " does not exist!");
+        throw new ElementNotFoundException(Util.getNotExistingErrorMessage("User", id));
     }
 
-    public UserDto createUser(UserRegisterDto userDto) {
+    public UserDto registerUser(UserRegisterDto userDto) {
         if (userDto.getPassword().equals(userDto.getConfirmationPassword())) {
             if (userRepository.findByEmail(userDto.getEmail()) != null) {
-                throw new InvalidOperationException("User already exists!");
+                throw new InvalidOperationException(Util.USER_ALREADY_EXIST);
             }
             LocalDateTime now = LocalDateTime.now();
             User user = new User();
@@ -61,7 +61,7 @@ public class UserService {
             user.setId(id);
             return user.toDto();
         }
-        throw new AuthorizationException("The password and its confirmation do not match. Please try again");
+        throw new AuthorizationException(Util.INCORRECT_PASSWORD_CONFIRMATION);
     }
 
     public UserDto updateUser(long id, EditUserDto userDto) {
@@ -106,10 +106,10 @@ public class UserService {
     public UserDto changePassword(long userId, UserChangePasswordDto userDto) {
         User user = getUserById(userId);
         if (!BCrypt.checkpw(userDto.getOldPassword(), user.getPassword())) {
-            throw new InvalidOperationException("Changing password can not be proceed!");
+            throw new InvalidOperationException(Util.INCORRECT_PASSWORD);
         }
         if (!userDto.getNewPassword().equals(userDto.getConfirmNewPassword())) {
-            throw new InvalidOperationException("The new password and its confirmation do not match.");
+            throw new InvalidOperationException(Util.INCORRECT_PASSWORD_CONFIRMATION);
         }
         String password = encoder.encode(userDto.getNewPassword());
         user.setPassword(password);

@@ -9,6 +9,9 @@ public class Util {
     private static final String PLACEHOLDER = "%@";
     private static final String NOT_EXISTING = " with id = %@ does NOT exist!";
 
+    public static final String USER_ALREADY_EXIST = "User already exists!";
+    public static final String INCORRECT_PASSWORD = "Password does NOT match. Please try again.";
+    public static final String INCORRECT_PASSWORD_CONFIRMATION = "The password and its confirmation do not match. Please try again.";
     public static final String FOREIGN_BUDGET_OPERATION = "You can %@ only your own budgets!";
     public static final String DUPLICATED_ACCOUNT = "You cannot make transfer to the same account!";
     public static final String FUTURE_OPERATION = "You cannot make future %@!";

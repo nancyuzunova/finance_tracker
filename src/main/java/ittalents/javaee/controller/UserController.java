@@ -31,8 +31,8 @@ public class UserController extends AbstractController {
 
     @PostMapping("/users/register")
     public ResponseEntity register(HttpSession session, @RequestBody @Valid UserRegisterDto user) {
-        UserDto registeredUser = userService.createUser(user);
-        SessionManager.registerAndLogUser(session, user);
+        UserDto registeredUser = userService.registerUser(user);
+        SessionManager.registerUser(session, user);
         return new ResponseEntity(registeredUser, HttpStatus.CREATED);
     }
 

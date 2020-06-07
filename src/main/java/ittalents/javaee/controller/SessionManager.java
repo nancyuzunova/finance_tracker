@@ -23,7 +23,7 @@ public class SessionManager {
         session.setAttribute(LOGGED, user);
     }
 
-    public static void registerAndLogUser(HttpSession session, UserRegisterDto user) {
+    public static void registerUser(HttpSession session, UserRegisterDto user) {
         UserDto userDto = new UserDto(user);
         logUser(session, userDto);
     }
