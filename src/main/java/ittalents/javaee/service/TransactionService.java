@@ -1,5 +1,6 @@
 package ittalents.javaee.service;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ElementNotFoundException;
 import ittalents.javaee.exceptions.InvalidOperationException;
 import ittalents.javaee.model.dao.TransactionDao;
@@ -64,7 +65,7 @@ public class TransactionService {
     public ResponseTransactionDto createTransaction(RequestTransactionDto requestTransactionDto) {
         Optional<Account> acc = accountRepository.findById(requestTransactionDto.getAccountId());
         if (!acc.isPresent()) {
-            throw new ElementNotFoundException("Account does NOT exist");
+            throw new ElementNotFoundException(Util.getNotExistingErrorMessage("Account", requestTransactionDto.getAccountId()));
         }
         Account account = acc.get();
         double amount = requestTransactionDto.getAmount();
@@ -72,7 +73,7 @@ public class TransactionService {
             amount = CurrencyConverter.convert(requestTransactionDto.getCurrency(), account.getCurrency(), amount);
         }
         if (Type.EXPENSE.equals(requestTransactionDto.getType()) && account.getBalance() < amount) {
-            throw new InvalidOperationException("Not enough account balance!");
+            throw new InvalidOperationException(Util.NOT_ENOUGH_BALANCE);
         }
         if (Type.EXPENSE.equals(requestTransactionDto.getType())) {
             account.setBalance(account.getBalance() - amount);
@@ -95,14 +96,6 @@ public class TransactionService {
             transactions.add(transaction.toDto());
         }
         return transactions;
-    }
-
-    public Transaction getTransactionById(long id) {
-        Optional<Transaction> transactionById = transactionRepository.findById(id);
-        if (!transactionById.isPresent()) {
-            throw new ElementNotFoundException("Transaction with id = " + id + " does not exist!");
-        }
-        return transactionById.get();
     }
 
     public List<ResponseTransactionDto> getTransactions(long userId, long accountId) throws SQLException {
@@ -132,21 +125,20 @@ public class TransactionService {
     }
 
     public Map<LocalDate, ExpenseIncomeEntity> getDailyStatistics(long id, Date from, Date to, boolean export) throws SQLException {
-        if (from.after(to)) {
-            throw new InvalidOperationException("Incorrect input dates. Please, check again!");
-        }
+        validateDateRange(from, to);
+
         List<TransactionDao.StatisticEntity> entities = transactionDao.getDailyTransactions(id, from, to);
         Map<LocalDate, List<ExpenseIncomeEntity>> map = new TreeMap<>();
         for (int i = 0; i < entities.size(); i++) {
-            if(!map.containsKey(entities.get(i).getDate())){
+            if (!map.containsKey(entities.get(i).getDate())) {
                 map.put(entities.get(i).getDate(), new ArrayList<>());
             }
             ExpenseIncomeEntity row = new ExpenseIncomeEntity();
             double total = CurrencyConverter.convert(entities.get(i).getCurrency(), Currency.BGN, entities.get(i).getTotal());
-            if(entities.get(i).getType().equals(Type.EXPENSE)){
+            if (entities.get(i).getType().equals(Type.EXPENSE)) {
                 row.setExpense(total);
             }
-            if(entities.get(i).getType().equals(Type.INCOME)){
+            if (entities.get(i).getType().equals(Type.INCOME)) {
                 row.setIncome(total);
             }
             map.get(entities.get(i).getDate()).add(row);
@@ -155,22 +147,21 @@ public class TransactionService {
         for (Map.Entry<LocalDate, List<ExpenseIncomeEntity>> entry : map.entrySet()) {
             double totalExpenseInBGN = 0;
             double totalIncomeInBGN = 0;
-            for(ExpenseIncomeEntity t : entry.getValue()){
+            for (ExpenseIncomeEntity t : entry.getValue()) {
                 totalExpenseInBGN += t.getExpense();
                 totalIncomeInBGN += t.getIncome();
             }
             result.put(entry.getKey(), new ExpenseIncomeEntity(totalExpenseInBGN, totalIncomeInBGN));
         }
-        if(export){
+        if (export) {
             prepareDailyStatisticForExporting(result);
         }
         return result;
     }
 
     public List<TotalExpenseByDate> getTotalExpensesByDate(long id, long accountId, Date from, Date to) throws SQLException {
-        if (from.after(to)) {
-            throw new InvalidOperationException("Incorrect input dates! Please, check again!");
-        }
+        validateDateRange(from, to);
+
         List<TotalExpenseByDate> list;
         if (accountId == 0) {
             list = this.transactionDao.getAllTotalExpensesByDate(id, from, to);
@@ -245,9 +236,7 @@ public class TransactionService {
     }
 
     public List<ResponseTransactionDto> getTransactionsByPeriod(long id, Date from, Date to) throws SQLException {
-        if (from.after(to)) {
-            throw new InvalidOperationException("Incorrect input dates! Please, check again!");
-        }
+        validateDateRange(from, to);
         return transactionDao.getTransactionsByPeriod(id, from, to);
     }
 
@@ -257,6 +246,12 @@ public class TransactionService {
 
     public void deleteTransactionByAccountId(long accountId){
         this.transactionRepository.deleteTransactionByAccount_Id(accountId);
+    }
+
+    private void validateDateRange(Date from, Date to) {
+        if (from.after(to)) {
+            throw new InvalidOperationException(Util.INVALID_DATE_RANGE);
+        }
     }
 
     private void prepareDailyStatisticForExporting(Map<LocalDate, ExpenseIncomeEntity> references) {
