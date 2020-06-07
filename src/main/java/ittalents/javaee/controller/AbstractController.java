@@ -1,5 +1,6 @@
 package ittalents.javaee.controller;
 
+import ittalents.javaee.Util;
 import ittalents.javaee.exceptions.ApiError;
 import ittalents.javaee.exceptions.AuthorizationException;
 import ittalents.javaee.exceptions.ElementNotFoundException;
@@ -66,15 +67,14 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String msg = "Invalid input data! Please check!";
-        ApiError error = new ApiError(msg, LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
+        ApiError error = new ApiError(Util.INVALID_INPUT, LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), e.getClass().getName());
         return new ResponseEntity<>(error, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     protected ApiError handleGlobalException(Exception e) {
-        return new ApiError("Something went wrong... Please try again later", LocalDateTime.now(),
+        return new ApiError(Util.SERVER_ERROR_MESSAGE, LocalDateTime.now(),
                 HttpStatus.SERVICE_UNAVAILABLE.value(), e.getClass().getName());
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractController extends ResponseEntityExceptionHandler 
     protected void validateUserOwnership(HttpSession session, long accountId) {
         UserDto user = (UserDto) session.getAttribute(SessionManager.LOGGED);
         if (!isLoggedUserOwner(user.getId(), accountId)) {
-            throw new ElementNotFoundException("Account not found!");
+            throw new ElementNotFoundException(Util.replacePlaceholder("Account", Util.NOT_FOUND));
         }
     }
 }

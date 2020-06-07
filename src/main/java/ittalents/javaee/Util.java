@@ -28,6 +28,9 @@ public class Util {
     public static final String EMAIL_BODY = "Hello,\nYour planned payment %@ has failed because of  insufficient balance " +
             "of your account. Please deposit to your account and make payment manually!";
 
+    public static final String SERVER_ERROR_MESSAGE = "Something went wrong... Please try again later.";
+    public static final String INVALID_INPUT = "Invalid input data! Please check!";
+
     public static final LocalDate MIN_DATE = LocalDate.of(1900, 1, 1);
     public static final LocalDate MAX_DATE = LocalDate.of(2150, 1, 1);
 
